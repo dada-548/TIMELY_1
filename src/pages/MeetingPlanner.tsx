@@ -25,22 +25,27 @@ import {
 } from "@/components/ui/select";
 
 export default function MeetingPlanner() {
-  const { selectedCities, highlightColor } = useWorldClock();
+  const { 
+    selectedCities, 
+    highlightColor, 
+    selectedDate, 
+    setSelectedDate, 
+    selectedHour, 
+    setSelectedHour, 
+    duration, 
+    setDuration,
+    fromCityIdx,
+    setFromCityIdx
+  } = useWorldClock();
   const now = useClock();
   const localTz = getLocalTimezone();
 
-  const [selectedDate, setSelectedDate] = useState<Date>(
-    startOfDay(new Date()),
-  );
-  const [selectedHour, setSelectedHour] = useState(() => new Date().getHours());
   const [selectedMinute, setSelectedMinute] = useState(0);
-  const [duration, setDuration] = useState(1);
-  const [fromCityIdx, setFromCityIdx] = useState(0);
 
   const fromCity = selectedCities[fromCityIdx] || selectedCities[0];
   const otherCities = selectedCities.filter((_, i) => i !== fromCityIdx);
 
-  const isToday = isSameDay(selectedDate, new Date());
+  const isToday = isSameDay(selectedDate, now);
   const currentHourInBase =
     isToday && fromCity
       ? getTimeInTimezone(fromCity.timezone, now).getHours()
@@ -73,7 +78,7 @@ export default function MeetingPlanner() {
     : [];
 
   const handleJumpToNow = useCallback(() => {
-    setSelectedDate(startOfDay(new Date()));
+    setSelectedDate(startOfDay(now));
     if (fromCity) {
       const localNow = getTimeInTimezone(fromCity.timezone, now);
       setSelectedHour(localNow.getHours());
@@ -124,6 +129,7 @@ export default function MeetingPlanner() {
               selectedDate={selectedDate}
               onSelectDate={setSelectedDate}
               onJumpToNow={handleJumpToNow}
+              now={now}
             />
 
             <div className="flex flex-wrap items-center gap-3">
@@ -164,7 +170,9 @@ export default function MeetingPlanner() {
                 onChangeDuration={setDuration}
               />
 
-              <div className="flex items-center ml-auto min-[640px]:ml-auto max-[639px]:ml-0 max-[639px]:w-full max-[639px]:basis-full">
+              <div className="flex-grow" />
+
+              <div className="flex items-center w-full sm:w-auto">
                 <CitySearch />
               </div>
             </div>

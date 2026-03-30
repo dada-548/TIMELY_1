@@ -142,13 +142,14 @@ export function isDaytime(timezone: string, date: Date = new Date()): boolean {
 export function getTimeOfDay(
   timezone: string,
   date: Date = new Date(),
+  hour?: number,
 ): "night" | "dawn" | "day" | "afternoon" | "dusk" {
-  const time = getTimeInTimezone(timezone, date);
-  const hour = time.getHours();
-  if (hour >= 5 && hour < 8) return "dawn";
-  if (hour >= 8 && hour < 13) return "day";
-  if (hour >= 13 && hour < 18) return "afternoon";
-  if (hour >= 18 && hour < 22) return "dusk";
+  const h =
+    hour !== undefined ? hour : getTimeInTimezone(timezone, date).getHours();
+  if (h >= 5 && h < 8) return "dawn";
+  if (h >= 8 && h < 13) return "day";
+  if (h >= 13 && h < 18) return "afternoon";
+  if (h >= 18 && h < 22) return "dusk";
   return "night";
 }
 

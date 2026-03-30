@@ -7,17 +7,18 @@ interface CalendarStripProps {
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
   onJumpToNow: () => void;
+  now: Date;
 }
 
 const BUFFER = 30;
 const LOAD_THRESHOLD = 200;
 
-export function CalendarStrip({ selectedDate, onSelectDate, onJumpToNow }: CalendarStripProps) {
+export function CalendarStrip({ selectedDate, onSelectDate, onJumpToNow, now }: CalendarStripProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<HTMLButtonElement>(null);
   const pendingPrependRef = useRef<{ prevScrollWidth: number; prevScrollLeft: number } | null>(null);
 
-  const today = useMemo(() => startOfDay(new Date()), []);
+  const today = useMemo(() => startOfDay(now), [now]);
   const { highlightColor } = useWorldClock();
   const [todayFlash, setTodayFlash] = useState(false);
   const [nowFlash, setNowFlash] = useState(false);

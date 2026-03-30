@@ -2,86 +2,97 @@ import { useState } from "react";
 import { Copy, Check, Share2 } from "lucide-react";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { convertTime } from "@/utils/timezone";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import type { City } from "@/data/cities";
+import ReactCountryFlag from "react-country-flag";
 
-const COUNTRY_FLAGS: Record<string, string> = {
-  "United States": "🇺🇸",
-  "United Kingdom": "🇬🇧",
-  Canada: "🇨🇦",
-  Australia: "🇦🇺",
-  Germany: "🇩🇪",
-  France: "🇫🇷",
-  Japan: "🇯🇵",
-  "South Korea": "🇰🇷",
-  China: "🇨🇳",
-  India: "🇮🇳",
-  Brazil: "🇧🇷",
-  Mexico: "🇲🇽",
-  Russia: "🇷🇺",
-  Italy: "🇮🇹",
-  Spain: "🇪🇸",
-  Netherlands: "🇳🇱",
-  Sweden: "🇸🇪",
-  Norway: "🇳🇴",
-  Denmark: "🇩🇰",
-  Finland: "🇫🇮",
-  Switzerland: "🇨🇭",
-  Austria: "🇦🇹",
-  Belgium: "🇧🇪",
-  Ireland: "🇮🇪",
-  Portugal: "🇵🇹",
-  Poland: "🇵🇱",
-  "Czech Republic": "🇨🇿",
-  Greece: "🇬🇷",
-  Turkey: "🇹🇷",
-  Israel: "🇮🇱",
-  "Saudi Arabia": "🇸🇦",
-  UAE: "🇦🇪",
-  "South Africa": "🇿🇦",
-  Egypt: "🇪🇬",
-  Nigeria: "🇳🇬",
-  Kenya: "🇰🇪",
-  Singapore: "🇸🇬",
-  Malaysia: "🇲🇾",
-  Thailand: "🇹🇭",
-  Vietnam: "🇻🇳",
-  Indonesia: "🇮🇩",
-  Philippines: "🇵🇭",
-  Taiwan: "🇹🇼",
-  "Hong Kong": "🇭🇰",
-  "New Zealand": "🇳🇿",
-  Argentina: "🇦🇷",
-  Chile: "🇨🇱",
-  Colombia: "🇨🇴",
-  Peru: "🇵🇪",
-  Pakistan: "🇵🇰",
-  Bangladesh: "🇧🇩",
-  "Sri Lanka": "🇱🇰",
-  Romania: "🇷🇴",
-  Hungary: "🇭🇺",
-  Ukraine: "🇺🇦",
-  Morocco: "🇲🇦",
-  Ethiopia: "🇪🇹",
-  Ghana: "🇬🇭",
-  Tanzania: "🇹🇿",
-  Fiji: "🇫🇯",
-  Iceland: "🇮🇸",
-  Qatar: "🇶🇦",
-  Kuwait: "🇰🇼",
-  Bahrain: "🇧🇭",
-  Oman: "🇴🇲",
-  Jordan: "🇯🇴",
-  Lebanon: "🇱🇧",
-  Iraq: "🇮🇶",
-  Nepal: "🇳🇵",
-  Myanmar: "🇲🇲",
-  Cambodia: "🇰🇭",
+const COUNTRY_CODES: Record<string, string> = {
+  "United States": "US",
+  "USA": "US",
+  "United Kingdom": "GB",
+  "UK": "GB",
+  Canada: "CA",
+  Australia: "AU",
+  Germany: "DE",
+  France: "FR",
+  Japan: "JP",
+  "South Korea": "KR",
+  China: "CN",
+  India: "IN",
+  Brazil: "BR",
+  Mexico: "MX",
+  Russia: "RU",
+  Italy: "IT",
+  Spain: "ES",
+  Netherlands: "NL",
+  Sweden: "SE",
+  Norway: "NO",
+  Denmark: "DK",
+  Finland: "FI",
+  Switzerland: "CH",
+  Austria: "AT",
+  Belgium: "BE",
+  Ireland: "IE",
+  Portugal: "PT",
+  Poland: "PL",
+  "Czech Republic": "CZ",
+  Greece: "GR",
+  Turkey: "TR",
+  Israel: "IL",
+  "Saudi Arabia": "SA",
+  UAE: "AE",
+  "South Africa": "ZA",
+  Egypt: "EG",
+  Nigeria: "NG",
+  Kenya: "KE",
+  Singapore: "SG",
+  Malaysia: "MY",
+  Thailand: "TH",
+  Vietnam: "VN",
+  Indonesia: "ID",
+  Philippines: "PH",
+  Taiwan: "TW",
+  "Hong Kong": "HK",
+  "New Zealand": "NZ",
+  Argentina: "AR",
+  Chile: "CL",
+  Colombia: "CO",
+  Peru: "PE",
+  Pakistan: "PK",
+  Bangladesh: "BD",
+  "Sri Lanka": "LK",
+  Romania: "RO",
+  Hungary: "HU",
+  Ukraine: "UA",
+  Morocco: "MA",
+  Ethiopia: "ET",
+  Ghana: "GH",
+  Tanzania: "TZ",
+  Fiji: "FJ",
+  Iceland: "IS",
+  Qatar: "QA",
+  Kuwait: "KW",
+  Bahrain: "BH",
+  Oman: "OM",
+  Jordan: "JO",
+  Lebanon: "LB",
+  Iraq: "IQ",
+  Nepal: "NP",
+  Myanmar: "MM",
+  Cambodia: "KH",
 };
 
-function getFlag(country: string): string {
-  return COUNTRY_FLAGS[country] || "🌍";
+function getCountryCode(country: string): string {
+  return COUNTRY_CODES[country] || "US"; // Default to US if not found
 }
+
+// Helper to get emoji flag for clipboard (still better than nothing, and many apps handle it)
+const getEmojiFlag = (country: string): string => {
+  const code = getCountryCode(country);
+  return code
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397));
+};
 
 interface ShareMeetingPanelProps {
   selectedCities: City[];
@@ -124,25 +135,30 @@ export function ShareMeetingPanel({
     return `${h}:${minute.toString().padStart(2, "0")} ${ampm}`;
   };
 
-  const endHour = (selectedHour + duration) % 24;
-  const dateStr = format(selectedDate, "EEEE, MMMM d, yyyy");
+  const formatDate = (date: Date, dayOffset: number = 0) => {
+    const targetDate = dayOffset === 0 ? date : addDays(date, dayOffset);
+    return format(targetDate, "EEE, MMM d");
+  };
 
-  const lines = [
-    `📅 ${dateStr}`,
+  const endHour = (selectedHour + duration) % 24;
+  const mainDateStr = format(selectedDate, "EEEE, MMMM d, yyyy");
+
+  // Generate text for clipboard
+  const clipboardLines = [
+    `📅 Meeting Proposal`,
     `⏱️ Duration: ${duration} hour${duration > 1 ? "s" : ""}`,
     "",
-    `${getFlag(fromCity.country)} ${fromCity.name}: ${formatTime(selectedHour, selectedMinute)} - ${formatTime(endHour, selectedMinute)}`,
+    `${getEmojiFlag(fromCity.country)} ${fromCity.name}: ${formatDate(selectedDate)} @ ${formatTime(selectedHour, selectedMinute)} - ${formatTime(endHour, selectedMinute)}`,
     ...selectedCities
       .filter((c) => c.id !== fromCity.id)
       .map((city, i) => {
         const conv = conversions[i];
         const endConvHour = (conv.hour + duration) % 24;
-        const dayDiff = conv.dayOffset;
-        return `${getFlag(city.country)} ${city.name}: ${formatTime(conv.hour, conv.minute)} - ${formatTime(endConvHour, conv.minute)}${dayDiff !== 0 ? ` (${dayDiff > 0 ? "+" : ""}${dayDiff} day)` : ""}`;
+        return `${getEmojiFlag(city.country)} ${city.name}: ${formatDate(selectedDate, conv.dayOffset)} @ ${formatTime(conv.hour, conv.minute)} - ${formatTime(endConvHour, conv.minute)}`;
       }),
   ];
 
-  const textToCopy = lines.join("\n");
+  const textToCopy = clipboardLines.join("\n");
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(textToCopy);
@@ -189,7 +205,39 @@ export function ShareMeetingPanel({
       </div>
 
       <div className="bg-secondary/50 rounded-lg p-3 font-mono text-xs text-foreground whitespace-pre-line select-text">
-        {textToCopy}
+        <div className="mb-1 text-muted-foreground">📅 Meeting Proposal</div>
+        <div className="mb-2 text-muted-foreground">⏱️ Duration: {duration} hour{duration > 1 ? "s" : ""}</div>
+        
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2">
+            <ReactCountryFlag 
+              countryCode={getCountryCode(fromCity.country)} 
+              svg 
+              style={{ width: '1.2em', height: '1.2em' }}
+            />
+            <span>
+              <span className="font-bold">{fromCity.name}</span>: {formatDate(selectedDate)} @ {formatTime(selectedHour, selectedMinute)} - {formatTime(endHour, selectedMinute)}
+            </span>
+          </div>
+          {selectedCities
+            .filter((c) => c.id !== fromCity.id)
+            .map((city, i) => {
+              const conv = conversions[i];
+              const endConvHour = (conv.hour + duration) % 24;
+              return (
+                <div key={city.id} className="flex items-center gap-2">
+                  <ReactCountryFlag 
+                    countryCode={getCountryCode(city.country)} 
+                    svg 
+                    style={{ width: '1.2em', height: '1.2em' }}
+                  />
+                  <span>
+                    <span className="font-bold">{city.name}</span>: {formatDate(selectedDate, conv.dayOffset)} @ {formatTime(conv.hour, conv.minute)} - {formatTime(endConvHour, conv.minute)}
+                  </span>
+                </div>
+              );
+            })}
+        </div>
       </div>
     </div>
   );

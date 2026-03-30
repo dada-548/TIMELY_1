@@ -1,5 +1,5 @@
-import React, { useRef, useCallback, useEffect, useState } from "react";
-import { addDays, format, isSameDay } from "date-fns";
+import React, { useRef, useCallback, useEffect, useState, useLayoutEffect } from "react";
+import { addDays, format, isSameDay, startOfDay } from "date-fns";
 import {
   getTimeOfDay,
   getTimezoneAbbreviation,
@@ -7,6 +7,7 @@ import {
 } from "@/utils/timezone";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import {
   Sun,
   Moon,
@@ -15,7 +16,16 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutGrid,
+  MessageSquare,
+  Briefcase,
+  Clock,
 } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Returns opacity based on time-of-day, with inverted values for light mode
 function getTimeOfDayOpacity(cityHour: number, isDarkMode: boolean): number {
@@ -68,18 +78,25 @@ interface ScrollableTimelineProps {
   onResizeEnd: (newDuration: number) => void;
 }
 
-function TimeOfDayIcon({ tod }: { tod: string }) {
+function TimeOfDayIcon({ tod, className }: { tod: string; className?: string }) {
+  const colorClass = {
+    dawn: "text-sunriseicon",
+    day: "text-dayicon",
+    afternoon: "text-dayicon",
+    dusk: "text-sunseticon",
+    night: "text-nighticon",
+  }[tod as keyof typeof colorClass] || "";
+
   switch (tod) {
     case "day":
-      return <Sun className="h-3 w-3 text-dayicon" />;
     case "afternoon":
-      return <Sun className="h-3 w-3 text-dayicon" />;
+      return <Sun className={cn("h-3 w-3", colorClass, className)} />;
     case "night":
-      return <Moon className="h-3 w-3 text-nighticon" />;
+      return <Moon className={cn("h-3 w-3", colorClass, className)} />;
     case "dawn":
-      return <Sunrise className="h-3 w-3 text-sunriseicon" />;
+      return <Sunrise className={cn("h-3 w-3", colorClass, className)} />;
     case "dusk":
-      return <Sunset className="h-3 w-3 text-sunseticon" />;
+      return <Sunset className={cn("h-3 w-3", colorClass, className)} />;
     default:
       return null;
   }
@@ -88,6 +105,7 @@ function TimeOfDayIcon({ tod }: { tod: string }) {
 const TOTAL_CELLS = 72; // 3 days
 const DAY_CELLS = 24;
 const CENTER_START = 24; // current day starts at cell 24
+const CELL_WIDTH = 36; // Keep the size as 36 px even in smaller screen size
 
 function formatHour(hour: number, use24h: boolean): string {
   if (use24h) return hour.toString().padStart(2, "0");
@@ -129,12 +147,18 @@ export function ScrollableTimeline({
   const wheelTargetRef = useRef<number | null>(null);
   const wheelRafRef = useRef<number | null>(null);
 
-  const { highlightColor, timelineHighlightColor, dayIndicationColor, theme } =
-    useWorldClock();
+  const {
+    highlightColor,
+    timelineHighlightColor,
+    dayIndicationColor,
+    theme,
+    use24h,
+    timelineMode,
+    setTimelineMode,
+  } = useWorldClock();
   const isMobile = useIsMobile();
   const isDarkMode = theme === "dark";
   const [dateFlash, setDateFlash] = useState(false);
-  const [use24h, setUse24h] = useState(true);
 
   // Drag state
   const [dragging, setDragging] = useState<
@@ -146,13 +170,18 @@ export function ScrollableTimeline({
 
   const isToday = isSameDay(selectedDate, new Date());
 
-  // Center scroll on current day
+  // Center scroll on current day or current hour
   const centerScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollLeft = el.clientWidth;
-    wheelTargetRef.current = el.scrollLeft;
-  }, []);
+    
+    // If we have a current hour, center on it to show "12 hours in the future"
+    // Otherwise center on the start of the current day
+    const startHour = currentHourInBase !== null ? currentHourInBase : 0;
+    const scrollLeft = (CENTER_START + startHour) * CELL_WIDTH - el.clientWidth / 2 + CELL_WIDTH / 2;
+    el.scrollLeft = scrollLeft;
+    wheelTargetRef.current = scrollLeft;
+  }, [currentHourInBase]);
 
   // On mount, center + attach smooth wheel handler
   useEffect(() => {
@@ -217,15 +246,27 @@ export function ScrollableTimeline({
     prevDateRef.current = selectedDate;
   }, [selectedDate, centerScroll]);
 
+  // Scroll to selected hour when it changes (if not dragging)
+  useLayoutEffect(() => {
+    if (dragging || !scrollRef.current) return;
+    const el = scrollRef.current;
+    const scrollLeft = (CENTER_START + selectedHour) * CELL_WIDTH - el.clientWidth / 2 + CELL_WIDTH / 2;
+    // Only scroll if it's significantly different to avoid jitter
+    if (Math.abs(el.scrollLeft - scrollLeft) > 1) {
+      el.scrollLeft = scrollLeft;
+      wheelTargetRef.current = scrollLeft;
+    }
+  }, [selectedHour, dragging]);
+
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
     if (isAdjusting.current) return;
     const el = scrollRef.current;
     if (!el) return;
 
-    const oneDay = el.clientWidth;
+    const oneDay = 24 * CELL_WIDTH;
 
-    if (el.scrollLeft < oneDay * 0.15) {
+    if (el.scrollLeft < oneDay * 0.5) {
       isAdjusting.current = true;
       dateChangedByScroll.current = true;
       el.scrollLeft += oneDay;
@@ -236,7 +277,7 @@ export function ScrollableTimeline({
       requestAnimationFrame(() => {
         isAdjusting.current = false;
       });
-    } else if (el.scrollLeft > oneDay * 1.85) {
+    } else if (el.scrollLeft > oneDay * 1.5) {
       isAdjusting.current = true;
       dateChangedByScroll.current = true;
       el.scrollLeft -= oneDay;
@@ -364,9 +405,14 @@ export function ScrollableTimeline({
     [startDrag],
   );
 
-  // Compute selection overlay percentages
-  const selLeftPct = (selectionAbsStart / TOTAL_CELLS) * 100;
-  const selWidthPct = (duration / TOTAL_CELLS) * 100;
+  // Compute selection overlay position in pixels
+  const getCellLeft = (idx: number) => {
+    const offset = (Math.floor(idx / 24) * 0.5);
+    return idx * (CELL_WIDTH + 1) + offset;
+  };
+
+  const selLeft = getCellLeft(selectionAbsStart);
+  const selWidth = getCellLeft(selectionAbsStart + duration) - selLeft - 1;
 
   return (
     <div className="rounded-xl border border-border bg-card p-1.5 sm:p-5 overflow-hidden">
@@ -395,35 +441,95 @@ export function ScrollableTimeline({
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          {/* 12/24h toggle */}
-          <div className="flex items-center rounded-lg border border-border overflow-hidden mr-2">
-            <button
-              onClick={() => setUse24h(false)}
-              className={`px-2 py-1 text-[10px] font-medium ${
-                !use24h
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              style={
-                !use24h ? { backgroundColor: `${highlightColor}25` } : undefined
-              }
-            >
-              12h
-            </button>
-            <button
-              onClick={() => setUse24h(true)}
-              className={`px-2 py-1 text-[10px] font-medium ${
-                use24h
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              style={
-                use24h ? { backgroundColor: `${highlightColor}25` } : undefined
-              }
-            >
-              24h
-            </button>
+          {/* Timeline Modes */}
+          <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card mr-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setTimelineMode("default")}
+                    className={`p-1.5 transition-colors ${
+                      timelineMode === "default"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={
+                      timelineMode === "default"
+                        ? { backgroundColor: `${highlightColor}25` }
+                        : undefined
+                    }
+                  >
+                    <Clock className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Default Grid</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setTimelineMode("tod")}
+                    className={`p-1.5 border-l border-border transition-colors ${
+                      timelineMode === "tod"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={
+                      timelineMode === "tod"
+                        ? { backgroundColor: `${highlightColor}25` }
+                        : undefined
+                    }
+                  >
+                    <Sun className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Time of Day</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setTimelineMode("friendly")}
+                    className={`p-1.5 border-l border-border transition-colors ${
+                      timelineMode === "friendly"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={
+                      timelineMode === "friendly"
+                        ? { backgroundColor: `${highlightColor}25` }
+                        : undefined
+                    }
+                  >
+                    <MessageSquare className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Friendly Hours (9am-9pm)</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setTimelineMode("working")}
+                    className={`p-1.5 border-l border-border transition-colors ${
+                      timelineMode === "working"
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={
+                      timelineMode === "working"
+                        ? { backgroundColor: `${highlightColor}25` }
+                        : undefined
+                    }
+                  >
+                    <Briefcase className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Working Hours (9am-5pm)</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
+
           <button
             onClick={() => onSelectDate(addDays(selectedDate, -1))}
             className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -513,13 +619,13 @@ export function ScrollableTimeline({
           className="flex-1 min-w-0 overflow-x-auto scrollbar-hide"
           onScroll={handleScroll}
         >
-          <div style={{ width: "300%" }}>
+          <div style={{ width: TOTAL_CELLS * CELL_WIDTH }}>
             {/* City rows + selection overlay */}
             <div className="relative group space-y-0.5 pt-6">
               {/* Selection overlay */}
               <div
                 className={`absolute top-6 bottom-0 pointer-events-none z-30`}
-                style={{ left: `${selLeftPct}%`, width: `${selWidthPct}%` }}
+                style={{ left: selLeft, width: selWidth }}
               >
                 <div
                   className={`absolute inset-0 pointer-events-auto ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
@@ -596,18 +702,36 @@ export function ScrollableTimeline({
                       const effectiveOpacity = isDimmed
                         ? opacity * 0.35
                         : opacity;
+
+                      // Hide background color when a mode is selected
+                      const showBg = timelineMode === "default";
                       const cellStyle = {
-                        backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${effectiveOpacity})`,
+                        backgroundColor: showBg
+                          ? `rgba(${hexToRgb(timelineHighlightColor)}, ${effectiveOpacity})`
+                          : isDimmed
+                            ? isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"
+                            : "transparent",
+                        border: !showBg 
+                          ? `1px solid ${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}` 
+                          : undefined,
                       };
+
+                      // Mode-specific logic
+                      const isFriendly = cityHour >= 9 && cityHour < 21;
+                      const isWorking = cityHour >= 9 && cityHour < 17;
 
                       return (
                         <button
                           key={cellIdx}
                           onClick={() => handleCellClick(cellIdx)}
-                          className={`flex-1 h-9 sm:h-9 rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 ${
+                          className={`h-[44px] rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 ${
                             cellIdx % 24 === 0 && cellIdx > 0 ? "ml-0.5" : ""
                           }`}
-                          style={cellStyle}
+                          style={{
+                            ...cellStyle,
+                            minWidth: CELL_WIDTH,
+                            flex: `0 0 ${CELL_WIDTH}px`,
+                          }}
                           title={`${city.name}: ${formatHourFull(cityHour, use24h)}`}
                         >
                           {/* Next day indicator line at 00 hour */}
@@ -618,13 +742,13 @@ export function ScrollableTimeline({
                             />
                           )}
 
-                          <span
+                          <div
                             className={`absolute inset-0 flex flex-col items-center justify-center font-mono ${
                               inSelection
-                                ? "text-[8px] sm:text-[11px] font-semibold"
+                                ? "font-semibold"
                                 : isDimmed
-                                  ? "text-[8px] sm:text-[11px] text-foreground/30"
-                                  : "text-[8px] sm:text-[11px] text-foreground/70 group-hover/cell:text-foreground/90"
+                                  ? "text-foreground/30"
+                                  : "text-foreground/70 group-hover/cell:text-foreground/90"
                             }`}
                             style={
                               inSelection
@@ -632,13 +756,39 @@ export function ScrollableTimeline({
                                 : undefined
                             }
                           >
-                            {formatHour(cityHour, use24h)}
+                            <span className="text-[11px]">
+                              {formatHour(cityHour, use24h)}
+                            </span>
                             {!use24h && (
-                              <span className="text-[8px] sm:text-[10px] leading-none opacity-80">
+                              <span className="text-[9px] font-medium leading-none opacity-80">
                                 {formatHourAmPm(cityHour)}
                               </span>
                             )}
-                          </span>
+
+                            {/* Mode Icons */}
+                            {timelineMode === "tod" && (
+                              <div className="mt-0.5">
+                                <TimeOfDayIcon
+                                  tod={getTimeOfDay(city.timezone, now, cityHour)}
+                                  className={`h-2.5 w-2.5 ${isDimmed ? "opacity-30" : ""}`}
+                                />
+                              </div>
+                            )}
+                            {timelineMode === "friendly" && isFriendly && (
+                              <div className="mt-0.5">
+                                <MessageSquare
+                                  className={`h-2.5 w-2.5 text-green-500 ${isDimmed ? "opacity-30" : ""}`}
+                                />
+                              </div>
+                            )}
+                            {timelineMode === "working" && isWorking && (
+                              <div className="mt-0.5">
+                                <Briefcase
+                                  className={`h-2.5 w-2.5 text-blue-500 ${isDimmed ? "opacity-30" : ""}`}
+                                />
+                              </div>
+                            )}
+                          </div>
 
                           {isCurrent && (
                             <div
@@ -664,51 +814,88 @@ export function ScrollableTimeline({
 
       {/* Legend */}
       <div className="flex flex-wrap items-center justify-center gap-3 mt-5">
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{
-              backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.4 : 0.8})`,
-            }}
-          />
-          <span className="text-[10px] text-muted-foreground">Dawn</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{
-              backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 1 : 0.2})`,
-            }}
-          />
-          <span className="text-[10px] text-muted-foreground">Morning</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{
-              backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.8 : 0.4})`,
-            }}
-          />
-          <span className="text-[10px] text-muted-foreground">Afternoon</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{
-              backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.6 : 0.6})`,
-            }}
-          />
-          <span className="text-[10px] text-muted-foreground">Evening</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <div
-            className="w-3 h-3 rounded-sm"
-            style={{
-              backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.2 : 1})`,
-            }}
-          />
-          <span className="text-[10px] text-muted-foreground">Night</span>
-        </div>
+        {timelineMode === "default" ? (
+          <>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{
+                  backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.4 : 0.8})`,
+                }}
+              />
+              <span className="text-[10px] text-muted-foreground">Dawn</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{
+                  backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 1 : 0.2})`,
+                }}
+              />
+              <span className="text-[10px] text-muted-foreground">Morning</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{
+                  backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.8 : 0.4})`,
+                }}
+              />
+              <span className="text-[10px] text-muted-foreground">Afternoon</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{
+                  backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.6 : 0.6})`,
+                }}
+              />
+              <span className="text-[10px] text-muted-foreground">Evening</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div
+                className="w-3 h-3 rounded-sm"
+                style={{
+                  backgroundColor: `rgba(${hexToRgb(timelineHighlightColor)}, ${isDarkMode ? 0.2 : 1})`,
+                }}
+              />
+              <span className="text-[10px] text-muted-foreground">Night</span>
+            </div>
+          </>
+        ) : timelineMode === "tod" ? (
+          <>
+            <div className="flex items-center gap-1.5">
+              <Sunrise className="h-3 w-3 text-sunriseicon" />
+              <span className="text-[10px] text-muted-foreground">Dawn</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Sun className="h-3 w-3 text-dayicon" />
+              <span className="text-[10px] text-muted-foreground">Day</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Sunset className="h-3 w-3 text-sunseticon" />
+              <span className="text-[10px] text-muted-foreground">Dusk</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Moon className="h-3 w-3 text-nighticon" />
+              <span className="text-[10px] text-muted-foreground">Night</span>
+            </div>
+          </>
+        ) : timelineMode === "friendly" ? (
+          <div className="flex items-center gap-1.5">
+            <MessageSquare className="h-3 w-3 text-green-500" />
+            <span className="text-[10px] text-muted-foreground">
+              Friendly (9 AM - 9 PM)
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5">
+            <Briefcase className="h-3 w-3 text-blue-500" />
+            <span className="text-[10px] text-muted-foreground">
+              Working (9 AM - 5 PM)
+            </span>
+          </div>
+        )}
         <div className="flex items-center gap-1.5">
           <div
             className="w-3 h-3 rounded-sm"

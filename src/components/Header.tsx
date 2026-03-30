@@ -10,7 +10,10 @@ const navItems = [
 ];
 
 export function Header() {
-  const { theme, toggleTheme, highlightColor } = useWorldClock();
+  const { 
+    theme, toggleTheme, highlightColor, 
+    use24h, setUse24h
+  } = useWorldClock();
   const location = useLocation();
 
   return (
@@ -46,19 +49,49 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-2">
-          <ColorSettingsMenu />
-          <button
-            onClick={toggleTheme}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary"
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? (
-              <Sun className="h-4 w-4" />
-            ) : (
-              <Moon className="h-4 w-4" />
-            )}
-          </button>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* 12/24h toggle */}
+            <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">
+              <button
+                onClick={() => setUse24h(false)}
+                className={`px-2 py-1.5 text-[10px] font-bold transition-colors ${
+                  !use24h
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                style={!use24h ? { backgroundColor: `${highlightColor}25` } : undefined}
+              >
+                12H
+              </button>
+              <button
+                onClick={() => setUse24h(true)}
+                className={`px-2 py-1.5 text-[10px] font-bold border-l border-border transition-colors ${
+                  use24h
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                style={use24h ? { backgroundColor: `${highlightColor}25` } : undefined}
+              >
+                24H
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1 sm:gap-2">
+            <ColorSettingsMenu />
+            <button
+              onClick={toggleTheme}
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-secondary"
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </header>

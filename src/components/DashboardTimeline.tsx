@@ -7,18 +7,24 @@ import { getTimeInTimezone, getOffsetMinutes } from "@/utils/timezone";
 import { ScrollableTimeline } from "@/components/planner/ScrollableTimeline";
 
 export function DashboardTimeline() {
-  const { selectedCities, highlightColor } = useWorldClock();
+  const { 
+    selectedCities, 
+    highlightColor, 
+    selectedDate, 
+    setSelectedDate, 
+    selectedHour, 
+    setSelectedHour, 
+    duration, 
+    setDuration,
+    fromCityIdx,
+    setFromCityIdx
+  } = useWorldClock();
   const now = useClock();
 
   const [visible, setVisible] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date>(
-    startOfDay(new Date()),
-  );
-  const [selectedHour, setSelectedHour] = useState(() => new Date().getHours());
   const [selectedMinute] = useState(0);
-  const [duration, setDuration] = useState(1);
 
-  const fromCity = selectedCities[0];
+  const fromCity = selectedCities[fromCityIdx] || selectedCities[0];
 
   const isToday = isSameDay(selectedDate, new Date());
   const currentHourInBase =
@@ -73,7 +79,7 @@ export function DashboardTimeline() {
         <div className="px-1 pb-3">
           <ScrollableTimeline
             selectedCities={selectedCities}
-            fromCityIdx={0}
+            fromCityIdx={fromCityIdx}
             fromCity={fromCity}
             cityOffsets={cityOffsets}
             selectedDate={selectedDate}

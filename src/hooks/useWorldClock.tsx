@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { City, CITIES } from '@/data/cities';
 
+export type TimelineMode = 'default' | 'tod' | 'friendly' | 'working';
+
 interface WorldClockState {
   selectedCities: City[];
   addCity: (city: City) => void;
@@ -14,6 +16,18 @@ interface WorldClockState {
   setTimelineHighlightColor: (color: string) => void;
   dayIndicationColor: string;
   setDayIndicationColor: (color: string) => void;
+  use24h: boolean;
+  setUse24h: (val: boolean) => void;
+  timelineMode: TimelineMode;
+  setTimelineMode: (mode: TimelineMode) => void;
+  selectedDate: Date;
+  setSelectedDate: (date: Date) => void;
+  selectedHour: number;
+  setSelectedHour: (hour: number) => void;
+  duration: number;
+  setDuration: (duration: number) => void;
+  fromCityIdx: number;
+  setFromCityIdx: (idx: number) => void;
 }
 
 const WorldClockContext = createContext<WorldClockState | null>(null);
@@ -49,6 +63,33 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
   const [dayIndicationColor, setDayIndicationColorState] = useState<string>(() => {
     return localStorage.getItem('worldclock-day-indication') || '#cf8b17';
   });
+
+  const [use24h, setUse24hState] = useState<boolean>(() => {
+    return localStorage.getItem('worldclock-use24h') !== 'false'; // default true
+  });
+
+  const [timelineMode, setTimelineModeState] = useState<TimelineMode>(() => {
+    return (localStorage.getItem('worldclock-timeline-mode') as TimelineMode) || 'default';
+  });
+
+  const [selectedDate, setSelectedDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
+  const [selectedHour, setSelectedHour] = useState(() => new Date().getHours());
+  const [duration, setDuration] = useState(1);
+  const [fromCityIdx, setFromCityIdx] = useState(0);
+
+  const setUse24h = useCallback((val: boolean) => {
+    setUse24hState(val);
+    localStorage.setItem('worldclock-use24h', String(val));
+  }, []);
+
+  const setTimelineMode = useCallback((mode: TimelineMode) => {
+    setTimelineModeState(mode);
+    localStorage.setItem('worldclock-timeline-mode', mode);
+  }, []);
 
   const setHighlightColor = useCallback((color: string) => {
     const update = () => {
@@ -136,7 +177,13 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
       theme, toggleTheme, 
       highlightColor, setHighlightColor,
       timelineHighlightColor, setTimelineHighlightColor,
-      dayIndicationColor, setDayIndicationColor
+      dayIndicationColor, setDayIndicationColor,
+      use24h, setUse24h,
+      timelineMode, setTimelineMode,
+      selectedDate, setSelectedDate,
+      selectedHour, setSelectedHour,
+      duration, setDuration,
+      fromCityIdx, setFromCityIdx
     }}>
       {children}
     </WorldClockContext.Provider>
