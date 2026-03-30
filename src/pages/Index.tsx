@@ -79,14 +79,14 @@ const Index = () => {
   }, [order]);
 
   return (
-    <div className="min-h-screen bg-background w-full overflow-x-hidden">
+    <div className="min-h-screen bg-background w-full">
       <Header />
-      <main className="w-full max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-12 box-border overflow-hidden">
+      <main className="w-full max-w-screen-2xl mx-auto py-4 sm:py-8 px-4 sm:px-12 lg:px-16 box-border">
         <Reorder.Group
           axis="y"
           values={order}
           onReorder={setOrder}
-          className="grid gap-6"
+          className="grid gap-4 sm:gap-6 list-none p-0 m-0"
         >
           {order.map((id) => {
             const section = SECTIONS.find((s) => s.id === id);

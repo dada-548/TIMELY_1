@@ -16,7 +16,7 @@ export function LocalTimeDisplay() {
   const [showOtherCities, setShowOtherCities] = useState(false);
   const [locationName, setLocationName] = useState<string | null>(null);
   const [geoError, setGeoError] = useState(false);
-  const { highlightColor } = useWorldClock();
+  const { highlightColor, use24h } = useWorldClock();
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -69,10 +69,10 @@ export function LocalTimeDisplay() {
           <span className="text-muted-foreground"> | {info.timezoneName}</span>
         )}
       </p>
-      <div className="flex items-baseline gap-2 sm:gap-4 text-2xl sm:text-5xl font-mono font-semibold tracking-tight text-foreground">
-        <span className="shrink-0">{formatDate(tz, now).toUpperCase()}</span>
-        <span className="w-px h-6 sm:h-8 bg-border self-center shrink-0" />
-        <span className="shrink-0">{formatTime(tz, now)}</span>
+      <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-4 text-xl sm:text-4xl lg:text-5xl font-mono font-semibold tracking-tight text-foreground">
+        <span className="shrink-0 truncate">{formatDate(tz, now).toUpperCase()}</span>
+        <span className="hidden sm:block w-px h-8 bg-border self-center shrink-0" />
+        <span className="shrink-0">{formatTime(tz, now, use24h)}</span>
       </div>
 
       {info.otherCities.length > 0 && (

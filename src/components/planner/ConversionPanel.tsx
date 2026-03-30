@@ -36,14 +36,23 @@ export function ConversionPanel({
   duration,
   now,
 }: ConversionPanelProps) {
-  const { highlightColor, dayIndicationColor } = useWorldClock();
+  const { highlightColor, dayIndicationColor, use24h } = useWorldClock();
 
   const formatTimeRange = (h: number, m: number, dur: number) => {
-    const startStr = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+    const formatSingleTime = (hour: number, minute: number) => {
+      if (use24h) {
+        return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+      }
+      const displayH = hour % 12 || 12;
+      const ampm = hour >= 12 ? "PM" : "AM";
+      return `${displayH}:${minute.toString().padStart(2, "0")} ${ampm}`;
+    };
+
+    const startStr = formatSingleTime(h, m);
     const endMinutes = h * 60 + m + dur * 60;
     const endH = Math.floor(endMinutes / 60) % 24;
     const endM = endMinutes % 60;
-    const endStr = `${endH.toString().padStart(2, "0")}:${endM.toString().padStart(2, "0")}`;
+    const endStr = formatSingleTime(endH, endM);
     return `${startStr} – ${endStr}`;
   };
 

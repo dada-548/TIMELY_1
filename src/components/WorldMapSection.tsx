@@ -14,11 +14,11 @@ export function WorldMapSection() {
   const [showAllCities, setShowAllCities] = useState(false);
   const [showTimezones, setShowTimezones] = useState(false);
   const now = useClock();
-  const { selectedCities, highlightColor } = useWorldClock();
+  const { selectedCities, highlightColor, use24h } = useWorldClock();
   const [hoveredCity, setHoveredCity] = useState<City | null>(null);
 
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
       <button
         onClick={() => setVisible((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-foreground hover:bg-secondary/50 rounded-xl"
@@ -35,7 +35,7 @@ export function WorldMapSection() {
       </button>
 
       {visible && (
-        <div className="px-4 pb-4">
+        <div className="px-2 sm:px-4 pb-4">
           {/* Toggles */}
           <div className="flex items-center justify-end gap-2 mb-2">
             <button
@@ -91,11 +91,11 @@ export function WorldMapSection() {
 
             {/* UTC offset label bar at the bottom */}
             {showTimezones && (
-              <div className="flex w-full">
+              <div className="flex w-full min-w-0 overflow-hidden border-t border-border/50">
                 {TZ_OFFSETS.map((offset, i) => (
                   <div
                     key={offset}
-                    className="flex-1 text-center py-0.5 text-[9px] font-mono font-semibold select-none"
+                    className="flex-1 text-center py-1 text-[7px] sm:text-[9px] font-mono font-semibold select-none truncate"
                     style={{
                       backgroundColor:
                         i % 2 === 0
@@ -113,7 +113,7 @@ export function WorldMapSection() {
 
           {/* City status bar */}
           {selectedCities.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap gap-2 max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-border">
               {selectedCities.map((city) => {
                 const tod = getTimeOfDay(city.timezone, now);
                 const TodIcon =
@@ -152,7 +152,7 @@ export function WorldMapSection() {
                       {city.name}
                     </span>
                     <span className="text-muted-foreground font-mono">
-                      {formatTime(city.timezone, now)}
+                      {formatTime(city.timezone, now, use24h)}
                     </span>
                   </button>
                 );

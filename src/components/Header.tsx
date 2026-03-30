@@ -18,8 +18,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
-      <div className="w-full max-w-5xl mx-auto flex h-14 items-center justify-between px-3 sm:px-6">
-        <div className="flex items-center gap-3 sm:gap-8">
+      <div className="w-full max-w-screen-2xl mx-auto flex h-14 items-center justify-between px-4 sm:px-12 lg:px-16">
+        <div className="flex items-center gap-1.5 sm:gap-8">
           <Link to="/" className="flex items-center gap-2">
             <Globe className="h-5 w-5" style={{ color: highlightColor }} />
             <span className="text-base font-semibold tracking-tight hidden sm:inline">
@@ -31,7 +31,7 @@ export function Header() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg ${
+                className={`relative px-2 sm:px-3 py-1.5 text-[10px] sm:text-sm font-medium rounded-lg ${
                   location.pathname === item.path
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"
@@ -49,7 +49,7 @@ export function Header() {
             ))}
           </nav>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-1 sm:gap-4">
           <div className="flex items-center gap-1 sm:gap-2">
             {/* 12/24h toggle */}
             <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">

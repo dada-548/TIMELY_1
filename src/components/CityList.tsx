@@ -39,12 +39,11 @@ function TimeOfDayIcon({ tod }: { tod: string }) {
 
 function CityCard({ city }: { city: City; key?: React.Key }) {
   const now = useClock();
-  const { removeCity } = useWorldClock();
+  const { removeCity, highlightColor, use24h } = useWorldClock();
   const [expanded, setExpanded] = useState(false);
   const dragControls = useDragControls();
   const tod = getTimeOfDay(city.timezone, now);
   const isNight = tod === "night";
-  const { highlightColor } = useWorldClock();
 
   return (
     <Reorder.Item
@@ -85,7 +84,7 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             <div className="min-w-0">
               <div className="sm:flex sm:items-baseline sm:gap-2 sm:flex-nowrap">
-                <span className="font-semibold text-foreground whitespace-nowrap text-sm sm:text-base">
+                <span className="font-semibold text-foreground truncate text-sm sm:text-base">
                   {city.name}
                 </span>
                 <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap block sm:inline">
@@ -101,7 +100,7 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
             <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <TimeOfDayIcon tod={tod} />
               <span className="text-lg sm:text-2xl font-mono font-semibold tabular-nums text-foreground">
-                {formatTime(city.timezone, now)}
+                {formatTime(city.timezone, now, use24h)}
               </span>
             </div>
           </div>
@@ -180,7 +179,7 @@ export function CityList() {
       axis="y"
       values={selectedCities}
       onReorder={reorderCities}
-      className="space-y-2"
+      className="space-y-2 list-none p-0 m-0"
     >
       {selectedCities.map((city) => (
         <CityCard key={city.id} city={city} />

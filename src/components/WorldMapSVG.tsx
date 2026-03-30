@@ -9,6 +9,7 @@ import {
   Line,
 } from "react-simple-maps";
 import { City } from "@/data/cities";
+import { useWorldClock } from "@/hooks/useWorldClock";
 import { getTerminatorPath } from "@/utils/solar";
 import {
   formatTime,
@@ -196,6 +197,7 @@ export function WorldMapSVG({
     screenX: number;
     screenY: number;
   } | null>(null);
+  const { use24h } = useWorldClock();
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 0]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -445,13 +447,11 @@ export function WorldMapSVG({
             )}
 
           {/* Night overlay */}
-          <svg
-            viewBox="0 0 800 400"
+          <polygon
+            points={nightPoints}
+            fill="hsla(220, 25%, 8%, 0.35)"
             className="pointer-events-none"
-            style={{ position: "absolute", top: 0, left: 0 }}
-          >
-            <polygon points={nightPoints} fill="hsla(220, 25%, 8%, 0.35)" />
-          </svg>
+          />
 
           {/* All cities (secondary pins) */}
           {allCities
@@ -568,7 +568,7 @@ export function WorldMapSVG({
               className="text-sm font-mono font-semibold mt-0.5"
               style={{ color: highlightColor }}
             >
-              {formatTime(tooltipCity.city.timezone, now)}
+              {formatTime(tooltipCity.city.timezone, now, use24h)}
             </p>
             <p className="text-[10px] text-muted-foreground mt-0.5">
               {getTimezoneAbbreviation(tooltipCity.city.timezone, now)} ·{" "}

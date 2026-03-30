@@ -113,7 +113,7 @@ export function ShareMeetingPanel({
   duration,
   now,
 }: ShareMeetingPanelProps) {
-  const { highlightColor } = useWorldClock();
+  const { highlightColor, use24h } = useWorldClock();
   const [copied, setCopied] = useState(false);
 
   if (selectedCities.length < 1) return null;
@@ -130,6 +130,9 @@ export function ShareMeetingPanel({
   );
 
   const formatTime = (hour: number, minute: number) => {
+    if (use24h) {
+      return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+    }
     const h = hour % 12 || 12;
     const ampm = hour >= 12 ? "PM" : "AM";
     return `${h}:${minute.toString().padStart(2, "0")} ${ampm}`;

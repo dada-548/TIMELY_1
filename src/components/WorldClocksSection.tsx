@@ -28,7 +28,9 @@ export function WorldClocksSection() {
       {visible && (
         <div className="px-4 pb-4 space-y-4">
           <CitySearch />
-          <CityList />
+          <div className="pr-1">
+            <CityList />
+          </div>
         </div>
       )}
     </div>

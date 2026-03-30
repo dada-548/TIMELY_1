@@ -76,6 +76,7 @@ interface ScrollableTimelineProps {
   getDiffLabel: (offset: number) => string;
   onDragMove: (newStart: number) => void;
   onResizeEnd: (newDuration: number) => void;
+  maxHeight?: string;
 }
 
 function TimeOfDayIcon({ tod, className }: { tod: string; className?: string }) {
@@ -140,6 +141,7 @@ export function ScrollableTimeline({
   getDiffLabel,
   onDragMove,
   onResizeEnd,
+  maxHeight,
 }: ScrollableTimelineProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isAdjusting = useRef(false);
@@ -407,8 +409,8 @@ export function ScrollableTimeline({
 
   // Compute selection overlay position in pixels
   const getCellLeft = (idx: number) => {
-    const offset = (Math.floor(idx / 24) * 0.5);
-    return idx * (CELL_WIDTH + 1) + offset;
+    const marginOffset = Math.floor(idx / 24) * 2;
+    return idx * (CELL_WIDTH + 1) + marginOffset;
   };
 
   const selLeft = getCellLeft(selectionAbsStart);
@@ -549,7 +551,10 @@ export function ScrollableTimeline({
       </div>
 
       {/* Two-column layout: fixed labels + scrollable cells */}
-      <div className="flex w-full min-w-0">
+      <div 
+        className="flex w-full min-w-0 overflow-y-auto scrollbar-thin scrollbar-thumb-border"
+        style={maxHeight ? { maxHeight } : undefined}
+      >
         {/* Fixed labels column */}
         <div className="w-16 sm:w-44 flex-shrink-0">
           <div className="h-6" />
@@ -619,7 +624,7 @@ export function ScrollableTimeline({
           className="flex-1 min-w-0 overflow-x-auto scrollbar-hide"
           onScroll={handleScroll}
         >
-          <div style={{ width: TOTAL_CELLS * CELL_WIDTH }}>
+          <div style={{ width: getCellLeft(TOTAL_CELLS) }}>
             {/* City rows + selection overlay */}
             <div className="relative group space-y-0.5 pt-6">
               {/* Selection overlay */}
@@ -724,7 +729,7 @@ export function ScrollableTimeline({
                         <button
                           key={cellIdx}
                           onClick={() => handleCellClick(cellIdx)}
-                          className={`h-[44px] rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 ${
+                          className={`h-[44px] rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 overflow-hidden ${
                             cellIdx % 24 === 0 && cellIdx > 0 ? "ml-0.5" : ""
                           }`}
                           style={{
@@ -760,7 +765,7 @@ export function ScrollableTimeline({
                               {formatHour(cityHour, use24h)}
                             </span>
                             {!use24h && (
-                              <span className="text-[9px] font-medium leading-none opacity-80">
+                              <span className="text-[11px] font-extrabold leading-none">
                                 {formatHourAmPm(cityHour)}
                               </span>
                             )}
