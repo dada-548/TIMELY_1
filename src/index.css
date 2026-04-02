@@ -185,12 +185,12 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased overflow-x-hidden;
   }
 }
 
 html {
-  /* No transition here, we will use View Transitions API */
+  @apply overflow-x-hidden;
 }
 
 ::view-transition-old(root),

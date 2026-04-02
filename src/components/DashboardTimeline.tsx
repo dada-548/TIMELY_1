@@ -3,22 +3,12 @@ import { isSameDay, startOfDay } from "date-fns";
 import { 
   ChevronDown, 
   ChevronUp, 
-  Grid3X3, 
-  Clock, 
-  Sun, 
-  MessageSquare, 
-  Briefcase 
+  Grid3X3
 } from "lucide-react";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { useClock } from "@/hooks/useClock";
 import { getTimeInTimezone, getOffsetMinutes } from "@/utils/timezone";
 import { ScrollableTimeline } from "@/components/planner/ScrollableTimeline";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 export function DashboardTimeline() {
   const { 
@@ -86,95 +76,6 @@ export function DashboardTimeline() {
         </button>
 
         <div className="flex items-center gap-3">
-          {/* Timeline Modes */}
-          <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setTimelineMode("default")}
-                    className={`p-1.5 transition-colors ${
-                      timelineMode === "default"
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={
-                      timelineMode === "default"
-                        ? { backgroundColor: `${highlightColor}25` }
-                        : undefined
-                    }
-                  >
-                    <Clock className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Default Grid</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setTimelineMode("tod")}
-                    className={`p-1.5 border-l border-border transition-colors ${
-                      timelineMode === "tod"
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={
-                      timelineMode === "tod"
-                        ? { backgroundColor: `${highlightColor}25` }
-                        : undefined
-                    }
-                  >
-                    <Sun className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Time of Day</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setTimelineMode("friendly")}
-                    className={`p-1.5 border-l border-border transition-colors ${
-                      timelineMode === "friendly"
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={
-                      timelineMode === "friendly"
-                        ? { backgroundColor: `${highlightColor}25` }
-                        : undefined
-                    }
-                  >
-                    <MessageSquare className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Friendly Hours (9am-9pm)</TooltipContent>
-              </Tooltip>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setTimelineMode("working")}
-                    className={`p-1.5 border-l border-border transition-colors ${
-                      timelineMode === "working"
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={
-                      timelineMode === "working"
-                        ? { backgroundColor: `${highlightColor}25` }
-                        : undefined
-                    }
-                  >
-                    <Briefcase className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Working Hours (9am-5pm)</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-
           <button
             onClick={() => setVisible((v) => !v)}
             className="p-1 text-muted-foreground hover:text-foreground"
@@ -189,7 +90,7 @@ export function DashboardTimeline() {
       </div>
 
       {visible && fromCity && (
-        <div className="pb-3">
+        <div className="pb-3 min-w-0">
           <ScrollableTimeline
             selectedCities={selectedCities}
             fromCityIdx={fromCityIdx}

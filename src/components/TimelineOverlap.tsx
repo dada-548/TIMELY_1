@@ -94,7 +94,7 @@ export function TimelineOverlap() {
         <div className="flex items-center gap-4 mt-3 pt-3 border-t border-border">
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-sm working-hour-cell-active" />
-            <span className="text-[10px] text-muted-foreground">Working (9-5)</span>
+            <span className="text-[10px] text-muted-foreground">Working (9-6)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-sm overlap-cell" />

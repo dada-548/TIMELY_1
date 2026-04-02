@@ -31,13 +31,13 @@ function SectionItem({
       value={id}
       dragListener={false}
       dragControls={dragControls}
-      className="relative group"
+      className="relative group w-full min-w-0"
       whileDrag={{ scale: 1.01, zIndex: 50 }}
     >
       <button
         type="button"
         onPointerDown={(e) => dragControls.start(e)}
-        className="absolute -left-10 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing p-2 hidden sm:flex items-center justify-center h-full"
+        className="absolute -left-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 cursor-grab active:cursor-grabbing p-2 hidden md:flex items-center justify-center h-full"
         style={{ touchAction: "none" }}
         aria-label="Reorder section"
       >
@@ -79,14 +79,14 @@ const Index = () => {
   }, [order]);
 
   return (
-    <div className="min-h-screen bg-background w-full">
+    <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Header />
-      <main className="w-full max-w-screen-2xl mx-auto py-4 sm:py-8 px-4 sm:px-12 lg:px-16 box-border">
+      <main className="w-full max-w-screen-2xl mx-auto py-4 sm:py-8 px-4 sm:px-6 md:px-10 lg:px-12 box-border min-w-0">
         <Reorder.Group
           axis="y"
           values={order}
           onReorder={setOrder}
-          className="grid gap-4 sm:gap-6 list-none p-0 m-0"
+          className="grid gap-4 sm:gap-6 list-none p-0 m-0 w-full min-w-0"
         >
           {order.map((id) => {
             const section = SECTIONS.find((s) => s.id === id);

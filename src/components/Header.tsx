@@ -18,8 +18,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
-      <div className="w-full max-w-screen-2xl mx-auto flex h-14 items-center justify-between px-4 sm:px-12 lg:px-16">
-        <div className="flex items-center gap-1.5 sm:gap-8">
+      <div className="w-full max-w-screen-2xl mx-auto flex h-14 items-center justify-between px-4 sm:px-6 md:px-10 lg:px-12 min-w-0">
+        <div className="flex items-center gap-1.5 sm:gap-8 min-w-0">
           <Link to="/" className="flex items-center gap-2">
             <Globe className="h-5 w-5" style={{ color: highlightColor }} />
             <span className="text-base font-semibold tracking-tight hidden sm:inline">

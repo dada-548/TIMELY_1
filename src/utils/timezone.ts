@@ -154,7 +154,7 @@ export function getTimeOfDay(
 }
 
 export function isWorkingHour(hour: number): boolean {
-  return hour >= 9 && hour < 17;
+  return hour >= 9 && hour < 18;
 }
 
 export function getHourInTimezone(

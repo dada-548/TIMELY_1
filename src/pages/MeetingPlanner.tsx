@@ -15,7 +15,13 @@ import { DurationSelector } from "@/components/planner/DurationSelector";
 import { ScrollableTimeline } from "@/components/planner/ScrollableTimeline";
 import { ConversionPanel } from "@/components/planner/ConversionPanel";
 import { ShareMeetingPanel } from "@/components/planner/ShareMeetingPanel";
-import { Clock, LayoutGrid } from "lucide-react";
+import { Clock, LayoutGrid, Sun, MessageSquare, Briefcase } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Select,
   SelectContent,
@@ -35,7 +41,9 @@ export default function MeetingPlanner() {
     duration, 
     setDuration,
     fromCityIdx,
-    setFromCityIdx
+    setFromCityIdx,
+    timelineMode,
+    setTimelineMode
   } = useWorldClock();
   const now = useClock();
   const localTz = getLocalTimezone();
@@ -169,6 +177,94 @@ export default function MeetingPlanner() {
                 duration={duration}
                 onChangeDuration={setDuration}
               />
+
+              <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => setTimelineMode("default")}
+                        className={`p-1.5 transition-colors ${
+                          timelineMode === "default"
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                        style={
+                          timelineMode === "default"
+                            ? { backgroundColor: `${highlightColor}25` }
+                            : undefined
+                        }
+                      >
+                        <Clock className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Default Grid</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => setTimelineMode("tod")}
+                        className={`p-1.5 border-l border-border transition-colors ${
+                          timelineMode === "tod"
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                        style={
+                          timelineMode === "tod"
+                            ? { backgroundColor: `${highlightColor}25` }
+                            : undefined
+                        }
+                      >
+                        <Sun className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Time of Day</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => setTimelineMode("friendly")}
+                        className={`p-1.5 border-l border-border transition-colors ${
+                          timelineMode === "friendly"
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                        style={
+                          timelineMode === "friendly"
+                            ? { backgroundColor: `${highlightColor}25` }
+                            : undefined
+                        }
+                      >
+                        <MessageSquare className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Friendly Hours (9am-9pm)</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => setTimelineMode("working")}
+                        className={`p-1.5 border-l border-border transition-colors ${
+                          timelineMode === "working"
+                            ? "text-foreground"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                        style={
+                          timelineMode === "working"
+                            ? { backgroundColor: `${highlightColor}25` }
+                            : undefined
+                        }
+                      >
+                        <Briefcase className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>Working Hours (9am-5pm)</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
 
               <div className="flex-grow" />
 

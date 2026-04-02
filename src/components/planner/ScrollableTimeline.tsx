@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Briefcase,
   Clock,
+  X,
 } from "lucide-react";
 import {
   Tooltip,
@@ -157,6 +158,7 @@ export function ScrollableTimeline({
     use24h,
     timelineMode,
     setTimelineMode,
+    removeCity,
   } = useWorldClock();
   const isMobile = useIsMobile();
   const isDarkMode = theme === "dark";
@@ -506,7 +508,7 @@ export function ScrollableTimeline({
                     <MessageSquare className="h-3.5 w-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Friendly Hours (9am-9pm)</TooltipContent>
+                <TooltipContent>Friendly Hours (9 AM - 9 PM)</TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -527,7 +529,7 @@ export function ScrollableTimeline({
                     <Briefcase className="h-3.5 w-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Working Hours (9am-5pm)</TooltipContent>
+                <TooltipContent>Working Hours (9 AM - 6 PM)</TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
@@ -556,7 +558,7 @@ export function ScrollableTimeline({
         style={maxHeight ? { maxHeight } : undefined}
       >
         {/* Fixed labels column */}
-        <div className="w-16 sm:w-44 flex-shrink-0">
+        <div className="w-16 sm:w-44 flex-shrink-0 border-r border-border/50 bg-card/50">
           <div className="h-6" />
           {/* City labels */}
           <div className="space-y-0.5">
@@ -577,41 +579,55 @@ export function ScrollableTimeline({
               return (
                 <div
                   key={city.id}
-                  className="h-9 sm:h-9 flex flex-col justify-center pr-1 sm:pr-3"
+                  className="h-[44px] flex items-center group/label relative px-2 sm:px-3"
                 >
-                  <div className="flex items-center gap-1 sm:gap-1.5">
-                    <span className="hidden sm:inline">
-                      <TimeOfDayIcon tod={tod} />
-                    </span>
-                    <span
-                      className={`text-[9px] sm:text-xs font-medium truncate ${isBase ? "" : "text-foreground"}`}
-                      style={isBase ? { color: highlightColor } : undefined}
-                    >
-                      {city.name}
-                    </span>
-                  </div>
-                  {/* Country name on mobile, abbreviation on desktop */}
-                  <div className="flex items-center gap-1 sm:gap-1.5 sm:ml-[18px]">
-                    <span className="text-[7px] text-muted-foreground truncate sm:hidden">
-                      {city.country}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
-                      {abbrev}
-                    </span>
-                    {!isBase && getDiffLabel(offset) && (
-                      <span className="text-[8px] sm:text-[10px] text-muted-foreground">
-                        {getDiffLabel(offset)}
+                  <div className="flex flex-col justify-center min-w-0 flex-1">
+                    <div className="flex items-center gap-1 sm:gap-1.5">
+                      <span className="hidden sm:inline">
+                        <TimeOfDayIcon tod={tod} />
                       </span>
-                    )}
-                    {dayOff !== 0 && (
                       <span
-                        className="text-[8px] sm:text-[10px] font-semibold"
-                        style={{ color: dayIndicationColor }}
+                        className={`text-[9px] sm:text-xs font-medium truncate ${isBase ? "" : "text-foreground"}`}
+                        style={isBase ? { color: highlightColor } : undefined}
                       >
-                        {dayOff > 0 ? `+${dayOff}d` : `${dayOff}d`}
+                        {city.name}
                       </span>
-                    )}
+                    </div>
+                    {/* Country name on mobile, abbreviation on desktop */}
+                    <div className="flex items-center gap-1 sm:gap-1.5 sm:ml-[18px]">
+                      <span className="text-[7px] text-muted-foreground truncate sm:hidden">
+                        {city.country}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
+                        {abbrev}
+                      </span>
+                      {!isBase && getDiffLabel(offset) && (
+                        <span className="text-[8px] sm:text-[10px] text-muted-foreground">
+                          {getDiffLabel(offset)}
+                        </span>
+                      )}
+                      {dayOff !== 0 && (
+                        <span
+                          className="text-[8px] sm:text-[10px] font-semibold"
+                          style={{ color: dayIndicationColor }}
+                        >
+                          {dayOff > 0 ? `+${dayOff}d` : `${dayOff}d`}
+                        </span>
+                      )}
+                    </div>
                   </div>
+
+                  {/* Remove button - positioned to the right of the city name */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeCity(city.id);
+                    }}
+                    className="opacity-0 group-hover/label:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-opacity flex-shrink-0 ml-1"
+                    title="Remove city"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </div>
               );
             })}
@@ -723,7 +739,7 @@ export function ScrollableTimeline({
 
                       // Mode-specific logic
                       const isFriendly = cityHour >= 9 && cityHour < 21;
-                      const isWorking = cityHour >= 9 && cityHour < 17;
+                      const isWorking = cityHour >= 9 && cityHour < 18;
 
                       return (
                         <button
@@ -897,7 +913,7 @@ export function ScrollableTimeline({
           <div className="flex items-center gap-1.5">
             <Briefcase className="h-3 w-3 text-blue-500" />
             <span className="text-[10px] text-muted-foreground">
-              Working (9 AM - 5 PM)
+              Working (9 AM - 6 PM)
             </span>
           </div>
         )}
