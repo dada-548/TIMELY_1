@@ -24,11 +24,11 @@ export function WorldMapSection() {
         className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-foreground hover:bg-secondary/50 rounded-xl"
       >
         <div className="flex flex-col items-start">
-          <span className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 py-0.5">
+            <MapPin className="h-3.5 w-3.5" style={{ color: highlightColor }} />
             WORLD MAP
           </span>
-          <span className="text-[10px] text-muted-foreground font-medium ml-6">
+          <span className="text-xs sm:text-sm font-medium text-foreground mt-1 sm:mt-1.5 px-2 py-0.5">
             {now.toLocaleDateString(undefined, {
               weekday: "long",
               year: "numeric",

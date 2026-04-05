@@ -39,11 +39,13 @@ function TimeOfDayIcon({ tod }: { tod: string }) {
 
 function CityCard({ city }: { city: City; key?: React.Key }) {
   const now = useClock();
-  const { removeCity, highlightColor, use24h } = useWorldClock();
+  const { removeCity, highlightColor, use24h, dayIndicationColor } =
+    useWorldClock();
   const [expanded, setExpanded] = useState(false);
   const dragControls = useDragControls();
   const tod = getTimeOfDay(city.timezone, now);
   const isNight = tod === "night";
+  const diff = getDiffFromLocal(city.timezone, now);
 
   return (
     <Reorder.Item
@@ -81,27 +83,38 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
           onClick={() => setExpanded(!expanded)}
           className="flex-1 text-left min-w-0"
         >
-          <div className="flex items-center justify-between gap-2 sm:gap-4">
-            <div className="min-w-0">
-              <div className="sm:flex sm:items-baseline sm:gap-2 sm:flex-nowrap">
-                <span className="font-semibold text-foreground truncate text-sm sm:text-base">
-                  {city.name}
-                </span>
-                <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap block sm:inline">
-                  {city.country}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[10px] sm:text-xs text-muted-foreground">
-                  {getDiffFromLocal(city.timezone, now)}
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              <TimeOfDayIcon tod={tod} />
-              <span className="text-lg sm:text-2xl font-mono font-semibold tabular-nums text-foreground">
-                {formatTime(city.timezone, now, use24h)}
+          <div className="flex flex-col gap-1">
+            <div className="sm:flex sm:items-baseline sm:gap-2 sm:flex-nowrap">
+              <span className="font-semibold text-foreground truncate text-sm sm:text-base">
+                {city.name}
               </span>
+              <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap block sm:inline">
+                {city.country}
+              </span>
+            </div>
+            <div className="flex items-center flex-wrap gap-x-3 gap-y-1">
+              <div className="flex items-center gap-1.5">
+                <TimeOfDayIcon tod={tod} />
+                <span className="text-lg sm:text-xl font-mono font-semibold tabular-nums text-foreground">
+                  {formatTime(city.timezone, now, use24h)}
+                </span>
+              </div>
+              <span className="text-[10px] sm:text-xs text-muted-foreground font-medium">
+                {formatDate(city.timezone, now)}
+              </span>
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] sm:text-xs text-muted-foreground">
+                  {diff.timeDiff}
+                </span>
+                {diff.dayOffset !== 0 && (
+                  <span
+                    className="text-[10px] sm:text-xs font-semibold"
+                    style={{ color: dayIndicationColor }}
+                  >
+                    {diff.dayOffset > 0 ? `+${diff.dayOffset}d` : `${diff.dayOffset}d`}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </button>

@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LayoutGrid,
+  PaintRoller,
   MessageSquare,
   Briefcase,
   Clock,
@@ -175,22 +176,31 @@ export function ScrollableTimeline({
   const isToday = isSameDay(selectedDate, new Date());
 
   // Center scroll on current day or current hour
-  const centerScroll = useCallback(() => {
+  const centerScroll = useCallback((smooth = false) => {
     const el = scrollRef.current;
     if (!el) return;
     
     isAdjusting.current = true;
     // If we have a current hour, center on it to show "12 hours in the future"
-    // Otherwise center on the start of the current day
-    const startHour = currentHourInBase !== null ? currentHourInBase : 0;
+    // Otherwise center on the selected hour to maintain context
+    const startHour = currentHourInBase !== null ? currentHourInBase : selectedHour;
     const scrollLeft = (CENTER_START + startHour) * cellWidth - el.clientWidth / 2 + cellWidth / 2;
-    el.scrollLeft = scrollLeft;
-    wheelTargetRef.current = scrollLeft;
     
-    requestAnimationFrame(() => {
-      isAdjusting.current = false;
-    });
-  }, [currentHourInBase, cellWidth]);
+    if (smooth) {
+      el.scrollTo({ left: scrollLeft, behavior: "smooth" });
+      wheelTargetRef.current = scrollLeft;
+      // Keep isAdjusting true for a bit longer to allow smooth scroll to finish
+      setTimeout(() => {
+        isAdjusting.current = false;
+      }, 500);
+    } else {
+      el.scrollLeft = scrollLeft;
+      wheelTargetRef.current = scrollLeft;
+      requestAnimationFrame(() => {
+        isAdjusting.current = false;
+      });
+    }
+  }, [currentHourInBase, cellWidth, selectedHour]);
 
   // On mount, center + attach smooth wheel handler
   useEffect(() => {
@@ -243,37 +253,20 @@ export function ScrollableTimeline({
       }
       el.removeEventListener("wheel", wheelHandler);
     };
-  }, [centerScroll]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // When date changes externally (calendar strip), re-center
+  // When date changes externally (calendar strip), we no longer auto-center
+  // to avoid jarring jumps. The content stays at the same relative time position.
   const prevDateRef = useRef(selectedDate);
   useEffect(() => {
     if (prevDateRef.current.getTime() !== selectedDate.getTime()) {
-      if (!dateChangedByScroll.current) {
-        centerScroll();
-      }
       dateChangedByScroll.current = false;
       setDateFlash(true);
       setTimeout(() => setDateFlash(false), 700);
     }
     prevDateRef.current = selectedDate;
-  }, [selectedDate, centerScroll]);
-
-  // Scroll to selected hour when it changes (if not dragging)
-  useLayoutEffect(() => {
-    if (dragging || !scrollRef.current) return;
-    const el = scrollRef.current;
-    const scrollLeft = (CENTER_START + selectedHour) * cellWidth - el.clientWidth / 2 + cellWidth / 2;
-    // Only scroll if it's significantly different to avoid jitter
-    if (Math.abs(el.scrollLeft - scrollLeft) > 1) {
-      isAdjusting.current = true;
-      el.scrollLeft = scrollLeft;
-      wheelTargetRef.current = scrollLeft;
-      requestAnimationFrame(() => {
-        isAdjusting.current = false;
-      });
-    }
-  }, [selectedHour, dragging, cellWidth]);
+  }, [selectedDate]);
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
@@ -315,33 +308,28 @@ export function ScrollableTimeline({
     (cellIndex: number) => {
       const dayOffset = Math.floor(cellIndex / 24);
       const hour = cellIndex % 24;
+      const diff = dayOffset - 2;
 
-      if (dayOffset < 2) {
-        // Earlier days
+      if (diff !== 0) {
         dateChangedByScroll.current = true;
         if (scrollRef.current) {
-          const oneDay = 24 * cellWidth;
+          const oneDay = 24 * cellWidth + 2; // 24 cells + 2px margin
+          const shift = diff * oneDay;
+          
           isAdjusting.current = true;
-          scrollRef.current.scrollLeft += oneDay;
-          if (wheelTargetRef.current !== null) wheelTargetRef.current += oneDay;
+          // To keep the clicked cell at the same visual position when selectedDate changes:
+          // newScrollLeft = oldScrollLeft - diff * oneDay
+          const newScrollLeft = scrollRef.current.scrollLeft - shift;
+          scrollRef.current.scrollLeft = newScrollLeft;
+          if (wheelTargetRef.current !== null) {
+            wheelTargetRef.current = newScrollLeft;
+          }
+          
           requestAnimationFrame(() => {
             isAdjusting.current = false;
           });
         }
-        onSelectDate(addDays(selectedDate, dayOffset - 2));
-      } else if (dayOffset > 2) {
-        // Later days
-        dateChangedByScroll.current = true;
-        if (scrollRef.current) {
-          const oneDay = 24 * cellWidth;
-          isAdjusting.current = true;
-          scrollRef.current.scrollLeft -= oneDay;
-          if (wheelTargetRef.current !== null) wheelTargetRef.current -= oneDay;
-          requestAnimationFrame(() => {
-            isAdjusting.current = false;
-          });
-        }
-        onSelectDate(addDays(selectedDate, dayOffset - 2));
+        onSelectDate(addDays(selectedDate, diff));
       }
       onSelectHour(hour);
     },
@@ -496,10 +484,10 @@ export function ScrollableTimeline({
                         : undefined
                     }
                   >
-                    <Clock className="h-3.5 w-3.5" />
+                    <PaintRoller className="h-3.5 w-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Default Grid</TooltipContent>
+                <TooltipContent>Color Coat</TooltipContent>
               </Tooltip>
 
               <Tooltip>

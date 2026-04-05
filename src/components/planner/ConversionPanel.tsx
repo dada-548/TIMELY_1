@@ -1,4 +1,4 @@
-import { getTimezoneAbbreviation, getDiffFromLocal } from "@/utils/timezone";
+import { getTimezoneAbbreviation, getUTCOffset, getOffsetMinutes } from "@/utils/timezone";
 import {
   ArrowDown,
   Sun,
@@ -69,6 +69,8 @@ export function ConversionPanel({
       <Moon className="h-3.5 w-3.5 text-nighticon" />
     );
 
+  const fromOffset = getOffsetMinutes(fromCity.timezone, now);
+
   return (
     <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
@@ -87,13 +89,18 @@ export function ConversionPanel({
           border: `1px solid ${highlightColor}33`,
         }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
           <span className="font-medium text-sm text-foreground">
             {fromCity.name}
           </span>
-          <span className="text-[10px] text-muted-foreground">
-            {getTimezoneAbbreviation(fromCity.timezone, now)}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-muted-foreground">
+              {getTimezoneAbbreviation(fromCity.timezone, now)}
+            </span>
+            <span className="text-[10px] text-muted-foreground">
+              {getUTCOffset(fromCity.timezone, now).replace("UTC", "GMT")}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-xs flex items-center">{sourceTimeIcon}</span>
@@ -125,31 +132,33 @@ export function ConversionPanel({
             ) : (
               <Moon className="h-3.5 w-3.5 text-nighticon" />
             );
+
+          const toOffset = getOffsetMinutes(city.timezone, now);
+          const diffHours = Math.round((toOffset - fromOffset) / 60);
+          const diffLabel = diffHours === 0 ? "" : `(${diffHours > 0 ? "+" : ""}${diffHours}h)`;
+
           return (
             <div
               key={city.id}
               className="flex items-center justify-between p-3 rounded-lg bg-secondary/50"
             >
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
                 <span className="font-medium text-sm text-foreground">
                   {city.name}
                 </span>
-                <span className="text-[10px] text-muted-foreground">
-                  {getTimezoneAbbreviation(city.timezone, now)}
-                </span>
-                <span className="text-[10px] text-muted-foreground">
-                  ({getDiffFromLocal(city.timezone, now)})
-                </span>
-                {conv.dayOffset !== 0 && (
-                  <span
-                    className="text-[10px] font-semibold"
-                    style={{ color: dayIndicationColor }}
-                  >
-                    {conv.dayOffset > 0
-                      ? `+${conv.dayOffset}d`
-                      : `${conv.dayOffset}d`}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground">
+                    {getTimezoneAbbreviation(city.timezone, now)}
                   </span>
-                )}
+                  <span className="text-[10px] text-muted-foreground">
+                    {getUTCOffset(city.timezone, now).replace("UTC", "GMT")}
+                  </span>
+                  {diffLabel && (
+                    <span className="text-[10px] text-muted-foreground">
+                      {diffLabel}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs flex items-center">{timeIcon}</span>

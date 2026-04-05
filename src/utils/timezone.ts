@@ -168,18 +168,45 @@ export function getHourInTimezone(
   return (((baseHour + Math.round(offsetDiff / 60)) % 24) + 24) % 24;
 }
 
+export interface TimeDiff {
+  timeDiff: string;
+  dayOffset: number;
+}
+
 export function getDiffFromLocal(
   timezone: string,
   date: Date = new Date(),
-): string {
+): TimeDiff {
   const localOffset = -date.getTimezoneOffset();
   const tzOffset = getOffsetMinutes(timezone, date);
   const diffHours = (tzOffset - localOffset) / 60;
-  if (diffHours === 0) return "Current time";
+
+  // Calculate day offset
+  const localDateStr = date.toLocaleDateString("en-US", {
+    timeZone: getLocalTimezone(),
+  });
+  const targetDateStr = date.toLocaleDateString("en-US", { timeZone: timezone });
+
+  const localDate = new Date(localDateStr);
+  const targetDate = new Date(targetDateStr);
+
+  const diffTime = targetDate.getTime() - localDate.getTime();
+  const dayOffset = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffHours === 0) return { timeDiff: "Current time", dayOffset };
   const sign = diffHours > 0 ? "+" : "";
   const abs = Math.abs(diffHours);
-  if (abs % 1 === 0) return `${sign}${diffHours}h`;
-  return `${sign}${Math.floor(diffHours)}h ${Math.round((abs % 1) * 60)}m`;
+
+  let timeDiffStr = "";
+  if (abs % 1 === 0) {
+    timeDiffStr = `${sign}${diffHours}h`;
+  } else {
+    timeDiffStr = `${sign}${Math.floor(diffHours)}h ${Math.round(
+      (abs % 1) * 60,
+    )}m`;
+  }
+
+  return { timeDiff: timeDiffStr, dayOffset };
 }
 
 export function isDSTActive(timezone: string): boolean {
