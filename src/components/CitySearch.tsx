@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Search, Plus, X } from "lucide-react";
+import { Search, Plus, X, Globe, MapPin } from "lucide-react";
 import { City, searchCities, CITIES } from "@/data/cities";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { motion, AnimatePresence } from "framer-motion";
@@ -50,21 +50,7 @@ export function CitySearch() {
               const searchLat = parseFloat(lat);
               const searchLon = parseFloat(lon);
 
-              // 2. Get timezone from BigDataCloud (free, no key)
-              const tzRes = await fetch(
-                `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${searchLat}&longitude=${searchLon}&localityLanguage=en`
-              );
-              const tzData = await tzRes.json();
-              
-              // BigDataCloud returns timezone in tzData.localityInfo.informative (sometimes)
-              // or we can use another service if this is unreliable.
-              // Actually, let's use a more reliable one for timezone: https://worldtimeapi.org/api/timezone
-              // Wait, worldtimeapi doesn't do lat/lng.
-              
-              // Let's use the "closest city" logic but with the expanded database first.
-              // If we want to be truly dynamic, we need a reliable lat/lng to timezone API.
-              // 'https://api.teleport.org/api/locations/{lat},{lng}/'
-              
+              // 2. Get timezone from Teleport
               const teleportRes = await fetch(`https://api.teleport.org/api/locations/${searchLat},${searchLon}/`);
               const teleportData = await teleportRes.json();
               const cityHref = teleportData._embedded['location:nearest-cities']?.[0]?._links['location:nearest-city']?.href;
@@ -159,7 +145,7 @@ export function CitySearch() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search cities"
+          placeholder="Search cities or time zones"
           className="h-10 w-full rounded-lg border border-border bg-card pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2"
           style={
             { "--tw-ring-color": `${highlightColor}4d` } as React.CSSProperties
@@ -189,31 +175,50 @@ export function CitySearch() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-card shadow-lg overflow-hidden"
+            className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-card shadow-lg overflow-hidden max-h-[400px] overflow-y-auto"
           >
             {results.length > 0 ? (
-              results.map((city) => (
-                <button
-                  key={city.id}
-                  onClick={() => handleAdd(city)}
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left"
-                >
-                  <div>
-                    <span className="font-medium text-foreground">
-                      {city.name}
-                    </span>
-                    <span className="ml-2 text-muted-foreground">
-                      {city.country}
-                    </span>
-                    {city.airportCode && (
-                      <span className="ml-2 text-xs text-muted-foreground font-mono">
-                        ({city.airportCode})
-                      </span>
-                    )}
-                  </div>
-                  <Plus className="h-4 w-4" style={{ color: highlightColor }} />
-                </button>
-              ))
+              results.map((city) => {
+                const isTz = city.id.startsWith('tz-');
+                return (
+                  <button
+                    key={city.id}
+                    onClick={() => handleAdd(city)}
+                    className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
+                        {isTz ? (
+                          <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                        ) : (
+                          <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium text-foreground">
+                          {city.name}
+                        </div>
+                        <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                          <span>{city.country}</span>
+                          {city.airportCode && (
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-border" />
+                              <span className="font-mono uppercase">{city.airportCode}</span>
+                            </>
+                          )}
+                          {isTz && (
+                            <>
+                              <span className="w-1 h-1 rounded-full bg-border" />
+                              <span className="text-[9px] font-mono opacity-70">{city.timezone}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <Plus className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: highlightColor }} />
+                  </button>
+                );
+              })
             ) : searching ? (
               <div className="px-4 py-3 text-sm text-muted-foreground flex items-center gap-2">
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -226,22 +231,28 @@ export function CitySearch() {
                 </div>
                 <button
                   onClick={() => handleAdd(closestCity)}
-                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left"
+                  className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left group"
                 >
-                  <div>
-                    <span className="font-medium text-foreground">
-                      {closestCity.name}
-                    </span>
-                    <span className="ml-2 text-muted-foreground">
-                      {closestCity.country}
-                    </span>
-                    {closestCity.airportCode && (
-                      <span className="ml-2 text-xs text-muted-foreground font-mono">
-                        ({closestCity.airportCode})
-                      </span>
-                    )}
+                  <div className="flex items-center gap-3">
+                    <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
+                      <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">
+                        {closestCity.name}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                        <span>{closestCity.country}</span>
+                        {closestCity.airportCode && (
+                          <>
+                            <span className="w-1 h-1 rounded-full bg-border" />
+                            <span className="font-mono uppercase">{closestCity.airportCode}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <Plus className="h-4 w-4" style={{ color: highlightColor }} />
+                  <Plus className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: highlightColor }} />
                 </button>
               </div>
             ) : (

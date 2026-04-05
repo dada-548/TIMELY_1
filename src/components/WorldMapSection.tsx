@@ -23,10 +23,25 @@ export function WorldMapSection() {
         onClick={() => setVisible((v) => !v)}
         className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-foreground hover:bg-secondary/50 rounded-xl"
       >
-        <span className="flex items-center gap-2">
-          <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
-          WORLD MAP
-        </span>
+        <div className="flex flex-col items-start">
+          <span className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
+            WORLD MAP
+          </span>
+          <span className="text-[10px] text-muted-foreground font-medium ml-6">
+            {now.toLocaleDateString(undefined, {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}{" "}
+            · {now.toLocaleTimeString(undefined, {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: !use24h,
+            })}
+          </span>
+        </div>
         {visible ? (
           <ChevronUp className="h-4 w-4 text-muted-foreground" />
         ) : (
@@ -93,19 +108,28 @@ export function WorldMapSection() {
             {showTimezones && (
               <div className="flex w-full min-w-0 overflow-hidden border-t border-border/50">
                 {TZ_OFFSETS.map((offset, i) => (
-                  <div
-                    key={offset}
-                    className="flex-1 text-center py-1 text-[7px] sm:text-[9px] font-mono font-semibold select-none truncate"
-                    style={{
-                      backgroundColor:
-                        i % 2 === 0
-                          ? `${highlightColor}25`
-                          : `${highlightColor}12`,
-                      color: "hsl(var(--muted-foreground))",
-                    }}
-                  >
-                    {offset === 0 ? "GMT" : `${offset > 0 ? "+" : ""}${offset}`}
-                  </div>
+                    <div
+                      key={offset}
+                      className="flex-1 text-center py-1 text-[7px] sm:text-[9px] font-mono font-semibold select-none truncate flex flex-col items-center"
+                      style={{
+                        backgroundColor:
+                          i % 2 === 0
+                            ? `${highlightColor}25`
+                            : `${highlightColor}12`,
+                        color: "hsl(var(--muted-foreground))",
+                      }}
+                    >
+                      <span>
+                        {offset === 0 ? "GMT" : `${offset > 0 ? "+" : ""}${offset}`}
+                      </span>
+                      {(() => {
+                        const utcHour = now.getUTCHours();
+                        const localHour = utcHour + offset;
+                        if (localHour >= 24) return <span className="text-[6px] opacity-70">+1d</span>;
+                        if (localHour < 0) return <span className="text-[6px] opacity-70">-1d</span>;
+                        return null;
+                      })()}
+                    </div>
                 ))}
               </div>
             )}

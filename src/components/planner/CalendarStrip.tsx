@@ -18,7 +18,7 @@ export function CalendarStrip({ selectedDate, onSelectDate, onJumpToNow, now }: 
   const selectedRef = useRef<HTMLButtonElement>(null);
   const pendingPrependRef = useRef<{ prevScrollWidth: number; prevScrollLeft: number } | null>(null);
 
-  const today = useMemo(() => startOfDay(now), [now]);
+  const today = useMemo(() => startOfDay(now), [startOfDay(now).getTime()]);
   const { highlightColor } = useWorldClock();
   const [todayFlash, setTodayFlash] = useState(false);
   const [nowFlash, setNowFlash] = useState(false);
@@ -35,7 +35,7 @@ export function CalendarStrip({ selectedDate, onSelectDate, onJumpToNow, now }: 
     setTimeout(() => setNowFlash(false), 500);
   }, [onJumpToNow]);
 
-  const initialDiff = differenceInCalendarDays(startOfDay(selectedDate), today);
+  const initialDiff = useMemo(() => differenceInCalendarDays(startOfDay(selectedDate), today), [selectedDate, today]);
   const [startOffset, setStartOffset] = useState(() => initialDiff - 7);
   const [endOffset, setEndOffset] = useState(() => initialDiff + BUFFER);
 
@@ -63,10 +63,13 @@ export function CalendarStrip({ selectedDate, onSelectDate, onJumpToNow, now }: 
     pendingPrependRef.current = null;
   }, [startOffset]);
 
-  const days = [];
-  for (let i = startOffset; i <= endOffset; i++) {
-    days.push(addDays(today, i));
-  }
+  const days = useMemo(() => {
+    const arr = [];
+    for (let i = startOffset; i <= endOffset; i++) {
+      arr.push(addDays(today, i));
+    }
+    return arr;
+  }, [startOffset, endOffset, today]);
 
   // Scroll selected date into view whenever it changes (after range updates).
   useLayoutEffect(() => {
@@ -158,25 +161,25 @@ export function CalendarStrip({ selectedDate, onSelectDate, onJumpToNow, now }: 
                   ref={isSelected ? selectedRef : undefined}
                   onClick={() => onSelectDate(day)}
                   className={`relative flex flex-col items-center px-2.5 py-1.5 rounded-xl text-center min-w-[48px] ${
-                    isSelected
+                    isDayToday
                       ? 'text-foreground shadow-md scale-105 border'
                       : 'bg-background border border-border text-foreground hover:bg-secondary'
                   }`}
                   style={
-                    isSelected
+                    isDayToday
                       ? { backgroundColor: `${highlightColor}26`, borderColor: `${highlightColor}54` }
                       : undefined
                   }
                 >
                   <span className={`text-[9px] font-semibold uppercase tracking-wider leading-none ${
-                    isSelected ? 'text-foreground/70' : 'text-muted-foreground'
+                    isDayToday ? 'text-foreground/70' : 'text-muted-foreground'
                   }`}>
                     {format(day, 'EEE')}
                   </span>
                   <span className="text-base font-bold font-mono leading-tight mt-0.5">
                     {format(day, 'd')}
                   </span>
-                  {isDayToday && (
+                  {isSelected && (
                     <div
                       className="absolute inset-0 rounded-xl pointer-events-none"
                       style={{ border: `2px solid ${highlightColor}` }}

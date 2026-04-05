@@ -113,16 +113,136 @@ export const CITIES: City[] = [
   { id: 'syowa', name: 'Syowa', timezone: 'Antarctica/Syowa', country: 'Antarctica', coordinates: [39.58, -69.0], lat: -69.0, lng: 39.58, airportCode: 'SYO' },
   { id: 'vostok', name: 'Vostok', timezone: 'Antarctica/Vostok', country: 'Antarctica', coordinates: [106.8, -78.45], lat: -78.45, lng: 106.8, airportCode: 'VST' },
   { id: 'mcmurdo', name: 'McMurdo', timezone: 'Antarctica/McMurdo', country: 'Antarctica', coordinates: [166.6667, -77.85], lat: -77.85, lng: 166.6667, airportCode: 'MCM' },
+  { id: 'phoenix', name: 'Phoenix', timezone: 'America/Phoenix', country: 'USA', coordinates: [-112.074, 33.4484], lat: 33.4484, lng: -112.074, airportCode: 'PHX' },
+  { id: 'las-vegas', name: 'Las Vegas', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-115.1398, 36.1699], lat: 36.1699, lng: -115.1398, airportCode: 'LAS' },
+  { id: 'salt-lake-city', name: 'Salt Lake City', timezone: 'America/Denver', country: 'USA', coordinates: [-111.891, 40.7608], lat: 40.7608, lng: -111.891, airportCode: 'SLC' },
+  { id: 'dallas', name: 'Dallas', timezone: 'America/Chicago', country: 'USA', coordinates: [-96.797, 32.7767], lat: 32.7767, lng: -96.797, airportCode: 'DFW' },
+  { id: 'atlanta', name: 'Atlanta', timezone: 'America/New_York', country: 'USA', coordinates: [-84.388, 33.749], lat: 33.749, lng: -84.388, airportCode: 'ATL' },
+  { id: 'washington-dc', name: 'Washington DC', timezone: 'America/New_York', country: 'USA', coordinates: [-77.0369, 38.9072], lat: 38.9072, lng: -77.0369, airportCode: 'IAD' },
+  { id: 'boston', name: 'Boston', timezone: 'America/New_York', country: 'USA', coordinates: [-71.0589, 42.3601], lat: 42.3601, lng: -71.0589, airportCode: 'BOS' },
+  { id: 'philadelphia', name: 'Philadelphia', timezone: 'America/New_York', country: 'USA', coordinates: [-75.1652, 39.9526], lat: 39.9526, lng: -75.1652, airportCode: 'PHL' },
+  { id: 'detroit', name: 'Detroit', timezone: 'America/Detroit', country: 'USA', coordinates: [-83.0458, 42.3314], lat: 42.3314, lng: -83.0458, airportCode: 'DTW' },
+  { id: 'minneapolis', name: 'Minneapolis', timezone: 'America/Chicago', country: 'USA', coordinates: [-93.265, 44.9778], lat: 44.9778, lng: -93.265, airportCode: 'MSP' },
+  { id: 'st-louis', name: 'St. Louis', timezone: 'America/Chicago', country: 'USA', coordinates: [-90.1994, 38.627], lat: 38.627, lng: -90.1994, airportCode: 'STL' },
+  { id: 'new-orleans', name: 'New Orleans', timezone: 'America/Chicago', country: 'USA', coordinates: [-90.0715, 29.9511], lat: 29.9511, lng: -90.0715, airportCode: 'MSY' },
+  { id: 'san-diego', name: 'San Diego', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-117.1611, 32.7157], lat: 32.7157, lng: -117.1611, airportCode: 'SAN' },
+  { id: 'portland', name: 'Portland', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-122.6765, 45.5231], lat: 45.5231, lng: -122.6765, airportCode: 'PDX' },
+  { id: 'austin', name: 'Austin', timezone: 'America/Chicago', country: 'USA', coordinates: [-97.7431, 30.2672], lat: 30.2672, lng: -97.7431, airportCode: 'AUS' },
+  { id: 'nashville', name: 'Nashville', timezone: 'America/Chicago', country: 'USA', coordinates: [-86.7816, 36.1627], lat: 36.1627, lng: -86.7816, airportCode: 'BNA' },
+  { id: 'charlotte', name: 'Charlotte', timezone: 'America/New_York', country: 'USA', coordinates: [-80.8431, 35.2271], lat: 35.2271, lng: -80.8431, airportCode: 'CLT' },
+  { id: 'indianapolis', name: 'Indianapolis', timezone: 'America/Indiana/Indianapolis', country: 'USA', coordinates: [-86.1581, 39.7684], lat: 39.7684, lng: -86.1581, airportCode: 'IND' },
+  { id: 'columbus', name: 'Columbus', timezone: 'America/New_York', country: 'USA', coordinates: [-82.9988, 39.9612], lat: 39.9612, lng: -82.9988, airportCode: 'CMH' },
+  { id: 'san-antonio', name: 'San Antonio', timezone: 'America/Chicago', country: 'USA', coordinates: [-98.4936, 29.4241], lat: 29.4241, lng: -98.4936, airportCode: 'SAT' },
+  { id: 'san-jose', name: 'San Jose', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-121.8863, 37.3382], lat: 37.3382, lng: -121.8863, airportCode: 'SJC' },
+  { id: 'jacksonville', name: 'Jacksonville', timezone: 'America/New_York', country: 'USA', coordinates: [-81.6557, 30.3322], lat: 30.3322, lng: -81.6557, airportCode: 'JAX' },
+  { id: 'fort-worth', name: 'Fort Worth', timezone: 'America/Chicago', country: 'USA', coordinates: [-97.3308, 32.7555], lat: 32.7555, lng: -97.3308, airportCode: 'FTW' },
+  { id: 'oklahoma-city', name: 'Oklahoma City', timezone: 'America/Chicago', country: 'USA', coordinates: [-97.5164, 35.4676], lat: 35.4676, lng: -97.5164, airportCode: 'OKC' },
+  { id: 'milwaukee', name: 'Milwaukee', timezone: 'America/Chicago', country: 'USA', coordinates: [-87.9065, 43.0389], lat: 43.0389, lng: -87.9065, airportCode: 'MKE' },
+  { id: 'albuquerque', name: 'Albuquerque', timezone: 'America/Denver', country: 'USA', coordinates: [-106.6504, 35.0844], lat: 35.0844, lng: -106.6504, airportCode: 'ABQ' },
+  { id: 'tucson', name: 'Tucson', timezone: 'America/Phoenix', country: 'USA', coordinates: [-110.9747, 32.2226], lat: 32.2226, lng: -110.9747, airportCode: 'TUS' },
+  { id: 'fresno', name: 'Fresno', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-119.7726, 36.7468], lat: 36.7468, lng: -119.7726, airportCode: 'FAT' },
+  { id: 'sacramento', name: 'Sacramento', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-121.4944, 38.5816], lat: 38.5816, lng: -121.4944, airportCode: 'SMF' },
+  { id: 'kansas-city', name: 'Kansas City', timezone: 'America/Chicago', country: 'USA', coordinates: [-94.5786, 39.0997], lat: 39.0997, lng: -94.5786, airportCode: 'MCI' },
+  { id: 'mesa', name: 'Mesa', timezone: 'America/Phoenix', country: 'USA', coordinates: [-111.8315, 33.4151], lat: 33.4151, lng: -111.8315, airportCode: 'AZA' },
+  { id: 'colorado-springs', name: 'Colorado Springs', timezone: 'America/Denver', country: 'USA', coordinates: [-104.8214, 38.8339], lat: 38.8339, lng: -104.8214, airportCode: 'COS' },
+  { id: 'raleigh', name: 'Raleigh', timezone: 'America/New_York', country: 'USA', coordinates: [-78.6382, 35.7796], lat: 35.7796, lng: -78.6382, airportCode: 'RDU' },
+  { id: 'virginia-beach', name: 'Virginia Beach', timezone: 'America/New_York', country: 'USA', coordinates: [-75.9779, 36.8529], lat: 36.8529, lng: -75.9779, airportCode: 'ORF' },
+  { id: 'omaha', name: 'Omaha', timezone: 'America/Chicago', country: 'USA', coordinates: [-95.9345, 41.2565], lat: 41.2565, lng: -95.9345, airportCode: 'OMA' },
+  { id: 'oakland', name: 'Oakland', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-122.2711, 37.8044], lat: 37.8044, lng: -122.2711, airportCode: 'OAK' },
+  { id: 'tulsa', name: 'Tulsa', timezone: 'America/Chicago', country: 'USA', coordinates: [-95.9928, 36.154], lat: 36.154, lng: -95.9928, airportCode: 'TUL' },
+  { id: 'cleveland', name: 'Cleveland', timezone: 'America/New_York', country: 'USA', coordinates: [-81.6944, 41.4993], lat: 41.4993, lng: -81.6944, airportCode: 'CLE' },
+  { id: 'wichita', name: 'Wichita', timezone: 'America/Chicago', country: 'USA', coordinates: [-97.3301, 37.6872], lat: 37.6872, lng: -97.3301, airportCode: 'ICT' },
+  { id: 'arlington', name: 'Arlington', timezone: 'America/Chicago', country: 'USA', coordinates: [-97.1081, 32.7357], lat: 32.7357, lng: -97.1081, airportCode: 'DFW' },
+  { id: 'bakersfield', name: 'Bakersfield', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-119.0187, 35.3733], lat: 35.3733, lng: -119.0187, airportCode: 'BFL' },
+  { id: 'tampa', name: 'Tampa', timezone: 'America/New_York', country: 'USA', coordinates: [-82.4572, 27.9506], lat: 27.9506, lng: -82.4572, airportCode: 'TPA' },
+  { id: 'aurora', name: 'Aurora', timezone: 'America/Denver', country: 'USA', coordinates: [-104.8319, 39.7294], lat: 39.7294, lng: -104.8319, airportCode: 'DEN' },
+  { id: 'anaheim', name: 'Anaheim', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-117.9143, 33.8366], lat: 33.8366, lng: -117.9143, airportCode: 'SNA' },
+  { id: 'santa-ana', name: 'Santa Ana', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-117.8677, 33.7455], lat: 33.7455, lng: -117.8677, airportCode: 'SNA' },
+  { id: 'riverside', name: 'Riverside', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-117.3755, 33.9533], lat: 33.9533, lng: -117.3755, airportCode: 'ONT' },
+  { id: 'corpus-christi', name: 'Corpus Christi', timezone: 'America/Chicago', country: 'USA', coordinates: [-97.3964, 27.8006], lat: 27.8006, lng: -97.3964, airportCode: 'CRP' },
+  { id: 'lexington', name: 'Lexington', timezone: 'America/New_York', country: 'USA', coordinates: [-84.5003, 38.0406], lat: 38.0406, lng: -84.5003, airportCode: 'LEX' },
+  { id: 'pittsburgh', name: 'Pittsburgh', timezone: 'America/New_York', country: 'USA', coordinates: [-79.9959, 40.4406], lat: 40.4406, lng: -79.9959, airportCode: 'PIT' },
+  { id: 'stockton', name: 'Stockton', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-121.2908, 37.9577], lat: 37.9577, lng: -121.2908, airportCode: 'SCK' },
+  { id: 'cincinnati', name: 'Cincinnati', timezone: 'America/New_York', country: 'USA', coordinates: [-84.512, 39.1031], lat: 39.1031, lng: -84.512, airportCode: 'CVG' },
+  { id: 'st-paul', name: 'St. Paul', timezone: 'America/Chicago', country: 'USA', coordinates: [-93.0897, 44.9537], lat: 44.9537, lng: -93.0897, airportCode: 'MSP' },
+  { id: 'fayetteville', name: 'Fayetteville', timezone: 'America/Chicago', country: 'USA', coordinates: [-94.1605, 36.0627], lat: 36.0627, lng: -94.1605, airportCode: 'XNA' },
+  { id: 'toledo', name: 'Toledo', timezone: 'America/New_York', country: 'USA', coordinates: [-83.5379, 41.6528], lat: 41.6528, lng: -83.5379, airportCode: 'TOL' },
+  { id: 'newark', name: 'Newark', timezone: 'America/New_York', country: 'USA', coordinates: [-74.1724, 40.7357], lat: 40.7357, lng: -74.1724, airportCode: 'EWR' },
+  { id: 'greensboro', name: 'Greensboro', timezone: 'America/New_York', country: 'USA', coordinates: [-79.792, 36.0726], lat: 36.0726, lng: -79.792, airportCode: 'GSO' },
+  { id: 'plano', name: 'Plano', timezone: 'America/Chicago', country: 'USA', coordinates: [-96.7003, 33.0198], lat: 33.0198, lng: -96.7003, airportCode: 'DFW' },
+  { id: 'henderson', name: 'Henderson', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-114.9817, 36.0395], lat: 36.0395, lng: -114.9817, airportCode: 'LAS' },
+  { id: 'lincoln', name: 'Lincoln', timezone: 'America/Chicago', country: 'USA', coordinates: [-96.7026, 40.8136], lat: 40.8136, lng: -96.7026, airportCode: 'LNK' },
+  { id: 'buffalo', name: 'Buffalo', timezone: 'America/New_York', country: 'USA', coordinates: [-78.8784, 42.8864], lat: 42.8864, lng: -78.8784, airportCode: 'BUF' },
+  { id: 'fort-wayne', name: 'Fort Wayne', timezone: 'America/Indiana/Indianapolis', country: 'USA', coordinates: [-85.1394, 41.0793], lat: 41.0793, lng: -85.1394, airportCode: 'FWA' },
+  { id: 'jersey-city', name: 'Jersey City', timezone: 'America/New_York', country: 'USA', coordinates: [-74.0431, 40.7282], lat: 40.7282, lng: -74.0431, airportCode: 'EWR' },
+  { id: 'chula-vista', name: 'Chula Vista', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-117.0842, 32.64], lat: 32.64, lng: -117.0842, airportCode: 'SAN' },
+  { id: 'orlando', name: 'Orlando', timezone: 'America/New_York', country: 'USA', coordinates: [-81.3792, 28.5383], lat: 28.5383, lng: -81.3792, airportCode: 'MCO' },
+  { id: 'st-petersburg', name: 'St. Petersburg', timezone: 'America/New_York', country: 'USA', coordinates: [-82.6401, 27.7676], lat: 27.7676, lng: -82.6401, airportCode: 'PIE' },
+  { id: 'norfolk', name: 'Norfolk', timezone: 'America/New_York', country: 'USA', coordinates: [-76.2859, 36.8508], lat: 36.8508, lng: -76.2859, airportCode: 'ORF' },
+  { id: 'chandler', name: 'Chandler', timezone: 'America/Phoenix', country: 'USA', coordinates: [-111.8413, 33.3062], lat: 33.3062, lng: -111.8413, airportCode: 'PHX' },
+  { id: 'laredo', name: 'Laredo', timezone: 'America/Chicago', country: 'USA', coordinates: [-99.5075, 27.5036], lat: 27.5036, lng: -99.5075, airportCode: 'LRD' },
+  { id: 'madison', name: 'Madison', timezone: 'America/Chicago', country: 'USA', coordinates: [-89.4012, 43.0731], lat: 43.0731, lng: -89.4012, airportCode: 'MSN' },
+  { id: 'durham', name: 'Durham', timezone: 'America/New_York', country: 'USA', coordinates: [-78.8986, 35.994], lat: 35.994, lng: -78.8986, airportCode: 'RDU' },
+  { id: 'lubbock', name: 'Lubbock', timezone: 'America/Chicago', country: 'USA', coordinates: [-101.8551, 33.5779], lat: 33.5779, lng: -101.8551, airportCode: 'LBB' },
+  { id: 'winston-salem', name: 'Winston-Salem', timezone: 'America/New_York', country: 'USA', coordinates: [-80.2442, 36.0999], lat: 36.0999, lng: -80.2442, airportCode: 'INT' },
+  { id: 'garland', name: 'Garland', timezone: 'America/Chicago', country: 'USA', coordinates: [-96.6389, 32.9126], lat: 32.9126, lng: -96.6389, airportCode: 'DAL' },
+  { id: 'glendale', name: 'Glendale', timezone: 'America/Phoenix', country: 'USA', coordinates: [-112.186, 33.5387], lat: 33.5387, lng: -112.186, airportCode: 'PHX' },
+  { id: 'hialeah', name: 'Hialeah', timezone: 'America/New_York', country: 'USA', coordinates: [-80.2856, 25.8576], lat: 25.8576, lng: -80.2856, airportCode: 'MIA' },
+  { id: 'reno', name: 'Reno', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-119.8143, 39.5296], lat: 39.5296, lng: -119.8143, airportCode: 'RNO' },
+  { id: 'baton-rouge', name: 'Baton Rouge', timezone: 'America/Chicago', country: 'USA', coordinates: [-91.1871, 30.4515], lat: 30.4515, lng: -91.1871, airportCode: 'BTR' },
+  { id: 'irvine', name: 'Irvine', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-117.8265, 33.6846], lat: 33.6846, lng: -117.8265, airportCode: 'SNA' },
+  { id: 'chesapeake', name: 'Chesapeake', timezone: 'America/New_York', country: 'USA', coordinates: [-76.2859, 36.7682], lat: 36.7682, lng: -76.2859, airportCode: 'ORF' },
+  { id: 'irving', name: 'Irving', timezone: 'America/Chicago', country: 'USA', coordinates: [-96.9489, 32.814], lat: 32.814, lng: -96.9489, airportCode: 'DFW' },
+  { id: 'scottsdale', name: 'Scottsdale', timezone: 'America/Phoenix', country: 'USA', coordinates: [-111.9261, 33.4942], lat: 33.4942, lng: -111.9261, airportCode: 'PHX' },
+  { id: 'north-las-vegas', name: 'North Las Vegas', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-115.1175, 36.1989], lat: 36.1989, lng: -115.1175, airportCode: 'LAS' },
+  { id: 'fremont', name: 'Fremont', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-121.9886, 37.5483], lat: 37.5483, lng: -121.9886, airportCode: 'SJC' },
+  { id: 'gilbert', name: 'Gilbert', timezone: 'America/Phoenix', country: 'USA', coordinates: [-111.789, 33.3528], lat: 33.3528, lng: -111.789, airportCode: 'PHX' },
+  { id: 'san-bernardino', name: 'San Bernardino', timezone: 'America/Los_Angeles', country: 'USA', coordinates: [-117.2898, 34.1083], lat: 34.1083, lng: -117.2898, airportCode: 'ONT' },
+  { id: 'boise', name: 'Boise', timezone: 'America/Boise', country: 'USA', coordinates: [-116.2023, 43.615], lat: 43.615, lng: -116.2023, airportCode: 'BOI' },
+  { id: 'birmingham', name: 'Birmingham', timezone: 'America/Chicago', country: 'USA', coordinates: [-86.8104, 33.5186], lat: 33.5186, lng: -86.8104, airportCode: 'BHM' },
+  { id: 'havana', name: 'Havana', timezone: 'America/Havana', country: 'Cuba', coordinates: [-82.3666, 23.1136], lat: 23.1136, lng: -82.3666, airportCode: 'HAV' },
+  { id: 'kingston', name: 'Kingston', timezone: 'America/Jamaica', country: 'Jamaica', coordinates: [-76.7936, 17.9714], lat: 17.9714, lng: -76.7936, airportCode: 'KIN' },
+  { id: 'panama-city', name: 'Panama City', timezone: 'America/Panama', country: 'Panama', coordinates: [-79.5167, 8.9833], lat: 8.9833, lng: -79.5167, airportCode: 'PTY' },
+  { id: 'quito', name: 'Quito', timezone: 'America/Guayaquil', country: 'Ecuador', coordinates: [-78.4678, -0.1807], lat: -0.1807, lng: -78.4678, airportCode: 'UIO' },
+  { id: 'caracas', name: 'Caracas', timezone: 'America/Caracas', country: 'Venezuela', coordinates: [-66.9036, 10.4806], lat: 10.4806, lng: -66.9036, airportCode: 'CCS' },
+  { id: 'la-paz', name: 'La Paz', timezone: 'America/La_Paz', country: 'Bolivia', coordinates: [-68.1193, -16.4897], lat: -16.4897, lng: -68.1193, airportCode: 'LPB' },
+  { id: 'asuncion', name: 'Asuncion', timezone: 'America/Asuncion', country: 'Paraguay', coordinates: [-57.5759, -25.2637], lat: -25.2637, lng: -57.5759, airportCode: 'ASU' },
+  { id: 'montevideo', name: 'Montevideo', timezone: 'America/Montevideo', country: 'Uruguay', coordinates: [-56.1645, -34.9011], lat: -34.9011, lng: -56.1645, airportCode: 'MVD' },
+  { id: 'brasilia', name: 'Brasilia', timezone: 'America/Sao_Paulo', country: 'Brazil', coordinates: [-47.8825, -15.7942], lat: -15.7942, lng: -47.8825, airportCode: 'BSB' },
+  { id: 'fortaleza', name: 'Fortaleza', timezone: 'America/Fortaleza', country: 'Brazil', coordinates: [-38.5247, -3.7319], lat: -3.7319, lng: -38.5247, airportCode: 'FOR' },
+  { id: 'manaus', name: 'Manaus', timezone: 'America/Manaus', country: 'Brazil', coordinates: [-60.0217, -3.119], lat: -3.119, lng: -60.0217, airportCode: 'MAO' },
   { id: 'south-pole', name: 'South Pole', timezone: 'Antarctica/South_Pole', country: 'Antarctica', coordinates: [0.0, -90.0], lat: -90.0, lng: 0.0, airportCode: 'SPL' },
 ];
 
 export function searchCities(query: string): City[] {
   const q = query.toLowerCase();
-  return CITIES.filter(
+  const results = CITIES.filter(
     (c) =>
       c.name.toLowerCase().includes(q) ||
       c.country.toLowerCase().includes(q) ||
       c.id.toLowerCase().includes(q) ||
       (c.airportCode && c.airportCode.toLowerCase().includes(q))
   );
+
+  // If no direct city match, or if query is long enough, also search IANA timezones
+  if (query.length >= 3) {
+    const allTimezones = Intl.supportedValuesOf('timeZone');
+    const matchingTzs = allTimezones.filter(tz => tz.toLowerCase().includes(q));
+    
+    matchingTzs.forEach(tz => {
+      // Avoid duplicates if a city already has this timezone and is in results
+      if (!results.some(r => r.timezone === tz)) {
+        const name = tz.split('/').pop()?.replace(/_/g, ' ') || tz;
+        results.push({
+          id: `tz-${tz}`,
+          name: name,
+          timezone: tz,
+          country: tz.split('/')[0],
+          coordinates: [0, 0], // Placeholder
+        });
+      }
+    });
+  }
+
+  return results;
 }

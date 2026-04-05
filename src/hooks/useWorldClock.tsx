@@ -36,10 +36,17 @@ const DEFAULT_CITY_IDS = ['seattle', 'london', 'seoul', 'sydney'];
 
 export function WorldClockProvider({ children }: { children: React.ReactNode }) {
   const [selectedCities, setSelectedCities] = useState<City[]>(() => {
-    const saved = localStorage.getItem('worldclock-cities');
+    const saved = localStorage.getItem('worldclock-cities-full');
     if (saved) {
       try {
-        const ids: string[] = JSON.parse(saved);
+        return JSON.parse(saved) as City[];
+      } catch { /* ignore */ }
+    }
+    // Fallback to old format or defaults
+    const savedIds = localStorage.getItem('worldclock-cities');
+    if (savedIds) {
+      try {
+        const ids: string[] = JSON.parse(savedIds);
         return ids.map(id => CITIES.find(c => c.id === id)).filter(Boolean) as City[];
       } catch { /* ignore */ }
     }
@@ -128,6 +135,8 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   useEffect(() => {
+    localStorage.setItem('worldclock-cities-full', JSON.stringify(selectedCities));
+    // Keep old one for backward compatibility if needed, but full is better
     localStorage.setItem('worldclock-cities', JSON.stringify(selectedCities.map(c => c.id)));
   }, [selectedCities]);
 

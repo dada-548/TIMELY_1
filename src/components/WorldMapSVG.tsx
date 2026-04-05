@@ -197,6 +197,7 @@ export function WorldMapSVG({
     screenX: number;
     screenY: number;
   } | null>(null);
+  const [hoveredTimezone, setHoveredTimezone] = useState<number | null>(null);
   const { use24h } = useWorldClock();
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 0]);
@@ -323,49 +324,80 @@ export function WorldMapSVG({
           {/* Land */}
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill={landFill}
-                  stroke={landStroke}
-                  strokeWidth={0.5}
-                  style={{
-                    default: { outline: "none" },
-                    hover: {
-                      outline: "none",
-                      fill: highlightColor,
-                      opacity: 0.8,
-                    },
-                    pressed: { outline: "none" },
-                  }}
-                />
-              ))
+              geographies.map((geo) => {
+                const isUS = geo.properties.name === "United States of America";
+                const isUSHovered = isUS && zoom === 1 && hoveredCity?.id === "usa-continent";
+                
+                // Rough center longitude for timezone highlighting
+                // We'll use the bounding box center if available, or just the first coordinate
+                let centerLng = 0;
+                if (geo.geometry.type === "Polygon") {
+                  centerLng = geo.geometry.coordinates[0][0][0];
+                } else if (geo.geometry.type === "MultiPolygon") {
+                  centerLng = geo.geometry.coordinates[0][0][0][0];
+                }
+                
+                const countryTz = Math.round(centerLng / 15) * 15;
+                const isInHoveredTz = showTimezones && hoveredTimezone === countryTz;
+
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={isUSHovered || isInHoveredTz ? highlightColor : landFill}
+                    stroke={landStroke}
+                    strokeWidth={0.5}
+                    opacity={isInHoveredTz ? 0.6 : 1}
+                    onMouseEnter={() => {
+                      if (isUS && zoom === 1) {
+                        onHoverCity({ id: "usa-continent", name: "USA", country: "USA", timezone: "America/New_York", coordinates: [-98, 38] } as City);
+                      }
+                    }}
+                    onMouseLeave={() => {
+                      if (isUS && zoom === 1) onHoverCity(null);
+                    }}
+                    style={{
+                      default: { outline: "none" },
+                      hover: {
+                        outline: "none",
+                        fill: highlightColor,
+                        opacity: 0.8,
+                      },
+                      pressed: { outline: "none" },
+                    }}
+                  />
+                );
+              })
             }
           </Geographies>
 
           {/* US State boundaries with individual hover */}
           <Geographies geography={US_STATES_URL}>
             {({ geographies }) =>
-              geographies.map((geo) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="transparent"
-                  stroke={landStroke}
-                  strokeWidth={0.3 / zoom}
-                  style={{
-                    default: { outline: "none" },
-                    hover: {
-                      outline: "none",
-                      fill: `${highlightColor}50`,
-                      stroke: highlightColor,
-                      strokeWidth: 1 / zoom,
-                    },
-                    pressed: { outline: "none" },
-                  }}
-                />
-              ))
+              geographies.map((geo) => {
+                const isUSHovered = zoom === 1 && hoveredCity?.id === "usa-continent";
+                if (isUSHovered) return null; // Hide state lines when US continent is hovered at zoom 1
+
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="transparent"
+                    stroke={landStroke}
+                    strokeWidth={0.3 / zoom}
+                    style={{
+                      default: { outline: "none" },
+                      hover: {
+                        outline: "none",
+                        fill: `${highlightColor}50`,
+                        stroke: highlightColor,
+                        strokeWidth: 1 / zoom,
+                      },
+                      pressed: { outline: "none" },
+                    }}
+                  />
+                );
+              })
             }
           </Geographies>
 
@@ -407,16 +439,29 @@ export function WorldMapSVG({
               );
             })}
 
-          {/* Timezone meridian lines */}
+          {/* Timezone meridian lines and interactive strips */}
           {showTimezones &&
             TIMEZONE_LONGITUDES.map((lng) => (
-              <Line
-                key={`tz-${lng}`}
-                from={[lng, -85]}
-                to={[lng, 85]}
-                stroke={tzLineColor}
-                strokeWidth={0.8 / zoom}
-              />
+              <React.Fragment key={`tz-group-${lng}`}>
+                {/* Interactive strip for hover */}
+                <rect
+                  x={lng}
+                  y={-90}
+                  width={15}
+                  height={180}
+                  fill={hoveredTimezone === lng ? highlightColor : "transparent"}
+                  opacity={hoveredTimezone === lng ? 0.15 : 0}
+                  onMouseEnter={() => setHoveredTimezone(lng)}
+                  onMouseLeave={() => setHoveredTimezone(null)}
+                  className="cursor-pointer"
+                />
+                <Line
+                  from={[lng, -85]}
+                  to={[lng, 85]}
+                  stroke={tzLineColor}
+                  strokeWidth={0.8 / zoom}
+                />
+              </React.Fragment>
             ))}
 
           {/* UTC labels on timezone lines */}
@@ -512,6 +557,10 @@ export function WorldMapSVG({
             const placement = labelPlacements[city.id] || "top";
             const offset = getLabelOffset(placement, s);
 
+            // Check if city is in hovered timezone
+            const cityOffset = Math.round((city.lng || city.coordinates[0]) / 15) * 15;
+            const isInHoveredTz = showTimezones && hoveredTimezone === cityOffset;
+
             return (
               <Marker
                 key={city.id}
@@ -523,10 +572,10 @@ export function WorldMapSVG({
                 onTouchStart={(e: React.TouchEvent) => handlePinTouch(city, e)}
                 className="cursor-pointer"
               >
-                <circle r={(isHovered ? 8 : 5) / s} fill={`${pinColor}30`} />
+                <circle r={(isHovered || isInHoveredTz ? 8 : 5) / s} fill={`${isHovered || isInHoveredTz ? highlightColor : pinColor}30`} />
                 <circle
-                  r={(isHovered ? 4 : 2.5) / s}
-                  fill={pinColor}
+                  r={(isHovered || isInHoveredTz ? 4 : 2.5) / s}
+                  fill={isHovered || isInHoveredTz ? highlightColor : pinColor}
                   stroke="white"
                   strokeWidth={1.2 / s}
                 />
@@ -535,9 +584,9 @@ export function WorldMapSVG({
                   y={offset.y}
                   textAnchor={offset.anchor}
                   fontSize={9 / s}
-                  fontWeight={600}
+                  fontWeight={isHovered || isInHoveredTz ? 700 : 600}
                   fontFamily="'Inter', sans-serif"
-                  fill="hsl(var(--foreground))"
+                  fill={isHovered || isInHoveredTz ? highlightColor : "hsl(var(--foreground))"}
                   stroke="hsl(var(--card))"
                   strokeWidth={2.5 / s}
                   paintOrder="stroke"
@@ -569,6 +618,15 @@ export function WorldMapSVG({
               style={{ color: highlightColor }}
             >
               {formatTime(tooltipCity.city.timezone, now, use24h)}
+            </p>
+            <p className="text-[10px] text-muted-foreground font-medium">
+              {now.toLocaleDateString(undefined, {
+                timeZone: tooltipCity.city.timezone,
+                weekday: "long",
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </p>
             <p className="text-[10px] text-muted-foreground mt-0.5">
               {getTimezoneAbbreviation(tooltipCity.city.timezone, now)} ·{" "}

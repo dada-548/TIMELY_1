@@ -104,10 +104,9 @@ function TimeOfDayIcon({ tod, className }: { tod: string; className?: string }) 
   }
 }
 
-const TOTAL_CELLS = 72; // 3 days
+const TOTAL_CELLS = 120; // 5 days
 const DAY_CELLS = 24;
-const CENTER_START = 24; // current day starts at cell 24
-const CELL_WIDTH = 36; // Keep the size as 36 px even in smaller screen size
+const CENTER_START = 48; // current day starts at cell 48
 
 function formatHour(hour: number, use24h: boolean): string {
   if (use24h) return hour.toString().padStart(2, "0");
@@ -161,6 +160,7 @@ export function ScrollableTimeline({
     removeCity,
   } = useWorldClock();
   const isMobile = useIsMobile();
+  const cellWidth = isMobile ? 32 : 36;
   const isDarkMode = theme === "dark";
   const [dateFlash, setDateFlash] = useState(false);
 
@@ -179,13 +179,18 @@ export function ScrollableTimeline({
     const el = scrollRef.current;
     if (!el) return;
     
+    isAdjusting.current = true;
     // If we have a current hour, center on it to show "12 hours in the future"
     // Otherwise center on the start of the current day
     const startHour = currentHourInBase !== null ? currentHourInBase : 0;
-    const scrollLeft = (CENTER_START + startHour) * CELL_WIDTH - el.clientWidth / 2 + CELL_WIDTH / 2;
+    const scrollLeft = (CENTER_START + startHour) * cellWidth - el.clientWidth / 2 + cellWidth / 2;
     el.scrollLeft = scrollLeft;
     wheelTargetRef.current = scrollLeft;
-  }, [currentHourInBase]);
+    
+    requestAnimationFrame(() => {
+      isAdjusting.current = false;
+    });
+  }, [currentHourInBase, cellWidth]);
 
   // On mount, center + attach smooth wheel handler
   useEffect(() => {
@@ -203,8 +208,12 @@ export function ScrollableTimeline({
         return;
       }
 
+      isAdjusting.current = true;
       el.scrollLeft += diff * 0.22;
       wheelRafRef.current = requestAnimationFrame(animate);
+      requestAnimationFrame(() => {
+        isAdjusting.current = false;
+      });
     };
 
     const wheelHandler = (e: WheelEvent) => {
@@ -254,13 +263,17 @@ export function ScrollableTimeline({
   useLayoutEffect(() => {
     if (dragging || !scrollRef.current) return;
     const el = scrollRef.current;
-    const scrollLeft = (CENTER_START + selectedHour) * CELL_WIDTH - el.clientWidth / 2 + CELL_WIDTH / 2;
+    const scrollLeft = (CENTER_START + selectedHour) * cellWidth - el.clientWidth / 2 + cellWidth / 2;
     // Only scroll if it's significantly different to avoid jitter
     if (Math.abs(el.scrollLeft - scrollLeft) > 1) {
+      isAdjusting.current = true;
       el.scrollLeft = scrollLeft;
       wheelTargetRef.current = scrollLeft;
+      requestAnimationFrame(() => {
+        isAdjusting.current = false;
+      });
     }
-  }, [selectedHour, dragging]);
+  }, [selectedHour, dragging, cellWidth]);
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
@@ -268,9 +281,11 @@ export function ScrollableTimeline({
     const el = scrollRef.current;
     if (!el) return;
 
-    const oneDay = 24 * CELL_WIDTH;
+    const oneDay = 24 * cellWidth;
 
-    if (el.scrollLeft < oneDay * 0.5) {
+    // Thresholds for 5-day buffer:
+    // We want to stay roughly between day 1.5 and 3.5
+    if (el.scrollLeft < oneDay * 1.5) {
       isAdjusting.current = true;
       dateChangedByScroll.current = true;
       el.scrollLeft += oneDay;
@@ -281,7 +296,7 @@ export function ScrollableTimeline({
       requestAnimationFrame(() => {
         isAdjusting.current = false;
       });
-    } else if (el.scrollLeft > oneDay * 1.5) {
+    } else if (el.scrollLeft > oneDay * 3.5) {
       isAdjusting.current = true;
       dateChangedByScroll.current = true;
       el.scrollLeft -= oneDay;
@@ -293,7 +308,7 @@ export function ScrollableTimeline({
         isAdjusting.current = false;
       });
     }
-  }, [selectedDate, onSelectDate]);
+  }, [selectedDate, onSelectDate, cellWidth]);
 
   // Click on a cell
   const handleCellClick = useCallback(
@@ -301,18 +316,36 @@ export function ScrollableTimeline({
       const dayOffset = Math.floor(cellIndex / 24);
       const hour = cellIndex % 24;
 
-      if (dayOffset === 0) {
-        // Previous day
+      if (dayOffset < 2) {
+        // Earlier days
         dateChangedByScroll.current = true;
-        onSelectDate(addDays(selectedDate, -1));
-      } else if (dayOffset === 2) {
-        // Next day
+        if (scrollRef.current) {
+          const oneDay = 24 * cellWidth;
+          isAdjusting.current = true;
+          scrollRef.current.scrollLeft += oneDay;
+          if (wheelTargetRef.current !== null) wheelTargetRef.current += oneDay;
+          requestAnimationFrame(() => {
+            isAdjusting.current = false;
+          });
+        }
+        onSelectDate(addDays(selectedDate, dayOffset - 2));
+      } else if (dayOffset > 2) {
+        // Later days
         dateChangedByScroll.current = true;
-        onSelectDate(addDays(selectedDate, 1));
+        if (scrollRef.current) {
+          const oneDay = 24 * cellWidth;
+          isAdjusting.current = true;
+          scrollRef.current.scrollLeft -= oneDay;
+          if (wheelTargetRef.current !== null) wheelTargetRef.current -= oneDay;
+          requestAnimationFrame(() => {
+            isAdjusting.current = false;
+          });
+        }
+        onSelectDate(addDays(selectedDate, dayOffset - 2));
       }
       onSelectHour(hour);
     },
-    [selectedDate, onSelectDate, onSelectHour],
+    [selectedDate, onSelectDate, onSelectHour, cellWidth],
   );
 
   // Selection position in 72-cell space (current day = cells 24-47)
@@ -412,11 +445,11 @@ export function ScrollableTimeline({
   // Compute selection overlay position in pixels
   const getCellLeft = (idx: number) => {
     const marginOffset = Math.floor(idx / 24) * 2;
-    return idx * (CELL_WIDTH + 1) + marginOffset;
+    return idx * cellWidth + marginOffset;
   };
 
   const selLeft = getCellLeft(selectionAbsStart);
-  const selWidth = getCellLeft(selectionAbsStart + duration) - selLeft - 1;
+  const selWidth = getCellLeft(selectionAbsStart + duration) - selLeft;
 
   return (
     <div className="rounded-xl border border-border bg-card p-1.5 sm:p-5 overflow-hidden">
@@ -444,7 +477,7 @@ export function ScrollableTimeline({
             {format(selectedDate, "EEEE, MMMM d, yyyy")}
           </span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
           {/* Timeline Modes */}
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card mr-1">
             <TooltipProvider>
@@ -704,20 +737,20 @@ export function ScrollableTimeline({
                 const offset = cityOffsets[idx] ?? 0;
 
                 return (
-                  <div key={city.id} className="flex gap-px">
+                  <div key={city.id} className="flex">
                     {Array.from({ length: TOTAL_CELLS }, (_, cellIdx) => {
                       const baseHour = cellIdx % 24;
                       const dayIdx = Math.floor(cellIdx / 24);
                       const cityHour = (((baseHour + offset) % 24) + 24) % 24;
                       const isCurrent =
-                        dayIdx === 1 &&
+                        dayIdx === 2 &&
                         isToday &&
                         currentHourInBase !== null &&
                         baseHour === currentHourInBase;
                       const inSelection =
                         cellIdx >= selectionAbsStart &&
                         cellIdx < selectionAbsEnd;
-                      const isDimmed = dayIdx !== 1;
+                      const isDimmed = dayIdx !== 2;
 
                       const opacity = getTimeOfDayOpacity(cityHour, isDarkMode);
                       const effectiveOpacity = isDimmed
@@ -732,9 +765,9 @@ export function ScrollableTimeline({
                           : isDimmed
                             ? isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"
                             : "transparent",
-                        border: !showBg 
-                          ? `1px solid ${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.08)"}` 
-                          : undefined,
+                        border: `1px solid ${isDarkMode ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
+                        backgroundClip: "padding-box",
+                        transition: "none",
                       };
 
                       // Mode-specific logic
@@ -750,8 +783,8 @@ export function ScrollableTimeline({
                           }`}
                           style={{
                             ...cellStyle,
-                            minWidth: CELL_WIDTH,
-                            flex: `0 0 ${CELL_WIDTH}px`,
+                            minWidth: cellWidth,
+                            flex: `0 0 ${cellWidth}px`,
                           }}
                           title={`${city.name}: ${formatHourFull(cityHour, use24h)}`}
                         >
