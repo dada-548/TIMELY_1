@@ -29,6 +29,8 @@ interface WorldMapSVGProps {
   onHoverCity: (city: City | null) => void;
   highlightColor: string;
   showTimezones?: boolean;
+  hoveredTimezone: number | null;
+  onHoverTimezone: (tz: number | null) => void;
 }
 
 function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
@@ -191,17 +193,22 @@ export function WorldMapSVG({
   onHoverCity,
   highlightColor,
   showTimezones = false,
+  hoveredTimezone,
+  onHoverTimezone,
 }: WorldMapSVGProps) {
   const [tooltipCity, setTooltipCity] = useState<{
     city: City;
     screenX: number;
     screenY: number;
   } | null>(null);
-  const [hoveredTimezone, setHoveredTimezone] = useState<number | null>(null);
   const { use24h } = useWorldClock();
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 0]);
+  const [isTwoFingerTouch, setIsTwoFingerTouch] = useState(false);
+  const isTwoFingerRef = useRef(false);
+  const [showTwoFingerOverlay, setShowTwoFingerOverlay] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const labelPlacements = useMemo(
     () => computeLabelPlacements(selectedCities),
@@ -225,6 +232,7 @@ export function WorldMapSVG({
 
   const handlePinEnter = useCallback(
     (city: City, e: React.MouseEvent) => {
+      e.stopPropagation();
       onHoverCity(city);
       setTooltipCity({ city, screenX: e.clientX, screenY: e.clientY });
     },
@@ -239,10 +247,11 @@ export function WorldMapSVG({
   // Touch support for tooltips on mobile
   const handlePinTouch = useCallback(
     (city: City, e: React.TouchEvent) => {
-      e.preventDefault();
+      e.stopPropagation();
+      // Don't prevent default here to allow two-finger gesture to work
+      // and to allow page scrolling if not a direct tap
       const touch = e.touches[0];
       if (tooltipCity?.city.id === city.id) {
-        // Toggle off if same city tapped again
         onHoverCity(null);
         setTooltipCity(null);
       } else {
@@ -256,6 +265,30 @@ export function WorldMapSVG({
     },
     [onHoverCity, tooltipCity],
   );
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length >= 2) {
+      setIsTwoFingerTouch(true);
+      isTwoFingerRef.current = true;
+      setShowTwoFingerOverlay(false);
+      if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+    } else {
+      setIsTwoFingerTouch(false);
+      isTwoFingerRef.current = false;
+      // Show overlay if they try to move with one finger
+      if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+      overlayTimeoutRef.current = setTimeout(() => {
+        if (!isTwoFingerRef.current) setShowTwoFingerOverlay(true);
+      }, 400);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsTwoFingerTouch(false);
+    isTwoFingerRef.current = false;
+    if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+    setShowTwoFingerOverlay(false);
+  }, []);
 
   const hoveredId = hoveredCity?.id;
 
@@ -274,18 +307,44 @@ export function WorldMapSVG({
   }, []);
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div 
+      className={`relative touch-pan-y sm:touch-auto ${zoom > 1 ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}`} 
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={(e) => {
+        if (e.touches.length >= 2) {
+          setIsTwoFingerTouch(true);
+          isTwoFingerRef.current = true;
+          setShowTwoFingerOverlay(false);
+          if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+        }
+      }}
+    >
+      {/* Two-finger overlay for mobile */}
+      {showTwoFingerOverlay && (
+        <div className="absolute inset-0 z-20 bg-black/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-none transition-opacity duration-300 rounded-lg">
+          <div className="bg-card/90 border border-border px-4 py-3 rounded-xl shadow-2xl flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-300">
+            <div className="flex gap-2">
+              <div className="w-2 h-8 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-2 h-8 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+            </div>
+            <p className="text-sm font-medium text-foreground">Use two fingers to move the map</p>
+          </div>
+        </div>
+      )}
+
       {/* Zoom controls */}
-      <div className="absolute top-2 right-2 z-10 flex flex-col gap-1">
+      <div className="absolute top-2 right-2 z-10 flex flex-col gap-2 sm:gap-1">
         <button
           onClick={() => setZoom((z) => Math.min(8, z * 1.5))}
-          className="w-7 h-7 rounded-md bg-card/80 border border-border text-foreground text-sm font-bold hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
+          className="w-10 h-10 sm:w-7 sm:h-7 rounded-md bg-card/80 border border-border text-foreground text-sm font-bold hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
         >
           +
         </button>
         <button
           onClick={() => setZoom((z) => Math.max(1, z / 1.5))}
-          className="w-7 h-7 rounded-md bg-card/80 border border-border text-foreground text-sm font-bold hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
+          className="w-10 h-10 sm:w-7 sm:h-7 rounded-md bg-card/80 border border-border text-foreground text-sm font-bold hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
         >
           −
         </button>
@@ -295,7 +354,7 @@ export function WorldMapSVG({
               setZoom(1);
               setCenter([0, 0]);
             }}
-            className="w-7 h-7 rounded-md bg-card/80 border border-border text-muted-foreground text-[10px] font-medium hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
+            className="w-10 h-10 sm:w-7 sm:h-7 rounded-md bg-card/80 border border-border text-muted-foreground text-[10px] font-medium hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
             title="Reset zoom"
           >
             ↺
@@ -310,6 +369,10 @@ export function WorldMapSVG({
         height={400}
         className="w-full h-auto rounded-lg"
         style={{ backgroundColor: "hsl(var(--card))" }}
+        onClick={() => {
+          onHoverCity(null);
+          setTooltipCity(null);
+        }}
       >
         <ZoomableGroup
           zoom={zoom}
@@ -320,6 +383,14 @@ export function WorldMapSVG({
           }}
           minZoom={1}
           maxZoom={8}
+          // Only allow panning/zooming with two fingers on mobile
+          // or always on desktop
+          filterZoomEvent={(e) => {
+            if (e.type === 'wheel') return true;
+            if (e.type === 'mousedown') return true;
+            if (e.type.startsWith('touch')) return isTwoFingerRef.current;
+            return true;
+          }}
         >
           {/* Land */}
           <Geographies geography={GEO_URL}>
@@ -337,7 +408,7 @@ export function WorldMapSVG({
                   centerLng = geo.geometry.coordinates[0][0][0][0];
                 }
                 
-                const countryTz = Math.round(centerLng / 15) * 15;
+                const countryTz = Math.round(centerLng / 15);
                 const isInHoveredTz = showTimezones && hoveredTimezone === countryTz;
 
                 return (
@@ -345,8 +416,8 @@ export function WorldMapSVG({
                     key={geo.rsmKey}
                     geography={geo}
                     fill={isUSHovered || isInHoveredTz ? highlightColor : landFill}
-                    stroke={landStroke}
-                    strokeWidth={0.5}
+                    stroke={isInHoveredTz ? highlightColor : landStroke}
+                    strokeWidth={isInHoveredTz ? 1.5 : 0.5}
                     opacity={isInHoveredTz ? 0.6 : 1}
                     onMouseEnter={() => {
                       if (isUS && zoom === 1) {
@@ -378,13 +449,23 @@ export function WorldMapSVG({
                 const isUSHovered = zoom === 1 && hoveredCity?.id === "usa-continent";
                 if (isUSHovered) return null; // Hide state lines when US continent is hovered at zoom 1
 
+                // Calculate state timezone
+                let centerLng = 0;
+                if (geo.geometry.type === "Polygon") {
+                  centerLng = geo.geometry.coordinates[0][0][0];
+                } else if (geo.geometry.type === "MultiPolygon") {
+                  centerLng = geo.geometry.coordinates[0][0][0][0];
+                }
+                const stateTz = Math.round(centerLng / 15);
+                const isInHoveredTz = showTimezones && hoveredTimezone === stateTz;
+
                 return (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill="transparent"
-                    stroke={landStroke}
-                    strokeWidth={0.3 / zoom}
+                    fill={isInHoveredTz ? `${highlightColor}30` : "transparent"}
+                    stroke={isInHoveredTz ? highlightColor : landStroke}
+                    strokeWidth={isInHoveredTz ? 1 / zoom : 0.3 / zoom}
                     style={{
                       default: { outline: "none" },
                       hover: {
@@ -441,34 +522,41 @@ export function WorldMapSVG({
 
           {/* Timezone meridian lines and interactive strips */}
           {showTimezones &&
-            TIMEZONE_LONGITUDES.map((lng) => (
-              <React.Fragment key={`tz-group-${lng}`}>
-                {/* Interactive strip for hover */}
-                <rect
-                  x={lng}
-                  y={-90}
-                  width={15}
-                  height={180}
-                  fill={hoveredTimezone === lng ? highlightColor : "transparent"}
-                  opacity={hoveredTimezone === lng ? 0.15 : 0}
-                  onMouseEnter={() => setHoveredTimezone(lng)}
-                  onMouseLeave={() => setHoveredTimezone(null)}
-                  className="cursor-pointer"
-                />
-                <Line
-                  from={[lng, -85]}
-                  to={[lng, 85]}
-                  stroke={tzLineColor}
-                  strokeWidth={0.8 / zoom}
-                />
-              </React.Fragment>
-            ))}
+            TIMEZONE_LONGITUDES.map((lng, i) => {
+              const offset = Math.round(lng / 15);
+              const isHovered = hoveredTimezone === offset;
+              const stripColor = i % 2 === 0 ? `${highlightColor}25` : `${highlightColor}12`;
+              
+              return (
+                <React.Fragment key={`tz-group-${lng}`}>
+                  {/* Interactive strip for hover */}
+                  <rect
+                    x={lng}
+                    y={-90}
+                    width={15}
+                    height={180}
+                    fill={isHovered ? `${highlightColor}40` : stripColor}
+                    opacity={isHovered ? 0.6 : 0.3}
+                    onMouseEnter={() => onHoverTimezone(offset)}
+                    onMouseLeave={() => onHoverTimezone(null)}
+                    className="cursor-pointer transition-all duration-200"
+                  />
+                  <Line
+                    from={[lng, -85]}
+                    to={[lng, 85]}
+                    stroke={tzLineColor}
+                    strokeWidth={0.8 / zoom}
+                  />
+                </React.Fragment>
+              );
+            })}
 
           {/* UTC labels on timezone lines */}
           {showTimezones &&
             TIMEZONE_LONGITUDES.filter((lng) => lng >= -180 && lng < 180).map(
               (lng) => {
-                const utcOffset = lng / 15;
+                const utcOffset = Math.round(lng / 15);
+                const isHovered = hoveredTimezone === utcOffset;
                 const label =
                   utcOffset === 0
                     ? "GMT"
@@ -479,10 +567,10 @@ export function WorldMapSVG({
                     <text
                       textAnchor="middle"
                       fontSize={Math.max(5, 7 * Math.pow(zoom, 0.3)) / zoom}
-                      fill={tzLabelColor}
+                      fill={isHovered ? highlightColor : tzLabelColor}
                       fontFamily="'Inter', sans-serif"
-                      fontWeight={utcOffset === 0 ? 600 : 400}
-                      className="pointer-events-none select-none"
+                      fontWeight={isHovered || utcOffset === 0 ? 600 : 400}
+                      className="pointer-events-none select-none transition-colors duration-200"
                     >
                       {label}
                     </text>
@@ -515,6 +603,8 @@ export function WorldMapSVG({
                   onTouchStart={(e: React.TouchEvent) => handlePinTouch(city, e)}
                   className="cursor-pointer"
                 >
+                  {/* Larger hit area for touch */}
+                  <circle r={12 / s} fill="transparent" />
                   <circle
                     r={(isHovered ? 6 : 3.5) / s}
                     fill={
@@ -558,7 +648,7 @@ export function WorldMapSVG({
             const offset = getLabelOffset(placement, s);
 
             // Check if city is in hovered timezone
-            const cityOffset = Math.round((city.lng || city.coordinates[0]) / 15) * 15;
+            const cityOffset = Math.round((city.lng || city.coordinates[0]) / 15);
             const isInHoveredTz = showTimezones && hoveredTimezone === cityOffset;
 
             return (
@@ -572,6 +662,8 @@ export function WorldMapSVG({
                 onTouchStart={(e: React.TouchEvent) => handlePinTouch(city, e)}
                 className="cursor-pointer"
               >
+                {/* Larger hit area for touch */}
+                <circle r={15 / s} fill="transparent" />
                 <circle r={(isHovered || isInHoveredTz ? 8 : 5) / s} fill={`${isHovered || isInHoveredTz ? highlightColor : pinColor}30`} />
                 <circle
                   r={(isHovered || isInHoveredTz ? 4 : 2.5) / s}

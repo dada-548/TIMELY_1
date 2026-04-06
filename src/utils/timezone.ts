@@ -80,10 +80,54 @@ const TZ_ABBREV_MAP: Record<string, string> = {
   "America/Mexico_City": "CST",
 };
 
+const SEASONAL_TZ_MAP: Record<string, { standard: string; daylight: string }> = {
+  "Australia/Sydney": { standard: "AEST", daylight: "AEDT" },
+  "Australia/Melbourne": { standard: "AEST", daylight: "AEDT" },
+  "Australia/Adelaide": { standard: "ACST", daylight: "ACDT" },
+  "Australia/Canberra": { standard: "AEST", daylight: "AEDT" },
+  "Australia/Hobart": { standard: "AEST", daylight: "AEDT" },
+  "Australia/Brisbane": { standard: "AEST", daylight: "AEST" },
+  "Australia/Perth": { standard: "AWST", daylight: "AWST" },
+  "Australia/Darwin": { standard: "ACST", daylight: "ACST" },
+  "America/New_York": { standard: "EST", daylight: "EDT" },
+  "America/Chicago": { standard: "CST", daylight: "CDT" },
+  "America/Denver": { standard: "MST", daylight: "MDT" },
+  "America/Los_Angeles": { standard: "PST", daylight: "PDT" },
+  "America/Phoenix": { standard: "MST", daylight: "MST" },
+  "Europe/London": { standard: "GMT", daylight: "BST" },
+  "Europe/Paris": { standard: "CET", daylight: "CEST" },
+  "Europe/Berlin": { standard: "CET", daylight: "CEST" },
+  "Europe/Rome": { standard: "CET", daylight: "CEST" },
+  "Europe/Madrid": { standard: "CET", daylight: "CEST" },
+  "Europe/Amsterdam": { standard: "CET", daylight: "CEST" },
+  "Europe/Brussels": { standard: "CET", daylight: "CEST" },
+  "Europe/Vienna": { standard: "CET", daylight: "CEST" },
+  "Europe/Zurich": { standard: "CET", daylight: "CEST" },
+  "Europe/Stockholm": { standard: "CET", daylight: "CEST" },
+  "Europe/Oslo": { standard: "CET", daylight: "CEST" },
+  "Europe/Copenhagen": { standard: "CET", daylight: "CEST" },
+  "Europe/Prague": { standard: "CET", daylight: "CEST" },
+  "Europe/Warsaw": { standard: "CET", daylight: "CEST" },
+  "Europe/Budapest": { standard: "CET", daylight: "CEST" },
+  "Europe/Lisbon": { standard: "WET", daylight: "WEST" },
+  "Europe/Dublin": { standard: "GMT", daylight: "IST" },
+  "America/Toronto": { standard: "EST", daylight: "EDT" },
+  "America/Vancouver": { standard: "PST", daylight: "PDT" },
+  "Asia/Jerusalem": { standard: "IST", daylight: "IDT" },
+  "Asia/Beirut": { standard: "EET", daylight: "EEST" },
+  "Asia/Amman": { standard: "EET", daylight: "EEST" },
+  "Asia/Damascus": { standard: "EET", daylight: "EEST" },
+};
+
 export function getTimezoneAbbreviation(
   timezone: string,
   date: Date = new Date(),
 ): string {
+  const seasonal = SEASONAL_TZ_MAP[timezone];
+  if (seasonal) {
+    return isDSTActive(timezone, date) ? seasonal.daylight : seasonal.standard;
+  }
+
   const formatter = new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
     timeZoneName: "short",
@@ -209,14 +253,17 @@ export function getDiffFromLocal(
   return { timeDiff: timeDiffStr, dayOffset };
 }
 
-export function isDSTActive(timezone: string): boolean {
-  const jan = new Date(new Date().getFullYear(), 0, 1);
-  const jul = new Date(new Date().getFullYear(), 6, 1);
+export function isDSTActive(
+  timezone: string,
+  date: Date = new Date(),
+): boolean {
+  const jan = new Date(date.getFullYear(), 0, 1);
+  const jul = new Date(date.getFullYear(), 6, 1);
   const janOffset = getOffsetMinutes(timezone, jan);
   const julOffset = getOffsetMinutes(timezone, jul);
   if (janOffset === julOffset) return false;
-  const now = getOffsetMinutes(timezone);
-  return now === Math.max(janOffset, julOffset);
+  const currentOffset = getOffsetMinutes(timezone, date);
+  return currentOffset === Math.max(janOffset, julOffset);
 }
 
 export function observesDST(timezone: string): boolean {

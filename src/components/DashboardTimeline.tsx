@@ -62,55 +62,28 @@ export function DashboardTimeline() {
     setDuration(newDuration);
   }, []);
 
-  if (selectedCities.length === 0) return null;
+  if (selectedCities.length === 0 || !fromCity) return null;
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="w-full flex items-center justify-between px-4 py-3">
-        <button
-          onClick={() => setVisible((v) => !v)}
-          className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-foreground/80"
-        >
-          <Grid3X3 className="h-4 w-4" style={{ color: highlightColor }} />
-          TIMELINE
-        </button>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setVisible((v) => !v)}
-            className="p-1 text-muted-foreground hover:text-foreground"
-          >
-            {visible ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {visible && fromCity && (
-        <div className="pb-3 min-w-0">
-          <ScrollableTimeline
-            selectedCities={selectedCities}
-            fromCityIdx={fromCityIdx}
-            fromCity={fromCity}
-            cityOffsets={cityOffsets}
-            selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
-            selectedHour={selectedHour}
-            onSelectHour={setSelectedHour}
-            selectedMinute={selectedMinute}
-            duration={duration}
-            currentHourInBase={currentHourInBase}
-            now={now}
-            getDiffLabel={getDiffLabel}
-            onDragMove={handleDragMove}
-            onResizeEnd={handleResizeEnd}
-            maxHeight="300px"
-          />
-        </div>
-      )}
+    <div className="min-w-0">
+      <ScrollableTimeline
+        selectedCities={selectedCities}
+        fromCityIdx={fromCityIdx}
+        fromCity={fromCity}
+        cityOffsets={cityOffsets}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        selectedHour={selectedHour}
+        onSelectHour={setSelectedHour}
+        selectedMinute={selectedMinute}
+        duration={duration}
+        currentHourInBase={currentHourInBase}
+        now={now}
+        getDiffLabel={getDiffLabel}
+        onDragMove={handleDragMove}
+        onResizeEnd={handleResizeEnd}
+        maxHeight="300px"
+      />
     </div>
   );
 }

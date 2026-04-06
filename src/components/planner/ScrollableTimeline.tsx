@@ -15,8 +15,9 @@ import {
   Sunset,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   LayoutGrid,
-  PaintRoller,
   MessageSquare,
   Briefcase,
   Clock,
@@ -164,6 +165,7 @@ export function ScrollableTimeline({
   const cellWidth = isMobile ? 32 : 36;
   const isDarkMode = theme === "dark";
   const [dateFlash, setDateFlash] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   // Drag state
   const [dragging, setDragging] = useState<
@@ -176,35 +178,25 @@ export function ScrollableTimeline({
   const isToday = isSameDay(selectedDate, new Date());
 
   // Center scroll on current day or current hour
-  const centerScroll = useCallback((smooth = false) => {
+  const centerScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     
     isAdjusting.current = true;
     // If we have a current hour, center on it to show "12 hours in the future"
-    // Otherwise center on the selected hour to maintain context
-    const startHour = currentHourInBase !== null ? currentHourInBase : selectedHour;
+    // Otherwise center on the start of the current day
+    const startHour = currentHourInBase !== null ? currentHourInBase : 0;
     const scrollLeft = (CENTER_START + startHour) * cellWidth - el.clientWidth / 2 + cellWidth / 2;
+    el.scrollLeft = scrollLeft;
+    wheelTargetRef.current = scrollLeft;
     
-    if (smooth) {
-      el.scrollTo({ left: scrollLeft, behavior: "smooth" });
-      wheelTargetRef.current = scrollLeft;
-      // Keep isAdjusting true for a bit longer to allow smooth scroll to finish
-      setTimeout(() => {
-        isAdjusting.current = false;
-      }, 500);
-    } else {
-      el.scrollLeft = scrollLeft;
-      wheelTargetRef.current = scrollLeft;
-      requestAnimationFrame(() => {
-        isAdjusting.current = false;
-      });
-    }
-  }, [currentHourInBase, cellWidth, selectedHour]);
+    requestAnimationFrame(() => {
+      isAdjusting.current = false;
+    });
+  }, [currentHourInBase, cellWidth]);
 
-  // On mount, center + attach smooth wheel handler
+  // On mount, attach smooth wheel handler
   useEffect(() => {
-    centerScroll();
     const el = scrollRef.current;
     if (!el) return;
 
@@ -253,20 +245,26 @@ export function ScrollableTimeline({
       }
       el.removeEventListener("wheel", wheelHandler);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cellWidth]);
 
-  // When date changes externally (calendar strip), we no longer auto-center
-  // to avoid jarring jumps. The content stays at the same relative time position.
+  // Initial center on mount
+  useEffect(() => {
+    centerScroll();
+  }, []); // Only once on mount
+
+  // When date changes externally (calendar strip), re-center
   const prevDateRef = useRef(selectedDate);
   useEffect(() => {
     if (prevDateRef.current.getTime() !== selectedDate.getTime()) {
+      if (!dateChangedByScroll.current) {
+        centerScroll();
+      }
       dateChangedByScroll.current = false;
       setDateFlash(true);
       setTimeout(() => setDateFlash(false), 700);
     }
     prevDateRef.current = selectedDate;
-  }, [selectedDate]);
+  }, [selectedDate, centerScroll]);
 
   // Infinite scroll handler
   const handleScroll = useCallback(() => {
@@ -308,29 +306,36 @@ export function ScrollableTimeline({
     (cellIndex: number) => {
       const dayOffset = Math.floor(cellIndex / 24);
       const hour = cellIndex % 24;
-      const diff = dayOffset - 2;
 
-      if (diff !== 0) {
+      // If we click a cell in a different day (Yesterday or Tomorrow), 
+      // we need to shift the scroll position to keep the clicked hour under the mouse
+      if (dayOffset !== 2) {
         dateChangedByScroll.current = true;
         if (scrollRef.current) {
-          const oneDay = 24 * cellWidth + 2; // 24 cells + 2px margin
-          const shift = diff * oneDay;
-          
+          // A full day is 24 cells + the 2px margin between days
+          const oneDay = 24 * cellWidth + 2;
           isAdjusting.current = true;
-          // To keep the clicked cell at the same visual position when selectedDate changes:
-          // newScrollLeft = oldScrollLeft - diff * oneDay
-          const newScrollLeft = scrollRef.current.scrollLeft - shift;
-          scrollRef.current.scrollLeft = newScrollLeft;
+          
+          // Calculate the shift: 
+          // If we click Yesterday (dayOffset 1), we move 1 day forward (+oneDay)
+          // If we click Tomorrow (dayOffset 3), we move 1 day backward (-oneDay)
+          const daysToShift = 2 - dayOffset;
+          const shiftAmount = daysToShift * oneDay;
+          
+          scrollRef.current.scrollLeft += shiftAmount;
           if (wheelTargetRef.current !== null) {
-            wheelTargetRef.current = newScrollLeft;
+            wheelTargetRef.current += shiftAmount;
           }
           
           requestAnimationFrame(() => {
             isAdjusting.current = false;
           });
         }
-        onSelectDate(addDays(selectedDate, diff));
+        onSelectDate(addDays(selectedDate, dayOffset - 2));
       }
+      
+      // Select the hour. This should NOT trigger a re-center because of the 
+      // check in the useEffect that watches selectedDate.
       onSelectHour(hour);
     },
     [selectedDate, onSelectDate, onSelectHour, cellWidth],
@@ -443,14 +448,17 @@ export function ScrollableTimeline({
     <div className="rounded-xl border border-border bg-card p-1.5 sm:p-5 overflow-hidden">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 mb-3">
-        <div className="flex flex-col">
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2 py-0.5 flex items-center gap-1.5">
+        <button
+          onClick={() => setVisible((v) => !v)}
+          className="flex flex-col items-start hover:text-foreground/80 transition-colors text-left"
+        >
+          <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2 px-2">
             <LayoutGrid
-              className="h-3.5 w-3.5"
+              className="h-4 w-4"
               style={{ color: highlightColor }}
             />
-            TIME GRID
-          </h3>
+            <span>TIME GRID</span>
+          </div>
           <span
             className="text-xs  sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2 py-0.5"
             style={{
@@ -464,7 +472,7 @@ export function ScrollableTimeline({
           >
             {format(selectedDate, "EEEE, MMMM d, yyyy")}
           </span>
-        </div>
+        </button>
         <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
           {/* Timeline Modes */}
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card mr-1">
@@ -484,10 +492,10 @@ export function ScrollableTimeline({
                         : undefined
                     }
                   >
-                    <PaintRoller className="h-3.5 w-3.5" />
+                    <Clock className="h-3.5 w-3.5" />
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>Color Coat</TooltipContent>
+                <TooltipContent>Default Grid</TooltipContent>
               </Tooltip>
 
               <Tooltip>
@@ -567,17 +575,27 @@ export function ScrollableTimeline({
           >
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
-          <span className="text-[10px] text-muted-foreground ml-2 hidden sm:inline">
-            Scroll to navigate days
-          </span>
+
+          <button
+            onClick={() => setVisible((v) => !v)}
+            className="p-1 text-muted-foreground hover:text-foreground ml-1"
+          >
+            {visible ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
         </div>
       </div>
 
       {/* Two-column layout: fixed labels + scrollable cells */}
-      <div 
-        className="flex w-full min-w-0 overflow-y-auto scrollbar-thin scrollbar-thumb-border"
-        style={maxHeight ? { maxHeight } : undefined}
-      >
+      {visible && (
+        <>
+          <div 
+            className="flex w-full min-w-0 overflow-y-auto scrollbar-thin scrollbar-thumb-border"
+            style={maxHeight ? { maxHeight } : undefined}
+          >
         {/* Fixed labels column */}
         <div className="w-16 sm:w-44 flex-shrink-0 border-r border-border/50 bg-card/50">
           <div className="h-6" />
@@ -956,6 +974,8 @@ export function ScrollableTimeline({
           <span className="text-[10px] text-muted-foreground">Selected</span>
         </div>
       </div>
-    </div>
-  );
+    </>
+  )}
+</div>
+);
 }

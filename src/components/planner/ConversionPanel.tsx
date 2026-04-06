@@ -94,11 +94,8 @@ export function ConversionPanel({
             {fromCity.name}
           </span>
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-[10px] text-muted-foreground font-medium">
               {getTimezoneAbbreviation(fromCity.timezone, now)}
-            </span>
-            <span className="text-[10px] text-muted-foreground">
-              {getUTCOffset(fromCity.timezone, now).replace("UTC", "GMT")}
             </span>
           </div>
         </div>
@@ -147,15 +144,20 @@ export function ConversionPanel({
                   {city.name}
                 </span>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-[10px] text-muted-foreground font-medium">
                     {getTimezoneAbbreviation(city.timezone, now)}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">
-                    {getUTCOffset(city.timezone, now).replace("UTC", "GMT")}
-                  </span>
-                  {diffLabel && (
+                  {(diffLabel || conv.dayOffset !== 0) && (
                     <span className="text-[10px] text-muted-foreground">
                       {diffLabel}
+                      {conv.dayOffset !== 0 && (
+                        <span 
+                          className="ml-1 font-bold"
+                          style={{ color: dayIndicationColor }}
+                        >
+                          {conv.dayOffset > 0 ? "+" : ""}{conv.dayOffset}d
+                        </span>
+                      )}
                     </span>
                   )}
                 </div>
