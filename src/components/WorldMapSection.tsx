@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Sun, Moon, Sunrise, Sunset } from "lucide-react";
-import { ChevronDown, ChevronUp, MapPin, Globe } from "lucide-react";
+import { ChevronDown, ChevronUp, MapPin, Globe, CloudMoon } from "lucide-react";
 import { useClock } from "@/hooks/useClock";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { CITIES, City } from "@/data/cities";
@@ -20,6 +20,7 @@ export function WorldMapSection() {
   const { selectedCities, highlightColor, use24h } = useWorldClock();
   const [hoveredCity, setHoveredCity] = useState<City | null>(null);
   const [hoveredTimezone, setHoveredTimezone] = useState<number | null>(null);
+  const [showNightShade, setShowNightShade] = useState(true);
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -45,7 +46,8 @@ export function WorldMapSection() {
               month: "long",
               day: "numeric",
             })}{" "}
-            · {now.toLocaleTimeString(undefined, {
+            ·{" "}
+            {now.toLocaleTimeString(undefined, {
               hour: "2-digit",
               minute: "2-digit",
               hour12: !use24h,
@@ -55,6 +57,28 @@ export function WorldMapSection() {
 
         <div className="flex items-center gap-2">
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => setShowNightShade((v) => !v)}
+                    className={`p-1.5 transition-colors ${
+                      showNightShade
+                        ? "text-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    style={
+                      showNightShade
+                        ? { backgroundColor: `${highlightColor}25` }
+                        : undefined
+                    }
+                  >
+                    <CloudMoon className="h-3.5 w-3.5" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>Night shade</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -104,6 +128,7 @@ export function WorldMapSection() {
               highlightColor={highlightColor}
               hoveredTimezone={hoveredTimezone}
               onHoverTimezone={setHoveredTimezone}
+              showNightShade={showNightShade}
             />
           </div>
 

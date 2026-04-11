@@ -1,0 +1,3048 @@
+{
+  "Africa/Abidjan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Abidjan-tz"
+    }
+  ],
+  "Africa/Accra": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Accra-tz"
+    }
+  ],
+  "Africa/Addis_Ababa": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Addis_Ababa-tz"
+    }
+  ],
+  "Africa/Algiers": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Algiers-tz"
+    }
+  ],
+  "Africa/Asmara": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Asmara-tz"
+    }
+  ],
+  "Africa/Bamako": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Bamako-tz"
+    }
+  ],
+  "Africa/Bangui": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Bangui-tz"
+    }
+  ],
+  "Africa/Banjul": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Banjul-tz"
+    }
+  ],
+  "Africa/Bissau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Bissau-tz"
+    }
+  ],
+  "Africa/Blantyre": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Blantyre-tz"
+    }
+  ],
+  "Africa/Brazzaville": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Brazzaville-tz"
+    }
+  ],
+  "Africa/Bujumbura": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Bujumbura-tz"
+    }
+  ],
+  "Africa/Cairo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Cairo-tz"
+    }
+  ],
+  "Africa/Casablanca": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Casablanca-tz"
+    }
+  ],
+  "Africa/Ceuta": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Ceuta-tz"
+    }
+  ],
+  "Africa/Conakry": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Conakry-tz"
+    }
+  ],
+  "Africa/Dakar": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Dakar-tz"
+    }
+  ],
+  "Africa/Dar_es_Salaam": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Dar_es_Salaam-tz"
+    }
+  ],
+  "Africa/Djibouti": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Djibouti-tz"
+    }
+  ],
+  "Africa/Douala": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Douala-tz"
+    }
+  ],
+  "Africa/El_Aaiun": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-El_Aaiun-tz"
+    }
+  ],
+  "Africa/Freetown": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Freetown-tz"
+    }
+  ],
+  "Africa/Gaborone": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Gaborone-tz"
+    }
+  ],
+  "Africa/Harare": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Harare-tz"
+    }
+  ],
+  "Africa/Johannesburg": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Johannesburg-tz"
+    }, {
+      "op": "union",
+      "source": "manual-polygon",
+      "data": [[[-5.5,-86],[0,-86],[0,-68],[-5.5,-69],[-5.5,-86]]],
+      "description": "Add Antarctic Station of SANAE IV."
+    }
+  ],
+  "Africa/Juba": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Juba-tz"
+    }
+  ],
+  "Africa/Kampala": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Kampala-tz"
+    }
+  ],
+  "Africa/Khartoum": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Khartoum-tz"
+    }
+  ],
+  "Africa/Kigali": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Kigali-tz"
+    }
+  ],
+  "Africa/Kinshasa": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Kinshasa-tz"
+    }
+  ],
+  "Africa/Lagos": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Lagos-tz"
+    }
+  ],
+  "Africa/Libreville": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Libreville-tz"
+    }
+  ],
+  "Africa/Lome": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Lome-tz"
+    }
+  ],
+  "Africa/Luanda": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Luanda-tz"
+    }
+  ],
+  "Africa/Lubumbashi": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Lubumbashi-tz"
+    }
+  ],
+  "Africa/Lusaka": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Lusaka-tz"
+    }
+  ],
+  "Africa/Malabo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Malabo-tz"
+    }
+  ],
+  "Africa/Maputo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Maputo-tz"
+    }
+  ],
+  "Africa/Maseru": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Maseru-tz"
+    }
+  ],
+  "Africa/Mbabane": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Mbabane-tz"
+    }
+  ],
+  "Africa/Mogadishu": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Mogadishu-tz"
+    }
+  ],
+  "Africa/Monrovia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Monrovia-tz"
+    }
+  ],
+  "Africa/Nairobi": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Nairobi-tz"
+    }
+  ],
+  "Africa/Ndjamena": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Ndjamena-tz"
+    }
+  ],
+  "Africa/Niamey": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Niamey-tz"
+    }
+  ],
+  "Africa/Nouakchott": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Nouakchott-tz"
+    }
+  ],
+  "Africa/Ouagadougou": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Ouagadougou-tz"
+    }
+  ],
+  "Africa/Porto-Novo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Porto_Novo-tz"
+    }
+  ],
+  "Africa/Sao_Tome": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Sao_Tome-tz"
+    }
+  ],
+  "Africa/Tripoli": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Tripoli-tz"
+    }
+  ],
+  "Africa/Tunis": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Tunis-tz"
+    }
+  ],
+  "Africa/Windhoek": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Africa-Windhoek-tz"
+    }
+  ],
+  "America/Adak": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Adak-tz"
+    }
+  ],
+  "America/Anchorage": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Anchorage-tz"
+    }
+  ],
+  "America/Anguilla": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Anguilla-tz"
+    }
+  ],
+  "America/Antigua": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Antigua-tz"
+    }
+  ],
+  "America/Aruba": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Aruba-tz"
+    }
+  ],
+  "America/Araguaina": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Araguaina-tz"
+    }
+  ],
+  "America/Argentina/Buenos_Aires": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Buenos_Aires-tz"
+    }
+  ],
+  "America/Argentina/Catamarca": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Catamarca-tz"
+    }
+  ],
+  "America/Argentina/Cordoba": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Cordoba-tz"
+    }
+  ],
+  "America/Argentina/Jujuy": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Jujuy-tz"
+    }
+  ],
+  "America/Argentina/La_Rioja": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-La_Rioja-tz"
+    }
+  ],
+  "America/Argentina/Mendoza": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Mendoza-tz"
+    }
+  ],
+  "America/Argentina/Rio_Gallegos": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Rio_Gallegos-tz"
+    }
+  ],
+  "America/Argentina/Salta": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Salta-tz"
+    }
+  ],
+  "America/Argentina/San_Juan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-San_Juan-tz"
+    }
+  ],
+  "America/Argentina/San_Luis": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-San_Luis-tz"
+    }
+  ],
+  "America/Argentina/Tucuman": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Tucuman-tz"
+    }
+  ],
+  "America/Argentina/Ushuaia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Argentina-Ushuaia-tz"
+    }, {
+      "op": "union",
+      "source": "manual-polygon",
+      "data": [[[-58,-86],[-45,-86],[-35,-86],[-35,-75],[-58,-74],[-54,-63],[-57,-61.6],[-59,-61.8],[-58.8,-62.25],[-57.3,-63.4],[-64,-64],[-63.8,-64.8],[-65.5,-65.25],[-67.5,-66],[-67.5,-86],[-60,-86],[-58,-86]]],
+      "description": "Add Antarctic areas near Stations: Belgrano II, San Martín, Vernadsky, Esperanza and Arctowski."
+    }, {
+      "op": "union",
+      "source": "manual-polygon",
+      "data": [[[-45,-60],[-47.5,-60.5],[-46,-61.5],[-43.5,-61],[-43.5,-60],[-45,-60]]],
+      "description": "Add Antarctic area near Orcadas Station."
+    }
+  ],
+  "America/Asuncion": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Asuncion-tz"
+    }
+  ],
+  "America/Atikokan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Atikokan-tz"
+    }
+  ],
+  "America/Bahia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Bahia-tz"
+    }
+  ],
+  "America/Bahia_Banderas": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Bahia_Banderas-tz"
+    }
+  ],
+  "America/Barbados": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Barbados-tz"
+    }
+  ],
+  "America/Belem": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Belem-tz"
+    }
+  ],
+  "America/Belize": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Belize-tz"
+    }
+  ],
+  "America/Blanc-Sablon": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Blanc_Sablon-tz"
+    }
+  ],
+  "America/Boa_Vista": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Boa_Vista-tz"
+    }
+  ],
+  "America/Bogota": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Bogota-tz"
+    }
+  ],
+  "America/Boise": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Boise-tz"
+    }
+  ],
+  "America/Cambridge_Bay": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Cambridge_Bay-tz"
+    }
+  ],
+  "America/Campo_Grande": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Campo_Grande-tz"
+    }
+  ],
+  "America/Cancun": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Cancun-tz"
+    }
+  ],
+  "America/Caracas": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Caracas-tz"
+    }
+  ],
+  "America/Cayenne": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Cayenne-tz"
+    }
+  ],
+  "America/Cayman": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Cayman-tz"
+    }
+  ],
+  "America/Chicago": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Chicago-tz"
+    }, {
+      "op": "difference",
+      "source": "manual-polygon",
+      "data": [[[-85.2,32.97],[-85.237,32.954],[-85.282,32.847],[-85.235,32.765],[-85.198,32.656],[-85.182,32.571],[-85.214,32.514],[-85.119,32.444],[-85.094,32.397],[-85.073,32.355],[-85.031,32.339],[-85.02,32.3429],[-85.011,32.358],[-84.86,32.35],[-85.2,32.97]]],
+      "description": "Omit a few towns in Alabama close to Georgia that observe eastern time"
+    }
+  ],
+  "America/Chihuahua": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Chihuahua-tz"
+    }
+  ],
+  "America/Ciudad_Juarez": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Ciudad_Juarez-tz"
+    }
+  ],
+  "America/Costa_Rica": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Costa_Rica-tz"
+    }
+  ],
+  "America/Coyhaique": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Coyhaique-tz"
+    }
+  ],
+  "America/Creston": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Creston-tz"
+    }
+  ],
+  "America/Cuiaba": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Cuiaba-tz"
+    }
+  ],
+  "America/Curacao": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Curacao-tz"
+    }
+  ],
+  "America/Danmarkshavn": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Danmarkshavn-tz"
+    }
+  ],
+  "America/Dawson": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Dawson-tz"
+    }
+  ],
+  "America/Dawson_Creek": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Dawson_Creek-tz"
+    }
+  ],
+  "America/Denver": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Denver-tz"
+    }
+  ],
+  "America/Detroit": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Detroit-tz"
+    }
+  ],
+  "America/Dominica": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Dominica-tz"
+    }
+  ],
+  "America/Edmonton": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Edmonton-tz"
+    }
+  ],
+  "America/Eirunepe": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Eirunepe-tz"
+    }
+  ],
+  "America/El_Salvador": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-El_Salvador-tz"
+    }
+  ],
+  "America/Fort_Nelson": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Fort_Nelson-tz"
+    }
+  ],
+  "America/Fortaleza": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Fortaleza-tz"
+    }
+  ],
+  "America/Glace_Bay": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Glace_Bay-tz"
+    }
+  ],
+  "America/Goose_Bay": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Goose_Bay-tz"
+    }
+  ],
+  "America/Grand_Turk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Grand_Turk-tz"
+    }
+  ],
+  "America/Grenada": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Grenada-tz"
+    }
+  ],
+  "America/Guadeloupe": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Guadeloupe-tz"
+    }
+  ],
+  "America/Guatemala": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Guatemala-tz"
+    }
+  ],
+  "America/Guayaquil": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Guayaquil-tz"
+    }
+  ],
+  "America/Guyana": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Guyana-tz"
+    }
+  ],
+  "America/Halifax": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Halifax-tz"
+    }
+  ],
+  "America/Havana": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Havana-tz"
+    }
+  ],
+  "America/Hermosillo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Hermosillo-tz"
+    }
+  ],
+  "America/Indiana/Indianapolis": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Indianapolis-tz"
+    }
+  ],
+  "America/Indiana/Knox": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Knox-tz"
+    }
+  ],
+  "America/Indiana/Marengo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Marengo-tz"
+    }
+  ],
+  "America/Indiana/Petersburg": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Petersburg-tz"
+    }
+  ],
+  "America/Indiana/Tell_City": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Tell_City-tz"
+    }
+  ],
+  "America/Indiana/Vevay": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Vevay-tz"
+    }
+  ],
+  "America/Indiana/Vincennes": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Vincennes-tz"
+    }
+  ],
+  "America/Indiana/Winamac": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Indiana-Winamac-tz"
+    }
+  ],
+  "America/Inuvik": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Inuvik-tz"
+    }
+  ],
+  "America/Iqaluit": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Iqaluit-tz"
+    }
+  ],
+  "America/Jamaica": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Jamaica-tz"
+    }
+  ],
+  "America/Juneau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Juneau-tz"
+    }
+  ],
+  "America/Kentucky/Louisville": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Kentucky-Louisville-tz"
+    }
+  ],
+  "America/Kentucky/Monticello": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Kentucky-Monticello-tz"
+    }
+  ],
+  "America/Kralendijk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Kralendijk-tz"
+    }
+  ],
+  "America/La_Paz": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-La_Paz-tz"
+    }
+  ],
+  "America/Lima": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Lima-tz"
+    }
+  ],
+  "America/Los_Angeles": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Los_Angeles-tz"
+    }
+  ],
+  "America/Lower_Princes": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Lower_Princes-tz"
+    }
+  ],
+  "America/Maceio": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Maceio-tz"
+    }
+  ],
+  "America/Managua": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Managua-tz"
+    }
+  ],
+  "America/Manaus": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Manaus-tz"
+    }
+  ],
+  "America/Marigot": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Marigot-tz"
+    }
+  ],
+  "America/Martinique": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Martinique-tz"
+    }
+  ],
+  "America/Matamoros": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Matamoros-tz"
+    }
+  ],
+  "America/Mazatlan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Mazatlan-tz"
+    }
+  ],
+  "America/Miquelon": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Miquelon-tz"
+    }
+  ],
+  "America/Menominee": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Menominee-tz"
+    }
+  ],
+  "America/Merida": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Merida-tz"
+    }
+  ],
+  "America/Metlakatla": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Metlakatla-tz"
+    }
+  ],
+  "America/Mexico_City": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Mexico_City-tz"
+    }
+  ],
+  "America/Moncton": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Moncton-tz"
+    }
+  ],
+  "America/Monterrey": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Monterrey-tz"
+    }
+  ],
+  "America/Montevideo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Montevideo-tz"
+    }
+  ],
+  "America/Montserrat": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Montserrat-tz"
+    }
+  ],
+  "America/Nassau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Nassau-tz"
+    }
+  ],
+  "America/New_York": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-New_York-tz"
+    }, {
+      "op": "union",
+      "source": "manual-polygon",
+      "data": [[[-85.2,32.97],[-85.237,32.954],[-85.282,32.847],[-85.235,32.765],[-85.198,32.656],[-85.182,32.571],[-85.214,32.514],[-85.119,32.444],[-85.094,32.397],[-85.073,32.355],[-85.031,32.339],[-85.02,32.3429],[-85.011,32.358],[-84.86,32.35],[-85.2,32.97]]],
+      "description": "Add areas in Alabama near Phenix City and Lanett that observe eastern time.  The boundaries are a speculative guess."
+    }
+  ],
+  "America/Nome": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Nome-tz"
+    }
+  ],
+  "America/Noronha": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Noronha-tz"
+    }
+  ],
+  "America/North_Dakota/Beulah": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-North_Dakota-Beulah-tz"
+    }
+  ],
+  "America/North_Dakota/Center": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-North_Dakota-Center-tz"
+    }
+  ],
+  "America/North_Dakota/New_Salem": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-North_Dakota-New_Salem-tz"
+    }
+  ],
+  "America/Nuuk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Nuuk-tz"
+    }
+  ],
+  "America/Ojinaga": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Ojinaga-tz"
+    }
+  ],
+  "America/Panama": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Panama"
+    }
+  ],
+  "America/Paramaribo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Paramaribo-tz"
+    }
+  ],
+  "America/Phoenix": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Phoenix-tz"
+    }, {
+      "op": "difference",
+      "source": "overpass",
+      "id": "America-Creston-tz"
+    }
+  ],
+  "America/Port-au-Prince": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Port-au-Prince-tz"
+    }
+  ],
+  "America/Port_of_Spain": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Port_of_Spain-tz"
+    }
+  ],
+  "America/Porto_Velho": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Porto_Velho-tz"
+    }
+  ],
+  "America/Puerto_Rico": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Puerto_Rico-tz-old"
+    }
+  ],
+  "America/Punta_Arenas": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Punta_Arenas-tz"
+    }, {
+      "op": "union",
+      "source": "manual-polygon",
+      "data": [[[-64,-64],[-57.3,-63.4],[-58.8,-62.25],[-59,-61.8],[-63,-62.7],[-64,-64]]],
+      "description": "Add Antarctic Areas.  Includes stations General Bernardo O'Higgins, Great Wall, Bellinghausen and Artigas."
+    }
+  ],
+  "America/Rankin_Inlet": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Rankin_Inlet-tz"
+    }
+  ],
+  "America/Recife": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Recife-tz"
+    }
+  ],
+  "America/Regina": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Regina-tz"
+    }
+  ],
+  "America/Resolute": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Resolute-tz"
+    }
+  ],
+  "America/Rio_Branco": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Rio_Branco-tz"
+    }
+  ],
+  "America/Santarem": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Santarem-tz"
+    }
+  ],
+  "America/Santiago": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Santiago-tz"
+    }
+  ],
+  "America/Santo_Domingo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Santo_Domingo-tz"
+    }
+  ],
+  "America/Sao_Paulo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Sao_Paulo-tz"
+    }
+  ],
+  "America/Scoresbysund": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Scoresbysund-tz"
+    }
+  ],
+  "America/Sitka": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Sitka-tz"
+    }
+  ],
+  "America/St_Barthelemy": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-St_Barthelemy-tz"
+    }
+  ],
+  "America/St_Johns": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-St_Johns-tz"
+    }
+  ],
+  "America/St_Kitts": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-St_Kitts-tz"
+    }
+  ],
+  "America/St_Lucia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-St_Lucia-tz"
+    }
+  ],
+  "America/St_Thomas": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-St_Thomas-tz"
+    }
+  ],
+  "America/St_Vincent": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-St_Vincent-tz"
+    }
+  ],
+  "America/Swift_Current": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Swift_Current-tz"
+    }
+  ],
+  "America/Tegucigalpa": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Tegucigalpa-tz"
+    }
+  ],
+  "America/Thule": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Thule-tz"
+    }
+  ],
+  "America/Tijuana": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Tijuana-tz"
+    }
+  ],
+  "America/Toronto": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Toronto-tz"
+    }, {
+      "op": "difference",
+      "source": "manual-polygon",
+      "data": [[[-80.8,27.6],[-80.8,20.5],[-72,20.5],[-72,27.6],[-80.8,27.6]]],
+      "description": "Remove Bahamas included in raw OpenStreetMap relation."
+    }
+  ],
+  "America/Tortola": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Tortola-tz"
+    }
+  ],
+  "America/Vancouver": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Vancouver-tz"
+    }
+  ],
+  "America/Whitehorse": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Whitehorse-tz"
+    }
+  ],
+  "America/Winnipeg": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Winnipeg-tz"
+    }
+  ],
+  "America/Yakutat": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "America-Yakutat-tz"
+    }
+  ],
+  "Antarctica/Casey": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[97,-70],[115,-70],[120,-70],[120,-65],[97,-64],[97,-70]]],
+      "description": "Best guess at extent of Casey timezone based off of map at https://en.wikipedia.org/wiki/Time_in_Antarctica, but subtracting area for Vostok and Mirny Stations."
+    }
+  ],
+  "Antarctica/Davis": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[77.5,-86],[86,-86],[86,-65],[77.5,-68],[77.5,-86]]],
+      "description": "Best guess at extent of Davis timezone."
+    }
+  ],
+  "Antarctica/DumontDUrville": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[120,-70],[135,-70],[150,-70],[160,-70],[160,-65],[150,-65],[135,-65],[120,-65],[120,-70]]],
+      "description": "Best guess at extent of DumontDUrville timezone based off of map at https://en.wikipedia.org/wiki/Time_in_Antarctica, but subtracting area for Concordia Station (Australia/Perth)."
+    }
+  ],
+  "Antarctica/Macquarie": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia"
+    }, {
+      "op": "intersect",
+      "source": "manual-polygon",
+      "data": [[[159,-53],[156,-56],[162,-56],[159,-53]]],
+      "description": "Intersect part of Australia to isolate Macquarie Island."
+    }
+  ],
+  "Antarctica/Mawson": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[55,-86],[60,-86],[75,-86],[77.5,-86],[77.5,-68],[55,-64],[55,-86]]],
+      "description": "Best guess at extent of Mawson timezone.  This timezone also includes the Zhongshan and Bharati stations because apparently they also use UTC+5 https://encyclopedia.timegenie.com/time_zones/antarctica/."
+    }
+  ],
+  "Antarctica/McMurdo": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[-180,-90],[-180,-75],[-150,-75],[-150,-86],[-135,-86],[-120,-86],[-105,-86],[-90,-86],[-80,-86],[-75,-86],[-67.5,-86],[-60,-86],[-58,-86],[-45,-86],[-35,-86],[-30,-86],[-17,-86],[-15,-86],[-5.5,-86],[0,-86],[15,-86],[25,-86],[30,-86],[45,-86],[55,-86],[60,-86],[75,-86],[77.5,-86],[86,-86],[90,-86],[105,-86],[115,-86],[120,-86],[135,-86],[150,-86],[160,-86],[160,-65],[180,-70],[180,-86],[180,-90],[-180,-90]]],
+      "description": "Best guess at McMurdo timezone according to map of timezone at https://en.wikipedia.org/wiki/Time_in_Antarctica.  Includes South Pole timezone since it is linked to McMurdo in the timezone DB."
+    }
+  ],
+  "Antarctica/Palmer": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[-64,-64],[-65,-64.5],[-65.5,-65.25],[-63.8,-64.8],[-64,-64]]],
+      "description": "Best guess at Palmer timezone."
+    }
+  ],
+  "Antarctica/Rothera": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[-80,-86],[-75,-86],[-67.5,-86],[-67.5,-66],[-80,-66],[-80,-86]]],
+      "description": "Best guess at Rothera timezone partially based off of British Antarctic Claims."
+    }, {
+      "op": "union",
+      "source": "manual-polygon",
+      "data": [[[-35,-86],[-30,-86],[-17,-86],[-17,-71],[-35,-75],[-35,-86]]],
+      "description": "Add area near Halley Station."
+    }
+  ],
+  "Antarctica/Syowa": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[25,-86],[30,-86],[45,-86],[55,-86],[55,-64],[25,-68],[25,-86]]],
+      "description": "Best guess at Syowa timezone according to map of timezone at https://en.wikipedia.org/wiki/Time_in_Antarctica.  Also, Mirny station uses the same timezone as Vostok according to https://encyclopedia.timegenie.com/time_zones/antarctica/.  Also includes Japanese Asuka Station."
+    }
+  ],
+  "Antarctica/Troll": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[0,-86],[15,-86],[25,-86],[25,-68],[0,-68],[0,-86]]],
+      "description": "Best guess at Troll timezone according to map of timezone at https://en.wikipedia.org/wiki/Time_in_Antarctica, but subtracting area to west starting with SANAE IV station.  Also includes Maitri and Novolazarevskaya Stations."
+    }
+  ],
+  "Antarctica/Vostok": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[86,-86],[90,-86],[105,-86],[115,-86],[115,-70],[97,-70],[97,-64],[86,-65],[86,-86]]],
+      "description": "Best guess at Vostok timezone according to map of timezone at https://en.wikipedia.org/wiki/Time_in_Antarctica.  Also, Mirny station uses the same timezone as Vostok according to https://encyclopedia.timegenie.com/time_zones/antarctica/."
+    }
+  ],
+  "Arctic/Longyearbyen": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Arctic-Longyearbyen-tz"
+    }
+  ],
+  "Asia/Aden": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Aden-tz"
+    }
+  ],
+  "Asia/Almaty": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Almaty-tz"
+    }
+  ],
+  "Asia/Amman": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Amman-tz"
+    }
+  ],
+  "Asia/Anadyr": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Anadyr-tz"
+    }
+  ],
+  "Asia/Aqtau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Aqtau-tz"
+    }
+  ],
+  "Asia/Aqtobe": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Aqtobe-tz"
+    }
+  ],
+  "Asia/Ashgabat": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Ashgabat-tz"
+    }
+  ],
+  "Asia/Atyrau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Atyrau-tz"
+    }
+  ],
+  "Asia/Baghdad": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Baghdad-tz"
+    }
+  ],
+  "Asia/Bahrain": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Bahrain-tz"
+    }
+  ],
+  "Asia/Baku": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Baku-tz"
+    }
+  ],
+  "Asia/Bangkok": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Bangkok-tz"
+    }
+  ],
+  "Asia/Barnaul": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Barnaul-tz"
+    }
+  ],
+  "Asia/Beirut": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Beirut-tz"
+    }
+  ],
+  "Asia/Bishkek": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Bishkek-tz"
+    }
+  ],
+  "Asia/Brunei": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Brunei-tz"
+    }
+  ],
+  "Asia/Chita": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Chita-tz"
+    }
+  ],
+  "Asia/Colombo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Colombo-tz"
+    }
+  ],
+  "Asia/Damascus": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Damascus-tz"
+    }
+  ],
+  "Asia/Dhaka": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Dhaka-tz"
+    }
+  ],
+  "Asia/Dili": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Dili-tz"
+    }
+  ],
+  "Asia/Dubai": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Dubai-tz"
+    }
+  ],
+  "Asia/Dushanbe": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Dushanbe-tz"
+    }
+  ],
+  "Asia/Famagusta": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Famagusta-tz"
+    }
+  ],
+  "Asia/Gaza": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Gaza-tz"
+    }
+  ],
+  "Asia/Hebron": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Hebron-tz"
+    }
+  ],
+  "Asia/Ho_Chi_Minh": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Ho_Chi_Minh-tz"
+    }
+  ],
+  "Asia/Hong_Kong": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Hong_Kong-tz"
+    }
+  ],
+  "Asia/Hovd": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Hovd-tz"
+    }
+  ],
+  "Asia/Irkutsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Irkutsk-tz"
+    }
+  ],
+  "Asia/Jakarta": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Jakarta-tz"
+    }
+  ],
+  "Asia/Jayapura": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Jayapura-tz"
+    }
+  ],
+  "Asia/Jerusalem": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Jerusalem-tz"
+    }
+  ],
+  "Asia/Kabul": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Kabul-tz"
+    }
+  ],
+  "Asia/Kamchatka": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Kamchatka-tz"
+    }
+  ],
+  "Asia/Karachi": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Karachi-tz"
+    }
+  ],
+  "Asia/Kathmandu": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Kathmandu-tz"
+    }, {
+      "op": "union",
+      "source": "overpass",
+      "id": "Extent of Nepalese Claims at Kalapani Territory"
+    }
+  ],
+  "Asia/Khandyga": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Khandyga-tz"
+    }
+  ],
+  "Asia/Kolkata": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Kolkata-tz"
+    }, {
+      "op": "union",
+      "source": "overpass",
+      "id": "Extent of Nepalese Claims at Kalapani Territory"
+    }
+  ],
+  "Asia/Krasnoyarsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Krasnoyarsk-tz"
+    }
+  ],
+  "Asia/Kuala_Lumpur": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Kuala_Lumpur-tz"
+    }
+  ],
+  "Asia/Kuching": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Kuching-tz"
+    }
+  ],
+  "Asia/Kuwait": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Kuwait-tz"
+    }
+  ],
+  "Asia/Macau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Macau-tz"
+    }
+  ],
+  "Asia/Magadan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Magadan-tz"
+    }
+  ],
+  "Asia/Makassar": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Makassar-tz"
+    }
+  ],
+  "Asia/Manila": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Manila-tz"
+    }
+  ],
+  "Asia/Muscat": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Muscat-tz"
+    }
+  ],
+  "Asia/Nicosia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Nicosia-tz"
+    }
+  ],
+  "Asia/Novokuznetsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Novokuznetsk-tz"
+    }
+  ],
+  "Asia/Novosibirsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Novosibirsk-tz"
+    }
+  ],
+  "Asia/Omsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Omsk-tz"
+    }
+  ],
+  "Asia/Oral": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Oral-tz"
+    }
+  ],
+  "Asia/Phnom_Penh": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Phnom_Penh-tz"
+    }
+  ],
+  "Asia/Pontianak": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Pontianak-tz"
+    }
+  ],
+  "Asia/Pyongyang": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Pyongyang-tz"
+    }
+  ],
+  "Asia/Qatar": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Qatar-tz"
+    }
+  ],
+  "Asia/Qostanay": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Qostanay-tz"
+    }
+  ],
+  "Asia/Qyzylorda": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Qyzylorda-tz"
+    }
+  ],
+  "Asia/Riyadh": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Riyadh-tz"
+    }
+  ],
+  "Asia/Sakhalin": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Sakhalin-tz"
+    }
+  ],
+  "Asia/Samarkand": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Samarkand-tz"
+    }
+  ],
+  "Asia/Seoul": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Seoul-tz"
+    }
+  ],
+  "Asia/Shanghai": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Shanghai-tz"
+    }, {
+      "op": "union",
+      "source": "overpass",
+      "id": "China–Bhutan Disputed Area",
+      "description": "Add China–Bhutan Disputed Area. See https://en.wikipedia.org/wiki/Bhutan%E2%80%93China_relations#Boundary_issues."
+    }
+  ],
+  "Asia/Singapore": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Singapore-tz"
+    }
+  ],
+  "Asia/Srednekolymsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Srednekolymsk-tz"
+    }
+  ],
+  "Asia/Taipei": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Taipei-tz"
+    }
+  ],
+  "Asia/Tashkent": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Tashkent-tz"
+    }
+  ],
+  "Asia/Tbilisi": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Tbilisi-tz"
+    }
+  ],
+  "Asia/Tehran": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Tehran-tz"
+    }
+  ],
+  "Asia/Thimphu": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Thimphu-tz"
+    }, {
+      "op": "union",
+      "source": "overpass",
+      "id": "China–Bhutan Disputed Area",
+      "description": "Add China–Bhutan Disputed Area. See https://en.wikipedia.org/wiki/Bhutan%E2%80%93China_relations#Boundary_issues."
+    }
+  ],
+  "Asia/Tokyo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Tokyo-tz"
+    }
+  ],
+  "Asia/Tomsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Tomsk-tz"
+    }
+  ],
+  "Asia/Ulaanbaatar": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Ulaanbaatar-tz"
+    }
+  ],
+  "Asia/Urumqi": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Urumqi-tz"
+    }
+  ],
+  "Asia/Ust-Nera": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Ust-Nera-tz"
+    }
+  ],
+  "Asia/Vientiane": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Vientiane-tz"
+    }
+  ],
+  "Asia/Vladivostok": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Vladivostok-tz"
+    }
+  ],
+  "Asia/Yakutsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Yakutsk-tz"
+    }
+  ],
+  "Asia/Yangon": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Yangon-tz"
+    }
+  ],
+  "Asia/Yekaterinburg": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Yekaterinburg-tz"
+    }
+  ],
+  "Asia/Yerevan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Asia-Yerevan-tz"
+    }
+  ],
+  "Atlantic/Azores": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Azores-tz"
+    }
+  ],
+  "Atlantic/Bermuda": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Bermuda-tz"
+    }
+  ],
+  "Atlantic/Canary": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Canary-tz"
+    }
+  ],
+  "Atlantic/Cape_Verde": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Cape_Verde-tz"
+    }
+  ],
+  "Atlantic/Faroe": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Faroe-tz"
+    }
+  ],
+  "Atlantic/Madeira": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Madeira-tz"
+    }
+  ],
+  "Atlantic/Reykjavik": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Reykjavik-tz"
+    }
+  ],
+  "Atlantic/South_Georgia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-South_Georgia-tz"
+    }
+  ],
+  "Atlantic/St_Helena": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-St_Helena-tz"
+    }
+  ],
+  "Atlantic/Stanley": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Atlantic-Stanley-tz"
+    }
+  ],
+  "Australia/Adelaide": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Adelaide-tz"
+    }
+  ],
+  "Australia/Brisbane": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Brisbane-tz"
+    }
+  ],
+  "Australia/Broken_Hill": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Broken_Hill-tz"
+    }
+  ],
+  "Australia/Darwin": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Darwin-tz"
+    }
+  ],
+  "Australia/Eucla": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Eucla-tz"
+    }
+  ],
+  "Australia/Hobart": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Hobart-tz"
+    }
+  ],
+  "Australia/Lindeman": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Lindeman-tz"
+    }
+  ],
+  "Australia/Lord_Howe": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Lord_Howe-tz"
+    }
+  ],
+  "Australia/Melbourne": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Melbourne-tz"
+    }
+  ],
+  "Australia/Perth": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Perth-tz"
+    }, {
+      "op": "union",
+      "source": "manual-polygon",
+      "data": [[[115,-86],[120,-86],[135,-86],[150,-86],[160,-86],[160,-70],[150,-70],[135,-70],[120,-70],[115,-70],[115,-86]]],
+      "description": "According to chatter on the tz mailing list, the Antrarctic Concordia Station uses Australia/Perth time.  https://mm.icann.org/pipermail/tz/2013-December/020520.html"
+    }
+  ],
+  "Australia/Sydney": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Australia-Sydney-tz"
+    }
+  ],
+  "Etc/UTC": [
+    {
+      "op": "init",
+      "source": "manual-polygon",
+      "data": [[[-17,-86],[-15,-86],[-5.5,-86],[-5.5,-69],[-17,-71],[-17,-86]]],
+      "description": "Add Antarctic Station Neumayer III Station.  See discussion at https://github.com/evansiroky/timezone-boundary-builder/issues/61"
+    }
+  ],
+  "Europe/Amsterdam": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Amsterdam-tz"
+    }
+  ],
+  "Europe/Andorra": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Andorra-tz"
+    }
+  ],
+  "Europe/Astrakhan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Astrakhan-tz"
+    }
+  ],
+  "Europe/Athens": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Athens-tz"
+    }
+  ],
+  "Europe/Belgrade": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Belgrade-tz"
+    }
+  ],
+  "Europe/Berlin": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Germany"
+    }, {
+      "op": "difference",
+      "source": "overpass",
+      "id": "Europe-Busingen-tz"
+    }
+  ],
+  "Europe/Bratislava": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Bratislava-tz"
+    }
+  ],
+  "Europe/Brussels": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Brussels-tz"
+    }
+  ],
+  "Europe/Bucharest": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Bucharest-tz"
+    }
+  ],
+  "Europe/Budapest": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Budapest-tz"
+    }
+  ],
+  "Europe/Busingen": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Busingen-tz"
+    }
+  ],
+  "Europe/Chisinau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Chisinau-tz"
+    }
+  ],
+  "Europe/Copenhagen": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Copenhagen-tz"
+    }
+  ],
+  "Europe/Dublin": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Dublin-tz"
+    }
+  ],
+  "Europe/Gibraltar": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Gibraltar-tz"
+    }
+  ],
+  "Europe/Guernsey": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Guernsey-tz"
+    }
+  ],
+  "Europe/Helsinki": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Helsinki-tz"
+    }
+  ],
+  "Europe/Isle_of_Man": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Isle_of_Man-tz"
+    }
+  ],
+  "Europe/Istanbul": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Istanbul-tz"
+    }
+  ],
+  "Europe/Jersey": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Jersey-tz"
+    }
+  ],
+  "Europe/Kaliningrad": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Kaliningrad-tz"
+    }
+  ],
+  "Europe/Kyiv": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Kyiv-tz"
+    }
+  ],
+  "Europe/Kirov": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Kirov-tz"
+    }
+  ],
+  "Europe/Lisbon": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Lisbon-tz"
+    }
+  ],
+  "Europe/Ljubljana": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Ljubljana-tz"
+    }
+  ],
+  "Europe/London": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-London-tz"
+    }
+  ],
+  "Europe/Luxembourg": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Luxembourg-tz"
+    }
+  ],
+  "Europe/Madrid": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Madrid-tz"
+    }
+  ],
+  "Europe/Malta": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Malta-tz"
+    }
+  ],
+  "Europe/Mariehamn": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Mariehamn-tz"
+    }
+  ],
+  "Europe/Minsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Minsk-tz"
+    }
+  ],
+  "Europe/Monaco": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Monaco-tz"
+    }
+  ],
+  "Europe/Moscow": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Moscow-tz"
+    }, {
+      "op": "difference",
+      "source": "overpass",
+      "id": "Europe-Simferopol-tz"
+    }, {
+      "op": "difference",
+      "source": "overpass",
+      "id": "Europe-Kirov-tz"
+    }, {
+      "op": "difference",
+      "source": "overpass",
+      "id": "Europe-Volgograd-tz"
+    }
+  ],
+  "Europe/Oslo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Oslo-tz"
+    }
+  ],
+  "Europe/Paris": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Paris-tz"
+    }
+  ],
+  "Europe/Podgorica": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Podgorica-tz"
+    }
+  ],
+  "Europe/Prague": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Prague-tz"
+    }
+  ],
+  "Europe/Riga": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Riga-tz"
+    }
+  ],
+  "Europe/Rome": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Rome-tz"
+    }
+  ],
+  "Europe/Samara": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Samara-tz"
+    }
+  ],
+  "Europe/San_Marino": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-San_Marino-tz"
+    }
+  ],
+  "Europe/Sarajevo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Sarajevo-tz"
+    }
+  ],
+  "Europe/Saratov": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Saratov-tz"
+    }
+  ],
+  "Europe/Simferopol": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Simferopol-tz"
+    }
+  ],
+  "Europe/Skopje": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Skopje-tz"
+    }
+  ],
+  "Europe/Sofia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Sofia-tz"
+    }
+  ],
+  "Europe/Stockholm": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Stockholm-tz"
+    }
+  ],
+  "Europe/Tallinn": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Tallinn-tz"
+    }
+  ],
+  "Europe/Tirane": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Tirane-tz"
+    }
+  ],
+  "Europe/Ulyanovsk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Ulyanovsk-tz"
+    }
+  ],
+  "Europe/Vaduz": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Vaduz-tz"
+    }
+  ],
+  "Europe/Vatican": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Vatican-tz"
+    }
+  ],
+  "Europe/Vienna": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Vienna-tz"
+    }, {
+      "op": "union",
+      "source": "overpass",
+      "id": "Jungholz, AT",
+      "description": "Add back Jungholz as union to Austria. See https://github.com/evansiroky/timezone-boundary-builder/issues/93"
+    }
+  ],
+  "Europe/Vilnius": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Vilnius-tz"
+    }
+  ],
+  "Europe/Volgograd": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Volgograd-tz"
+    }
+  ],
+  "Europe/Warsaw": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Warsaw-tz"
+    }
+  ],
+  "Europe/Zagreb": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Zagreb-tz"
+    }
+  ],
+  "Europe/Zurich": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Europe-Zurich-tz"
+    }
+  ],
+  "Indian/Antananarivo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Antananarivo-tz"
+    }
+  ],
+  "Indian/Chagos": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Chagos-tz"
+    }
+  ],
+  "Indian/Christmas": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Christmas-tz"
+    }
+  ],
+  "Indian/Cocos": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Cocos-tz"
+    }
+  ],
+  "Indian/Comoro": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Comoro-tz"
+    }
+  ],
+  "Indian/Kerguelen": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Kerguelen-tz"
+    }
+  ],
+  "Indian/Mahe": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Mahe-tz"
+    }
+  ],
+  "Indian/Maldives": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Maldives-tz"
+    }
+  ],
+  "Indian/Mauritius": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Mauritius-tz"
+    }
+  ],
+  "Indian/Mayotte": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Mayotte-tz"
+    }
+  ],
+  "Indian/Reunion": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Indian-Reunion-tz"
+    }
+  ],
+  "Pacific/Apia": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Apia-tz"
+    }
+  ],
+  "Pacific/Auckland": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Auckland-tz"
+    }, {
+      "op": "difference",
+      "source": "manual-polygon",
+      "data": [[[-180,-90],[-180,-59],[180,-59],[180,-90],[-180,-90]]],
+      "description": "Remove arbitrary Antarctic Areas included in raw OpenStreetMap relation."
+    }
+  ],
+  "Pacific/Bougainville": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Bougainville-tz"
+    }
+  ],
+  "Pacific/Chatham": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Chatham-tz"
+    }
+  ],
+  "Pacific/Chuuk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Chuuk-tz"
+    }
+  ],
+  "Pacific/Easter": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Easter-tz"
+    }
+  ],
+  "Pacific/Efate": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Efate-tz"
+    }
+  ],
+  "Pacific/Fakaofo": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Fakaofo-tz"
+    }
+  ],
+  "Pacific/Fiji": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Fiji-tz"
+    }
+  ],
+  "Pacific/Funafuti": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Funafuti-tz"
+    }
+  ],
+  "Pacific/Galapagos": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Galapagos-tz"
+    }
+  ],
+  "Pacific/Gambier": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Gambier-tz"
+    }
+  ],
+  "Pacific/Guadalcanal": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Guadalcanal-tz"
+    }
+  ],
+  "Pacific/Guam": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Chamorro Time Zone"
+    }
+  ],
+  "Pacific/Honolulu": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Honolulu-tz"
+    }
+  ],
+  "Pacific/Kanton": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Kanton-tz"
+    }
+  ],
+  "Pacific/Kiritimati": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Kiritimati-tz"
+    }
+  ],
+  "Pacific/Kosrae": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Kosrae-tz"
+    }
+  ],
+  "Pacific/Kwajalein": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Kwajalein-tz"
+    }
+  ],
+  "Pacific/Majuro": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Majuro-tz"
+    }
+  ],
+  "Pacific/Marquesas": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Marquesas-tz"
+    }
+  ],
+  "Pacific/Midway": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Midway-tz"
+    }
+  ],
+  "Pacific/Nauru": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Nauru-tz"
+    }
+  ],
+  "Pacific/Niue": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Niue-tz"
+    }
+  ],
+  "Pacific/Norfolk": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Norfolk-tz"
+    }
+  ],
+  "Pacific/Noumea": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Noumea-tz"
+    }
+  ],
+  "Pacific/Pago_Pago": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Pago_Pago-tz"
+    }
+  ],
+  "Pacific/Palau": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Palau-tz"
+    }
+  ],
+  "Pacific/Pitcairn": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Pitcairn-tz"
+    }
+  ],
+  "Pacific/Pohnpei": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Pohnpei-tz"
+    }
+  ],
+  "Pacific/Port_Moresby": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Port_Moresby-tz"
+    }
+  ],
+  "Pacific/Rarotonga": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Rarotonga-tz"
+    }
+  ],
+  "Pacific/Saipan": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Guam-tz"
+    }, {
+      "op": "difference",
+      "source": "overpass",
+      "id": "Chamorro Time Zone"
+    }
+  ],
+  "Pacific/Tahiti": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Tahiti-tz"
+    }
+  ],
+  "Pacific/Tarawa": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Tarawa-tz"
+    }
+  ],
+  "Pacific/Tongatapu": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Tongatapu-tz"
+    }
+  ],
+  "Pacific/Wake": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Wake-tz"
+    }
+  ],
+  "Pacific/Wallis": [
+    {
+      "op": "init",
+      "source": "overpass",
+      "id": "Pacific-Wallis-tz"
+    }
+  ]
+}
