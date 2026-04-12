@@ -81,7 +81,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Header />
-      <main className="w-full max-w-screen-2xl mx-auto py-4 sm:py-8 px-4 sm:px-6 md:px-10 lg:px-12 box-border min-w-0">
+      <main className="w-full max-w-[1000px] mx-auto py-4 sm:py-8 px-4 sm:px-6 md:px-10 lg:px-12 box-border min-w-0">
         <Reorder.Group
           axis="y"
           values={order}

@@ -20,7 +20,7 @@ export function WorldMapSection() {
   const { selectedCities, highlightColor, use24h } = useWorldClock();
   const [hoveredCity, setHoveredCity] = useState<City | null>(null);
   const [hoveredTimezone, setHoveredTimezone] = useState<number | null>(null);
-  const [showNightShade, setShowNightShade] = useState(true);
+  const [showNightShade, setShowNightShade] = useState(false);
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">

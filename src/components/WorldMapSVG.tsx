@@ -211,7 +211,7 @@ export function WorldMapSVG({
   highlightColor,
   hoveredTimezone,
   onHoverTimezone,
-  showNightShade = true,
+  showNightShade = false,
 }: WorldMapSVGProps) {
   const [tooltipCity, setTooltipCity] = useState<{
     city: City;
@@ -396,8 +396,8 @@ export function WorldMapSVG({
           {TIMEZONE_LONGITUDES.map((lng) => (
             <Line
               key={`meridian-${lng}`}
-              from={[lng, 85]}
-              to={[lng, -85]}
+              from={[lng, 90]}
+              to={[lng, -75]}
               stroke={tzLineColor}
               strokeWidth={0.5 / zoom}
               strokeDasharray="2 1"
@@ -408,7 +408,7 @@ export function WorldMapSVG({
           <Geographies geography={TZ_GEO_URL}>
             {({ geographies }) => {
               // Group geometries by their UTC offset for synchronized highlighting
-              const offsetGroups: Record<number, { tzid: string; geo: any }[]> = {};
+              const offsetGroups: Record<number, { tzid: string; geo: any }[]> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
               geographies.forEach((geo) => {
                 const tzid = geo.properties?.tzid;
                 if (!tzid) return;
