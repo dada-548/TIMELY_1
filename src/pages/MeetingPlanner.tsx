@@ -111,7 +111,7 @@ export default function MeetingPlanner() {
   return (
     <div className="min-h-screen bg-background w-full">
       <Header />
-      <main className="w-full max-w-[1000px] mx-auto py-6 space-y-4 px-4 sm:px-12 lg:px-16 box-border">
+      <main className="w-full max-w-screen-2xl mx-auto py-6 space-y-4 px-4 sm:px-12 lg:px-16 box-border">
         {/* Title */}
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">

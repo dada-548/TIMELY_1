@@ -450,7 +450,7 @@ const SidebarMenuButton = React.forwardRef<
       data-sidebar="menu-button"
       data-size={size}
       data-active={isActive}
-      className={cn(sidebarMenuButtonVariants({ variant: variant as any, size: size as any }), className)} // eslint-disable-line @typescript-eslint/no-explicit-any
+      className={cn(sidebarMenuButtonVariants({ variant: variant as any, size: size as any }), className)}
       {...props}
     />
   );

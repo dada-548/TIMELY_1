@@ -1,6 +1,6 @@
 import React from "react";
 import { GripVertical } from "lucide-react";
-// @ts-expect-error - react-resizable-panels types might be missing or incorrect
+// @ts-ignore
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels";
 import { useWorldClock } from "@/hooks/useWorldClock";
 

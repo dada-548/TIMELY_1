@@ -257,9 +257,9 @@ export const COUNTRY_TZ_OVERRIDES: Record<string, number> = {
 };
 
 // Compute centroid longitude from GeoJSON geometry coordinates
-export function computeCentroidLng(geometry: any): number { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function computeCentroidLng(geometry: any): number {
   const lngs: number[] = [];
-  function extract(coords: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
+  function extract(coords: any) {
     if (Array.isArray(coords) && typeof coords[0] === 'number') {
       lngs.push(coords[0]);
     } else if (Array.isArray(coords)) {
@@ -272,7 +272,7 @@ export function computeCentroidLng(geometry: any): number { // eslint-disable-li
 }
 
 // Get the UTC offset for a country geography feature
-export function getCountryOffset(geo: any): number { // eslint-disable-line @typescript-eslint/no-explicit-any
+export function getCountryOffset(geo: any): number {
   const name = geo.properties?.name;
   if (name && COUNTRY_TZ_OVERRIDES[name] !== undefined) {
     return COUNTRY_TZ_OVERRIDES[name];

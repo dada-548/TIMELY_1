@@ -103,12 +103,10 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
       setHighlightColorState(color);
       localStorage.setItem('worldclock-highlight', color);
     };
-    // @ts-expect-error - startViewTransition is not in the standard Document type yet
-    if (!document.startViewTransition) {
+    if (!(document as any).startViewTransition) {
       update();
     } else {
-      // @ts-expect-error - startViewTransition is not in the standard Document type yet
-      document.startViewTransition(update);
+      (document as any).startViewTransition(update);
     }
   }, []);
 
@@ -117,12 +115,10 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
       setTimelineHighlightColorState(color);
       localStorage.setItem('worldclock-timeline-highlight', color);
     };
-    // @ts-expect-error - startViewTransition is not in the standard Document type yet
-    if (!document.startViewTransition) {
+    if (!(document as any).startViewTransition) {
       update();
     } else {
-      // @ts-expect-error - startViewTransition is not in the standard Document type yet
-      document.startViewTransition(update);
+      (document as any).startViewTransition(update);
     }
   }, []);
 
@@ -131,12 +127,10 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
       setDayIndicationColorState(color);
       localStorage.setItem('worldclock-day-indication', color);
     };
-    // @ts-expect-error - startViewTransition is not in the standard Document type yet
-    if (!document.startViewTransition) {
+    if (!(document as any).startViewTransition) {
       update();
     } else {
-      // @ts-expect-error - startViewTransition is not in the standard Document type yet
-      document.startViewTransition(update);
+      (document as any).startViewTransition(update);
     }
   }, []);
 
@@ -179,12 +173,10 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
 
   const toggleTheme = useCallback(() => {
     const update = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-    // @ts-expect-error - startViewTransition is not in the standard Document type yet
-    if (!document.startViewTransition) {
+    if (!(document as any).startViewTransition) {
       update();
     } else {
-      // @ts-expect-error - startViewTransition is not in the standard Document type yet
-      document.startViewTransition(update);
+      (document as any).startViewTransition(update);
     }
   }, []);
 
