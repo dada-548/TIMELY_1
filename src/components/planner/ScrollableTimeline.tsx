@@ -266,7 +266,7 @@ export function ScrollableTimeline({
   // Initial center on mount
   useEffect(() => {
     centerScroll();
-  }, []); // Only once on mount
+  }, [centerScroll]); // Re-center if centerScroll changes (e.g. cellWidth changes)
 
   // When date changes externally (calendar strip), re-center
   const prevDateRef = useRef(selectedDate);

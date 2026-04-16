@@ -46,8 +46,7 @@ export function WorldMapSection() {
               month: "long",
               day: "numeric",
             })}{" "}
-            ·{" "}
-            {now.toLocaleTimeString(undefined, {
+            · {now.toLocaleTimeString(undefined, {
               hour: "2-digit",
               minute: "2-digit",
               hour12: !use24h,

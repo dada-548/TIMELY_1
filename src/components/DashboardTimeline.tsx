@@ -56,11 +56,11 @@ export function DashboardTimeline() {
 
   const handleDragMove = useCallback((newStart: number) => {
     setSelectedHour(newStart);
-  }, []);
+  }, [setSelectedHour]);
 
   const handleResizeEnd = useCallback((newDuration: number) => {
     setDuration(newDuration);
-  }, []);
+  }, [setDuration]);
 
   if (selectedCities.length === 0 || !fromCity) return null;
 

@@ -1,10 +1,4 @@
-import React, {
-  useMemo,
-  useState,
-  useCallback,
-  useRef,
-  useEffect,
-} from "react";
+import React, { useMemo, useState, useCallback, useRef, useEffect } from "react";
 import { Sun, Moon, Sunrise, Sunset } from "lucide-react";
 import {
   ComposableMap,
@@ -27,9 +21,7 @@ import {
 // Timezone-boundary-builder simplified TopoJSON with tzid properties
 const TZ_GEO_URL = "/timezones.json";
 // Country outlines for land border rendering
-const COUNTRY_URL =
-  "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
-const US_STATES_URL = "https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json";
+const COUNTRY_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json";
 
 interface WorldMapSVGProps {
   now: Date;
@@ -61,7 +53,8 @@ function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
 }
 
 // Meridian longitudes for timezone lines
-const TIMEZONE_LONGITUDES = Array.from({ length: 25 }, (_, i) => -180 + i * 15);
+const TIMEZONE_OFFSETS = Array.from({ length: 25 }, (_, i) => i - 12);
+const OCEAN_BOUNDARIES = Array.from({ length: 24 }, (_, i) => -172.5 + i * 15);
 
 // Cache for tzid → UTC offset (in whole hours)
 const tzidOffsetCache: Record<string, number> = {};
@@ -70,10 +63,10 @@ function getTzidOffset(tzid: string, now: Date): number {
   // Use cache for performance
   const cacheKey = tzid;
   if (tzidOffsetCache[cacheKey] !== undefined) return tzidOffsetCache[cacheKey];
-
+  
   try {
     const offsetMin = getOffsetMinutes(tzid, now);
-    const offsetHours = Math.round(offsetMin / 60);
+    const offsetHours = offsetMin / 60;
     tzidOffsetCache[cacheKey] = offsetHours;
     return offsetHours;
   } catch {
@@ -92,62 +85,9 @@ function getTzidOffset(tzid: string, now: Date): number {
   }
 }
 
-// US state label positions
-const US_STATE_LABELS: { abbr: string; lng: number; lat: number }[] = [
-  { abbr: "WA", lng: -120.5, lat: 47.4 },
-  { abbr: "OR", lng: -120.5, lat: 44 },
-  { abbr: "CA", lng: -119.5, lat: 37 },
-  { abbr: "NV", lng: -116.8, lat: 39 },
-  { abbr: "ID", lng: -114.5, lat: 44.5 },
-  { abbr: "MT", lng: -109.5, lat: 47 },
-  { abbr: "WY", lng: -107.5, lat: 43 },
-  { abbr: "UT", lng: -111.5, lat: 39.5 },
-  { abbr: "CO", lng: -105.5, lat: 39 },
-  { abbr: "AZ", lng: -111.5, lat: 34 },
-  { abbr: "NM", lng: -106, lat: 34.5 },
-  { abbr: "ND", lng: -100.5, lat: 47.5 },
-  { abbr: "SD", lng: -100, lat: 44.5 },
-  { abbr: "NE", lng: -99.8, lat: 41.5 },
-  { abbr: "KS", lng: -98.5, lat: 38.5 },
-  { abbr: "OK", lng: -97.5, lat: 35.5 },
-  { abbr: "TX", lng: -99, lat: 31 },
-  { abbr: "MN", lng: -94.5, lat: 46 },
-  { abbr: "IA", lng: -93.5, lat: 42 },
-  { abbr: "MO", lng: -92.5, lat: 38.5 },
-  { abbr: "AR", lng: -92.5, lat: 35 },
-  { abbr: "LA", lng: -92, lat: 31 },
-  { abbr: "WI", lng: -89.5, lat: 44.5 },
-  { abbr: "IL", lng: -89, lat: 40 },
-  { abbr: "MS", lng: -89.5, lat: 32.5 },
-  { abbr: "MI", lng: -84.5, lat: 44.5 },
-  { abbr: "IN", lng: -86.2, lat: 40 },
-  { abbr: "OH", lng: -82.5, lat: 40.5 },
-  { abbr: "KY", lng: -85.5, lat: 37.5 },
-  { abbr: "TN", lng: -86, lat: 36 },
-  { abbr: "AL", lng: -86.8, lat: 32.8 },
-  { abbr: "GA", lng: -83.5, lat: 33 },
-  { abbr: "FL", lng: -81.5, lat: 28.5 },
-  { abbr: "SC", lng: -81, lat: 34 },
-  { abbr: "NC", lng: -79.5, lat: 35.5 },
-  { abbr: "VA", lng: -79, lat: 37.5 },
-  { abbr: "WV", lng: -80.5, lat: 38.5 },
-  { abbr: "PA", lng: -77.5, lat: 41 },
-  { abbr: "NY", lng: -75.5, lat: 43 },
-  { abbr: "ME", lng: -69, lat: 45.5 },
-  { abbr: "VT", lng: -72.5, lat: 44 },
-  { abbr: "NH", lng: -71.5, lat: 43.5 },
-  { abbr: "MA", lng: -71.8, lat: 42.3 },
-  { abbr: "CT", lng: -72.7, lat: 41.6 },
-  { abbr: "NJ", lng: -74.5, lat: 40.2 },
-  { abbr: "DE", lng: -75.5, lat: 39 },
-  { abbr: "MD", lng: -76.7, lat: 39.2 },
-];
-
 type LabelPlacement = "top" | "bottom" | "left" | "right";
 
-function computeLabelPlacements(
-  cities: City[],
-): Record<string, LabelPlacement> {
+function computeLabelPlacements(cities: City[]): Record<string, LabelPlacement> {
   const placements: Record<string, LabelPlacement> = {};
   const options: LabelPlacement[] = ["top", "bottom", "right", "left"];
   const placed: { labelLng: number; labelLat: number }[] = [];
@@ -168,10 +108,7 @@ function computeLabelPlacements(
 
       let overlaps = 0;
       for (const p of placed) {
-        if (
-          Math.abs(lLng - p.labelLng) < LABEL_W &&
-          Math.abs(lLat - p.labelLat) < LABEL_H
-        )
+        if (Math.abs(lLng - p.labelLng) < LABEL_W && Math.abs(lLat - p.labelLat) < LABEL_H)
           overlaps++;
       }
       if (overlaps < minOverlaps) {
@@ -193,34 +130,26 @@ function computeLabelPlacements(
   return placements;
 }
 
-function getLabelOffset(
-  placement: LabelPlacement,
-  s: number,
-): { x: number; y: number; anchor: string } {
+function getLabelOffset(placement: LabelPlacement, s: number): { x: number; y: number; anchor: string } {
   switch (placement) {
-    case "top":
-      return { x: 0, y: -10 / s, anchor: "middle" };
-    case "bottom":
-      return { x: 0, y: 14 / s, anchor: "middle" };
-    case "right":
-      return { x: 8 / s, y: 3 / s, anchor: "start" };
-    case "left":
-      return { x: -8 / s, y: 3 / s, anchor: "end" };
+    case "top": return { x: 0, y: -10 / s, anchor: "middle" };
+    case "bottom": return { x: 0, y: 14 / s, anchor: "middle" };
+    case "right": return { x: 8 / s, y: 3 / s, anchor: "start" };
+    case "left": return { x: -8 / s, y: 3 / s, anchor: "end" };
   }
 }
 
 // Projection constants
-// These values ensure the map perfectly fills the container width
-const MAP_W = 800;
-const MAP_H = 400; // Reduced height to remove empty top/bottom space
-const PROJ_SCALE = MAP_W / (2 * Math.PI); // Mathematically centers the world
+const PROJ_SCALE = 120;
+const MAP_W = 754;
+const MAP_H = 380;
 const CX = MAP_W / 2;
 const PX_PER_DEG = (PROJ_SCALE * Math.PI) / 180;
 const STRIP_W = 15 * PX_PER_DEG;
 
 const BAR_H = 22;
-const TOP_BAR_Y = 0; // Move to absolute top
-const BOTTOM_BAR_Y = MAP_H - BAR_H; // Move to absolute bottom
+const TOP_BAR_Y = 5;
+const BOTTOM_BAR_Y = 353;
 
 export function WorldMapSVG({
   now,
@@ -241,7 +170,9 @@ export function WorldMapSVG({
   const { use24h } = useWorldClock();
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState<[number, number]>([0, 0]);
+  const [isTwoFingerTouch, setIsTwoFingerTouch] = useState(false);
   const isTwoFingerRef = useRef(false);
+  const [showTwoFingerOverlay, setShowTwoFingerOverlay] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -262,8 +193,15 @@ export function WorldMapSVG({
     return `hsl(${hsl.h}, ${Math.round(hsl.s * 30)}%, 95%)`;
   }, [hsl]);
 
-  const tzLineColor = useMemo(() => `${highlightColor}50`, [highlightColor]);
+  const tzLineColor = useMemo(() => `${highlightColor}40`, [highlightColor]);
   const tzLabelColor = useMemo(() => `${highlightColor}90`, [highlightColor]);
+
+  const getTzFill = useCallback((offset: number, isHovered: boolean) => {
+    if (isHovered) return `${highlightColor}60`;
+    // Generate a distinct but subtle color for each timezone offset
+    const hue = ((offset + 12) * 137.5) % 360; // Use golden angle for distribution
+    return `hsla(${hue}, 45%, 45%, 0.12)`;
+  }, [highlightColor]);
 
   const handlePinEnter = useCallback(
     (city: City, e: React.MouseEvent) => {
@@ -288,21 +226,37 @@ export function WorldMapSVG({
         setTooltipCity(null);
       } else {
         onHoverCity(city);
-        setTooltipCity({
-          city,
-          screenX: touch.clientX,
-          screenY: touch.clientY,
-        });
+        setTooltipCity({ city, screenX: touch.clientX, screenY: touch.clientY });
       }
     },
     [onHoverCity, tooltipCity],
   );
 
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length >= 2) {
+      setIsTwoFingerTouch(true);
+      isTwoFingerRef.current = true;
+      setShowTwoFingerOverlay(false);
+      if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+    } else {
+      setIsTwoFingerTouch(false);
+      isTwoFingerRef.current = false;
+      if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+      overlayTimeoutRef.current = setTimeout(() => {
+        if (!isTwoFingerRef.current) setShowTwoFingerOverlay(true);
+      }, 400);
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsTwoFingerTouch(false);
+    isTwoFingerRef.current = false;
+    if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+    setShowTwoFingerOverlay(false);
+  }, []);
+
   const hoveredId = hoveredCity?.id;
-  const nightPoints = useMemo(
-    () => getTerminatorPath(now, MAP_W, MAP_H),
-    [now],
-  );
+  const nightPoints = useMemo(() => getTerminatorPath(now, MAP_W, MAP_H), [now]);
 
   // Wheel zoom handler
   useEffect(() => {
@@ -320,57 +274,98 @@ export function WorldMapSVG({
     <div
       className={`relative touch-pan-y sm:touch-auto ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"}`}
       ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onTouchMove={(e) => {
+        if (e.touches.length >= 2) {
+          setIsTwoFingerTouch(true);
+          isTwoFingerRef.current = true;
+          setShowTwoFingerOverlay(false);
+          if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
+        }
+      }}
     >
-      {/* Zoom Controls */}
-      <div
-        className={`absolute top-3 right-3 z-10 flex flex-col gap-1.5 transition-opacity duration-300 ${
-          zoom > 1 || center[0] !== 0 || center[1] !== 0
-            ? "opacity-100"
-            : "opacity-0 sm:group-hover:opacity-100"
-        }`}
-      >
+      {/* Two-finger overlay for mobile */}
+      {showTwoFingerOverlay && (
+        <div className="absolute inset-0 z-20 bg-black/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-none transition-opacity duration-300 rounded-lg">
+          <div className="bg-card/90 border border-border px-4 py-3 rounded-xl shadow-2xl flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-300">
+            <div className="flex gap-2">
+              <div className="w-2 h-8 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+              <div className="w-2 h-8 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+            </div>
+            <p className="text-sm font-medium text-foreground">Use two fingers to move the map</p>
+          </div>
+        </div>
+      )}
+
+      {/* Zoom controls */}
+      <div className="absolute top-2 right-2 z-10 flex flex-col gap-2 sm:gap-1">
         <button
           onClick={() => setZoom((z) => Math.min(8, z * 1.5))}
-          className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center bg-background/80 backdrop-blur-md border border-border rounded-lg text-foreground hover:bg-accent transition-colors shadow-lg"
-          title="Zoom In"
+          className="w-10 h-10 sm:w-7 sm:h-7 rounded-md bg-card/80 border border-border text-foreground text-sm font-bold hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
         >
-          <span className="text-lg sm:text-base font-bold">+</span>
+          +
         </button>
         <button
           onClick={() => setZoom((z) => Math.max(1, z / 1.5))}
-          className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center bg-background/80 backdrop-blur-md border border-border rounded-lg text-foreground hover:bg-accent transition-colors shadow-lg"
-          title="Zoom Out"
+          className="w-10 h-10 sm:w-7 sm:h-7 rounded-md bg-card/80 border border-border text-foreground text-sm font-bold hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
         >
-          <span className="text-lg sm:text-base font-bold">−</span>
+          −
         </button>
-        <button
-          onClick={() => {
-            setZoom(1);
-            setCenter([0, 0]);
-          }}
-          className="w-8 h-8 sm:w-7 sm:h-7 flex items-center justify-center bg-background/80 backdrop-blur-md border border-border rounded-lg text-foreground hover:bg-accent transition-colors shadow-lg"
-          title="Reset Zoom"
-        >
-          <span className="text-xs sm:text-[10px] font-bold">↺</span>
-        </button>
+        {zoom > 1 && (
+          <button
+            onClick={() => { setZoom(1); setCenter([0, 0]); }}
+            className="w-10 h-10 sm:w-7 sm:h-7 rounded-md bg-card/80 border border-border text-muted-foreground text-[10px] font-medium hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
+            title="Reset zoom"
+          >
+            ↺
+          </button>
+        )}
       </div>
 
       <ComposableMap
         projection="geoEquirectangular"
-        // center: [0, 0] is the Equator/Prime Meridian intersection
-        projectionConfig={{
-          scale: PROJ_SCALE,
-          center: [0, 0],
-        }}
+        projectionConfig={{ scale: PROJ_SCALE, center: [0, 12] }}
         width={MAP_W}
         height={MAP_H}
-        // Remove the h-auto and use object-cover style if needed
-        className="w-full h-full block rounded-lg overflow-hidden"
-        style={{
-          backgroundColor: "hsl(var(--card))",
-          display: "block",
-        }}
+        className="w-full h-auto rounded-lg"
+        style={{ backgroundColor: "hsl(var(--card))" }}
+        onClick={() => { onHoverCity(null); setTooltipCity(null); }}
       >
+        <defs>
+          <pattern
+            id="pattern-stripes"
+            width="8"
+            height="8"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <line
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="8"
+              stroke="rgba(255,255,255,0.12)"
+              strokeWidth="2"
+            />
+          </pattern>
+          <pattern
+            id="pattern-stripes-hover"
+            width="8"
+            height="8"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(45)"
+          >
+            <line
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="8"
+              stroke="rgba(255,255,255,0.35)"
+              strokeWidth="2"
+            />
+          </pattern>
+        </defs>
         <ZoomableGroup
           zoom={zoom}
           center={center}
@@ -378,10 +373,6 @@ export function WorldMapSVG({
             setCenter(coordinates as [number, number]);
             setZoom(z);
           }}
-          translateExtent={[
-            [0, 0],
-            [MAP_W, MAP_H],
-          ]}
           minZoom={1}
           maxZoom={8}
           filterZoomEvent={(e) => {
@@ -391,34 +382,51 @@ export function WorldMapSVG({
             return true;
           }}
         >
-          {/* Meridian lines */}
-          {TIMEZONE_LONGITUDES.map((lng) => (
+          {/* Ocean Timezone Lines */}
+          {OCEAN_BOUNDARIES.map((lon) => (
             <Line
-              key={`meridian-${lng}`}
-              from={[lng, 90]}
-              to={[lng, -75]}
+              key={`ocean-line-${lon}`}
+              from={[lon, -90]}
+              to={[lon, 90]}
               stroke={tzLineColor}
               strokeWidth={0.5 / zoom}
-              strokeDasharray="2 1"
+              className="pointer-events-none"
             />
           ))}
+
+          {/* Base Country layer for continent/country shapes */}
+          <Geographies geography={COUNTRY_URL}>
+            {({ geographies }) =>
+              geographies
+                .filter((geo) => geo.properties?.name !== "Antarctica" && geo.id !== "010")
+                .map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  fill={landFill}
+                  stroke={landStroke}
+                  strokeWidth={0.2 / zoom}
+                  style={{
+                    default: { outline: "none" },
+                    hover: { outline: "none" },
+                    pressed: { outline: "none" },
+                  }}
+                  className="pointer-events-none"
+                />
+              ))
+            }
+          </Geographies>
 
           {/* Timezone shapes from timezone-boundary-builder (jagged political borders) */}
           <Geographies geography={TZ_GEO_URL}>
             {({ geographies }) => {
               // Group geometries by their UTC offset for synchronized highlighting
-              const offsetGroups: Record<number, { tzid: string; geo: any }[]> =
-                {};
+              const offsetGroups: Record<number, { tzid: string; geo: any }[]> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
               geographies.forEach((geo) => {
                 const tzid = geo.properties?.tzid;
                 if (!tzid) return;
                 // Skip Antarctica-related zones
-                if (
-                  tzid === "Antarctica/McMurdo" ||
-                  tzid === "Antarctica/South_Pole" ||
-                  tzid.startsWith("Antarctica/")
-                )
-                  return;
+                if (tzid === "Antarctica/McMurdo" || tzid === "Antarctica/South_Pole" || tzid.startsWith("Antarctica/")) return;
                 const offset = getTzidOffset(tzid, now);
                 if (!offsetGroups[offset]) offsetGroups[offset] = [];
                 offsetGroups[offset].push({ tzid, geo });
@@ -429,45 +437,52 @@ export function WorldMapSVG({
                 .map(([offsetStr, items]) => {
                   const offset = Number(offsetStr);
                   const isOffsetHovered = hoveredTimezone === offset;
+                  const isFractional = offset % 1 !== 0;
 
                   return (
-                    <g
-                      key={`tz-offset-${offset}`}
-                      id={`zone-${offset}`}
-                      data-timezone={offset}
-                    >
+                    <g key={`tz-offset-${offset}`} id={`zone-${offset}`} data-timezone={offset}>
                       {items.map(({ tzid, geo }) => (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          data-timezone={offset}
-                          data-tzid={tzid}
-                          fill={
-                            isOffsetHovered ? `${highlightColor}70` : landFill
-                          }
-                          stroke={isOffsetHovered ? highlightColor : landStroke}
-                          strokeWidth={
-                            isOffsetHovered ? 0.8 / zoom : 0.3 / zoom
-                          }
-                          style={{
-                            default: {
-                              outline: "none",
-                              transition: "fill 0.2s ease, stroke 0.2s ease",
-                              cursor: "pointer",
-                            },
-                            hover: {
-                              outline: "none",
-                              fill: `${highlightColor}90`,
-                              stroke: highlightColor,
-                              strokeWidth: 0.8 / zoom,
-                              transition: "fill 0.2s ease, stroke 0.2s ease",
-                              cursor: "pointer",
-                            },
-                            pressed: { outline: "none" },
-                          }}
-                          onMouseEnter={() => onHoverTimezone(offset)}
-                          onMouseLeave={() => onHoverTimezone(null)}
-                        />
+                        <React.Fragment key={geo.rsmKey}>
+                          <Geography
+                            geography={geo}
+                            data-timezone={offset}
+                            data-tzid={tzid}
+                            fill={getTzFill(offset, isOffsetHovered)}
+                            stroke={isOffsetHovered ? highlightColor : `${highlightColor}40`}
+                            strokeWidth={(isOffsetHovered ? 0.8 : 0.3) / zoom}
+                            style={{
+                              default: {
+                                outline: "none",
+                                transition: "fill 0.2s ease, stroke 0.2s ease",
+                                cursor: "pointer",
+                              },
+                              hover: {
+                                outline: "none",
+                                fill: `${highlightColor}60`,
+                                stroke: highlightColor,
+                                strokeWidth: 0.8 / zoom,
+                                transition: "fill 0.2s ease, stroke 0.2s ease",
+                                cursor: "pointer",
+                              },
+                              pressed: { outline: "none" },
+                            }}
+                            onMouseEnter={() => onHoverTimezone(offset)}
+                            onMouseLeave={() => onHoverTimezone(null)}
+                          />
+                          {isFractional && (
+                            <Geography
+                              geography={geo}
+                              fill={isOffsetHovered ? "url(#pattern-stripes-hover)" : "url(#pattern-stripes)"}
+                              stroke="transparent"
+                              className="pointer-events-none"
+                              style={{
+                                default: { outline: "none" },
+                                hover: { outline: "none" },
+                                pressed: { outline: "none" },
+                              }}
+                            />
+                          )}
+                        </React.Fragment>
                       ))}
                     </g>
                   );
@@ -475,127 +490,73 @@ export function WorldMapSVG({
             }}
           </Geographies>
 
-          {/* US State boundaries overlay */}
-          <Geographies geography={US_STATES_URL}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                let centerLng = 0;
-                if (geo.geometry.type === "Polygon") {
-                  centerLng = geo.geometry.coordinates[0][0][0];
-                } else if (geo.geometry.type === "MultiPolygon") {
-                  centerLng = geo.geometry.coordinates[0][0][0][0];
-                }
-                const stateTz = Math.round(centerLng / 15);
-                const isInHoveredTz = hoveredTimezone === stateTz;
-
-                return (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill={isInHoveredTz ? `${highlightColor}30` : "transparent"}
-                    stroke={isInHoveredTz ? highlightColor : landStroke}
-                    strokeWidth={isInHoveredTz ? 1 / zoom : 0.3 / zoom}
-                    style={{
-                      default: { outline: "none" },
-                      hover: {
-                        outline: "none",
-                        fill: `${highlightColor}50`,
-                        stroke: highlightColor,
-                        strokeWidth: 1 / zoom,
-                      },
-                      pressed: { outline: "none" },
-                    }}
-                  />
-                );
-              })
-            }
-          </Geographies>
-
-          {/* US state abbreviation labels */}
-          {zoom >= 2.5 &&
-            US_STATE_LABELS.map(({ abbr, lng, lat }) => {
-              const s = Math.pow(zoom, 0.6);
-              return (
-                <Marker key={`st-${abbr}`} coordinates={[lng, lat]}>
-                  <text
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize={6 / s}
-                    fontWeight={600}
-                    fontFamily="'Inter', sans-serif"
-                    fill="hsl(var(--foreground))"
-                    stroke="hsl(var(--card))"
-                    strokeWidth={1.5 / s}
-                    paintOrder="stroke"
-                    className="pointer-events-none select-none"
-                  >
-                    {abbr}
-                  </text>
-                </Marker>
-              );
-            })}
+          {/* US State boundaries overlay removed */}
 
           {/* Top and bottom UTC offset bars */}
-          {TIMEZONE_LONGITUDES.map((lng) => {
-            const offset = Math.round(lng / 15);
-            const isHovered = hoveredTimezone === offset;
+          {TIMEZONE_OFFSETS.map((offset) => {
+            const isHovered = hoveredTimezone !== null && Math.abs(hoveredTimezone - offset) < 0.75;
+            const isEdge = offset === -12 || offset === 12;
+            const width = isEdge ? STRIP_W / 2 : STRIP_W;
+            
+            // Calculate x position based on longitude
+            // -12 is from -180 to -172.5
+            // -11 is from -172.5 to -157.5
+            const lonStart = offset === -12 ? -180 : -172.5 + (offset + 11) * 15;
+            const xPx = CX + lonStart * PX_PER_DEG;
+            
             const isEven = Math.abs(offset) % 2 === 0;
-            const barBgColor = isEven
-              ? `${highlightColor}30`
-              : `${highlightColor}18`;
-            const hoveredBarBg = isEven
-              ? `${highlightColor}55`
-              : `${highlightColor}40`;
-            const label =
-              offset === 0 ? "0" : `${offset > 0 ? "+" : ""}${offset}`;
-            const xPx = CX + lng * PX_PER_DEG;
-            const fSize = 9;
+            const barBgColor = isEven ? `${highlightColor}25` : `${highlightColor}12`;
+            const hoveredBarBg = isEven ? `${highlightColor}50` : `${highlightColor}35`;
+            const label = offset === 0 ? "0" : `${offset > 0 ? "+" : ""}${offset}`;
+            const fSize = isEdge ? 7 : 9;
 
             return (
-              <React.Fragment key={`tz-bar-${lng}`}>
+              <React.Fragment key={`tz-bar-${offset}`}>
                 <rect
                   x={xPx}
                   y={TOP_BAR_Y}
-                  width={STRIP_W}
+                  width={width}
                   height={BAR_H}
                   fill={isHovered ? hoveredBarBg : barBgColor}
                   onMouseEnter={() => onHoverTimezone(offset)}
                   onMouseLeave={() => onHoverTimezone(null)}
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-colors duration-200"
                 />
                 <text
-                  x={xPx + STRIP_W / 2}
+                  x={xPx + width / 2}
                   y={TOP_BAR_Y + BAR_H / 2}
                   textAnchor="middle"
                   dominantBaseline="central"
                   fontSize={fSize}
                   fill={isHovered ? highlightColor : tzLabelColor}
                   fontFamily="'Inter', sans-serif"
-                  fontWeight={isHovered || offset === 0 ? 700 : 500}
-                  className="pointer-events-none select-none"
+                  fontWeight={isHovered || offset === 0 ? 800 : 500}
+                  className="pointer-events-none select-none transition-colors duration-200"
+                  style={{ textShadow: isHovered ? `0 0 8px ${highlightColor}40` : 'none' }}
                 >
                   {label}
                 </text>
                 <rect
                   x={xPx}
                   y={BOTTOM_BAR_Y}
-                  width={STRIP_W}
+                  width={width}
                   height={BAR_H}
                   fill={isHovered ? hoveredBarBg : barBgColor}
                   onMouseEnter={() => onHoverTimezone(offset)}
                   onMouseLeave={() => onHoverTimezone(null)}
-                  className="cursor-pointer"
+                  className="cursor-pointer transition-colors duration-200"
                 />
                 <text
-                  x={xPx + STRIP_W / 2}
+                  x={xPx + width / 2}
                   y={BOTTOM_BAR_Y + BAR_H / 2}
                   textAnchor="middle"
                   dominantBaseline="central"
                   fontSize={fSize}
                   fill={isHovered ? highlightColor : tzLabelColor}
                   fontFamily="'Inter', sans-serif"
-                  fontWeight={isHovered || offset === 0 ? 700 : 500}
-                  className="pointer-events-none select-none"
+                  fontWeight={isHovered || offset === 0 ? 800 : 500}
+                  className="pointer-events-none select-none transition-colors duration-200"
+                  style={{ textShadow: isHovered ? `0 0 8px ${highlightColor}40` : 'none' }}
                 >
                   {label}
                 </text>
@@ -621,33 +582,19 @@ export function WorldMapSVG({
               return (
                 <Marker
                   key={`all-${city.id}`}
-                  coordinates={[
-                    city.lng || city.coordinates[0],
-                    city.lat || city.coordinates[1],
-                  ]}
-                  onMouseEnter={(e) =>
-                    handlePinEnter(city, e as unknown as React.MouseEvent)
-                  }
+                  coordinates={[city.lng || city.coordinates[0], city.lat || city.coordinates[1]]}
+                  onMouseEnter={(e) => handlePinEnter(city, e as unknown as React.MouseEvent)}
                   onMouseLeave={handlePinLeave}
-                  onTouchStart={(e: React.TouchEvent) =>
-                    handlePinTouch(city, e)
-                  }
+                  onTouchStart={(e: React.TouchEvent) => handlePinTouch(city, e)}
                   className="cursor-pointer"
                 >
                   <circle r={12 / s} fill="transparent" />
                   <circle
                     r={(isHovered ? 6 : 3.5) / s}
-                    fill={
-                      isHovered
-                        ? "hsl(var(--foreground))"
-                        : "hsl(var(--muted-foreground))"
-                    }
+                    fill={isHovered ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))"}
                     opacity={isHovered ? 0.9 : 0.55}
                   />
-                  <circle
-                    r={(isHovered ? 3.5 : 2) / s}
-                    fill="hsl(var(--card))"
-                  />
+                  <circle r={(isHovered ? 3.5 : 2) / s} fill="hsl(var(--card))" />
                   {isHovered && (
                     <text
                       y={-8 / s}
@@ -676,30 +623,20 @@ export function WorldMapSVG({
             const s = Math.pow(zoom, 0.6);
             const placement = labelPlacements[city.id] || "top";
             const offset = getLabelOffset(placement, s);
-            const cityOffset = Math.round(
-              (city.lng || city.coordinates[0]) / 15,
-            );
+            const cityOffset = Math.round((city.lng || city.coordinates[0]) / 15);
             const isInHoveredTz = hoveredTimezone === cityOffset;
 
             return (
               <Marker
                 key={city.id}
-                coordinates={[
-                  city.lng || city.coordinates[0],
-                  city.lat || city.coordinates[1],
-                ]}
-                onMouseEnter={(e) =>
-                  handlePinEnter(city, e as unknown as React.MouseEvent)
-                }
+                coordinates={[city.lng || city.coordinates[0], city.lat || city.coordinates[1]]}
+                onMouseEnter={(e) => handlePinEnter(city, e as unknown as React.MouseEvent)}
                 onMouseLeave={handlePinLeave}
                 onTouchStart={(e: React.TouchEvent) => handlePinTouch(city, e)}
                 className="cursor-pointer"
               >
                 <circle r={15 / s} fill="transparent" />
-                <circle
-                  r={(isHovered || isInHoveredTz ? 8 : 5) / s}
-                  fill={`${isHovered || isInHoveredTz ? highlightColor : pinColor}30`}
-                />
+                <circle r={(isHovered || isInHoveredTz ? 8 : 5) / s} fill={`${isHovered || isInHoveredTz ? highlightColor : pinColor}30`} />
                 <circle
                   r={(isHovered || isInHoveredTz ? 4 : 2.5) / s}
                   fill={isHovered || isInHoveredTz ? highlightColor : pinColor}
@@ -713,11 +650,7 @@ export function WorldMapSVG({
                   fontSize={9 / s}
                   fontWeight={isHovered || isInHoveredTz ? 700 : 600}
                   fontFamily="'Inter', sans-serif"
-                  fill={
-                    isHovered || isInHoveredTz
-                      ? highlightColor
-                      : "hsl(var(--foreground))"
-                  }
+                  fill={isHovered || isInHoveredTz ? highlightColor : "hsl(var(--foreground))"}
                   stroke="hsl(var(--card))"
                   strokeWidth={2.5 / s}
                   paintOrder="stroke"
@@ -735,19 +668,13 @@ export function WorldMapSVG({
       {tooltipCity && (
         <div
           className="fixed z-50 pointer-events-none"
-          style={{
-            left: tooltipCity.screenX + 12,
-            top: tooltipCity.screenY - 20,
-          }}
+          style={{ left: tooltipCity.screenX + 12, top: tooltipCity.screenY - 20 }}
         >
           <div className="bg-card border border-border rounded-lg shadow-lg px-3 py-2 min-w-[130px]">
             <p className="text-xs font-semibold text-foreground">
               {tooltipCity.city.name}, {tooltipCity.city.country}
             </p>
-            <p
-              className="text-sm font-mono font-semibold mt-0.5"
-              style={{ color: highlightColor }}
-            >
+            <p className="text-sm font-mono font-semibold mt-0.5" style={{ color: highlightColor }}>
               {formatTime(tooltipCity.city.timezone, now, use24h)}
             </p>
             <p className="text-[10px] text-muted-foreground font-medium">
@@ -764,39 +691,14 @@ export function WorldMapSVG({
               {(() => {
                 const tod = getTimeOfDay(tooltipCity.city.timezone, now);
                 const TodIcon =
-                  tod === "day"
-                    ? Sun
-                    : tod === "afternoon"
-                      ? Sun
-                      : tod === "night"
-                        ? Moon
-                        : tod === "dawn"
-                          ? Sunrise
-                          : Sunset;
+                  tod === "day" ? Sun : tod === "afternoon" ? Sun : tod === "night" ? Moon : tod === "dawn" ? Sunrise : Sunset;
                 const iconColor =
-                  tod === "day"
-                    ? "#edb423"
-                    : tod === "afternoon"
-                      ? "#fbbf24"
-                      : tod === "night"
-                        ? "#72708e"
-                        : tod === "dawn"
-                          ? "#e26f71"
-                          : "#9e6ae2";
+                  tod === "day" ? "#edb423" : tod === "afternoon" ? "#fbbf24" : tod === "night" ? "#72708e" : tod === "dawn" ? "#e26f71" : "#9e6ae2";
                 const label =
-                  tod === "day"
-                    ? "Morning"
-                    : tod === "afternoon"
-                      ? "Afternoon"
-                      : tod === "night"
-                        ? "Night"
-                        : tod === "dawn"
-                          ? "Dawn"
-                          : "Evening";
+                  tod === "day" ? "Morning" : tod === "afternoon" ? "Afternoon" : tod === "night" ? "Night" : tod === "dawn" ? "Dawn" : "Evening";
                 return (
                   <span className="inline-flex items-center gap-0.5">
-                    <TodIcon size={10} color={iconColor} strokeWidth={2} />{" "}
-                    {label}
+                    <TodIcon size={10} color={iconColor} strokeWidth={2} /> {label}
                   </span>
                 );
               })()}
