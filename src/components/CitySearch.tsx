@@ -39,66 +39,36 @@ export function CitySearch() {
         if (localResults.length === 0 && query.length > 2) {
           setSearching(true);
           try {
-            // 1. Get coordinates from Nominatim
+            // Use Open-Meteo Geocoding API - more reliable and includes timezone
             const res = await fetch(
-              `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`
+              `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`
             );
             const data = await res.json();
             
-            if (data && data.length > 0) {
-              const { lat, lon, display_name } = data[0];
-              const searchLat = parseFloat(lat);
-              const searchLon = parseFloat(lon);
+            if (data.results && data.results.length > 0) {
+              const result = data.results[0];
+              const { latitude, longitude, name, country, timezone } = result;
 
-              // 2. Get timezone from Teleport
-              const teleportRes = await fetch(`https://api.teleport.org/api/locations/${searchLat},${searchLon}/`);
-              const teleportData = await teleportRes.json();
-              const cityHref = teleportData._embedded['location:nearest-cities']?.[0]?._links['location:nearest-city']?.href;
-              
-              if (cityHref) {
-                const cityDataRes = await fetch(cityHref);
-                const cityData = await cityDataRes.json();
-                const urbanAreaHref = cityData._links['city:urban_area']?.href;
-                
-                let timezone = 'UTC';
-                if (urbanAreaHref) {
-                  const uaRes = await fetch(urbanAreaHref);
-                  const uaData = await uaRes.json();
-                  const tzRes = await fetch(uaData._links['ua:timezone']?.href);
-                  const tzData = await tzRes.json();
-                  timezone = tzData.iana_name;
-                }
-
-                const newCity: City = {
-                  id: `custom-${Date.now()}`,
-                  name: cityData.name || query,
-                  timezone: timezone,
-                  country: display_name.split(',').pop()?.trim() || '',
-                  coordinates: [searchLon, searchLat],
-                  lat: searchLat,
-                  lng: searchLon
-                };
-                setClosestCity(newCity);
-              } else {
-                // Fallback to closest city in our database
-                let minDistance = Infinity;
-                let nearest: City | null = null;
-
-                CITIES.forEach(city => {
-                  if (selectedCities.find(sc => sc.id === city.id)) return;
-                  const dist = calculateDistance(searchLat, searchLon, city.lat || city.coordinates[1], city.lng || city.coordinates[0]);
-                  if (dist < minDistance) {
-                    minDistance = dist;
-                    nearest = city;
-                  }
-                });
-                setClosestCity(nearest);
-              }
+              const newCity: City = {
+                id: `custom-${Date.now()}`,
+                name: name || query,
+                timezone: timezone || 'UTC',
+                country: country || '',
+                coordinates: [longitude, latitude],
+                lat: latitude,
+                lng: longitude
+              };
+              setClosestCity(newCity);
             } else {
               setClosestCity(null);
             }
           } catch (e) {
-            console.error("Search error", e);
+            // Silently handle fetch failures for external search to avoid console noise
+            if (e instanceof Error && e.message.includes('fetch')) {
+              console.warn("External city search is temporarily unavailable.");
+            } else {
+              console.error("Search error:", e);
+            }
             setClosestCity(null);
           } finally {
             setSearching(false);
@@ -113,7 +83,7 @@ export function CitySearch() {
       }
     };
 
-    const timer = setTimeout(search, 300);
+    const timer = setTimeout(search, 500);
     return () => clearTimeout(timer);
   }, [query, selectedCities]);
 
@@ -256,8 +226,14 @@ export function CitySearch() {
                 </button>
               </div>
             ) : (
-              <div className="px-4 py-3 text-sm text-muted-foreground">
-                No cities found.
+              <div className="px-6 py-8 text-center">
+                <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted mb-3">
+                  <Search className="h-5 w-5 text-muted-foreground/60" />
+                </div>
+                <p className="text-sm font-medium text-foreground">No city or country found</p>
+                <p className="text-xs text-muted-foreground mt-1 px-4">
+                  We couldn't find any results for "{query}". Try checking the spelling or searching for a larger city.
+                </p>
               </div>
             )}
           </motion.div>

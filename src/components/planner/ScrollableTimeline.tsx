@@ -9,6 +9,7 @@ import { addDays, format, isSameDay, startOfDay } from "date-fns";
 import {
   getTimeOfDay,
   getTimezoneAbbreviation,
+  getTimeInTimezone,
   convertTime,
 } from "@/utils/timezone";
 import { useWorldClock } from "@/hooks/useWorldClock";
@@ -27,6 +28,7 @@ import {
   MessageSquare,
   Briefcase,
   PaintRoller,
+  Target,
   X,
 } from "lucide-react";
 import {
@@ -358,6 +360,17 @@ export function ScrollableTimeline({
     [selectedDate, onSelectDate, onSelectHour, cellWidth],
   );
 
+  const handleNow = useCallback(() => {
+    const today = new Date();
+    onSelectDate(today);
+    const h = getTimeInTimezone(fromCity.timezone, today).getHours();
+    onSelectHour(h);
+    // Force center scroll if already on today
+    if (isToday) {
+      centerScroll();
+    }
+  }, [onSelectDate, onSelectHour, fromCity.timezone, isToday, centerScroll]);
+
   // Selection position in 72-cell space (current day = cells 24-47)
   const selectionAbsStart = CENTER_START + selectedHour;
   const selectionAbsEnd = selectionAbsStart + duration;
@@ -580,12 +593,28 @@ export function ScrollableTimeline({
           <button
             onClick={() => onSelectDate(addDays(selectedDate, -1))}
             className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
+            title="Previous day"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
           </button>
+          
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={handleNow}
+                className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
+                aria-label="Reset to now"
+              >
+                <Target className="h-3.5 w-3.5" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>Now</TooltipContent>
+          </Tooltip>
+
           <button
             onClick={() => onSelectDate(addDays(selectedDate, 1))}
             className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
+            title="Next day"
           >
             <ChevronRight className="h-3.5 w-3.5" />
           </button>

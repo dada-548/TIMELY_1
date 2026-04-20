@@ -66,15 +66,62 @@ function getTzidStandardOffset(tzid: string): number {
   // or historical mapping preferred by the user.
   // Greenland (mostly Nuuk) shifted to -2 standard in 2023, but geographically -3 
   // is often preferred for balanced map visualization.
+  // Greenland Northwest (Thule/Qaanaaq)
   if (
-    tzid === "America/Nuuk" || 
-    tzid === "America/Godthab" || 
-    tzid === "America/Upernavik" || 
-    tzid === "America/Scoresbysund" ||
-    tzid === "America/Danmarkshavn"
+    tzid.includes("Thule") || 
+    tzid.includes("Qaanaaq") || 
+    tzid === "Etc/GMT+4" ||
+    tzid.includes("Greenland/Northwest")
+  ) {
+    tzidStandardOffsetCache[tzid] = -4;
+    return -4;
+  }
+
+  // Greenland Main (Nuuk/Upernavik/West)
+  if (
+    tzid.includes("Nuuk") || 
+    tzid.includes("Godthab") || 
+    tzid.includes("Upernavik") ||
+    tzid.includes("Tasiilaq") ||
+    tzid.includes("Angmagssalik") ||
+    tzid.includes("Kangerlussuaq") ||
+    tzid.includes("Ilulissat") ||
+    tzid.includes("Sisimiut") ||
+    tzid.includes("Qaqortoq") ||
+    tzid === "Etc/GMT+3" ||
+    tzid.includes("Greenland/West")
   ) {
     tzidStandardOffsetCache[tzid] = -3;
     return -3;
+  }
+
+  // East Greenland (strictly Scoresbysund area / Ittoqqortoormiut)
+  if (
+    tzid.includes("Scoresbysund") || 
+    tzid.includes("Ittoqqortoormiut") ||
+    tzid.includes("Scoresby") ||
+    tzid.includes("East_Greenland") ||
+    tzid.includes("Greenland/East") ||
+    tzid === "Etc/GMT+1"
+  ) {
+    tzidStandardOffsetCache[tzid] = -1;
+    return -1;
+  }
+  
+  // Danmarkshavn (Northeast Greenland) and Iceland
+  if (
+    tzid.includes("Danmarkshavn") || 
+    tzid.includes("Nord") ||
+    tzid.includes("Iceland") || 
+    tzid.includes("Reykjavik") ||
+    tzid.includes("GMT+0") ||
+    tzid.includes("GMT-0") ||
+    tzid.includes("Greenland/Northeast") ||
+    tzid === "Etc/GMT" ||
+    tzid === "UTC"
+  ) {
+    tzidStandardOffsetCache[tzid] = 0;
+    return 0;
   }
   
   try {
@@ -705,7 +752,7 @@ export function WorldMapSVG({
             />
           )}
 
-          {/* All cities (secondary pins) */}
+          {/* Stage 1: Secondary city pins */}
           {allCities
             .filter((c) => !selectedCities.some((sc) => sc.id === c.id))
             .map((city) => {
@@ -713,7 +760,7 @@ export function WorldMapSVG({
               const s = Math.pow(zoom, 0.6);
               return (
                 <Marker
-                  key={`all-${city.id}`}
+                  key={`all-pin-${city.id}`}
                   coordinates={[city.lng || city.coordinates[0], city.lat || city.coordinates[1]]}
                   onMouseEnter={(e) => handlePinEnter(city, e as unknown as React.MouseEvent)}
                   onMouseLeave={handlePinLeave}
@@ -728,34 +775,16 @@ export function WorldMapSVG({
                     opacity={isHovered ? 0.9 : 0.55}
                   />
                   <circle r={(isHovered ? 3.5 : 2) / s} fill="hsl(var(--card))" />
-                  {isHovered && (
-                    <text
-                      y={-10 / s}
-                      textAnchor="middle"
-                      fontSize={10 / s}
-                      fontWeight={700}
-                      fontFamily="'Inter', sans-serif"
-                      fill="white"
-                      stroke="black"
-                      strokeWidth={3 / s}
-                      paintOrder="stroke"
-                      className="pointer-events-none select-none"
-                    >
-                      {city.name}
-                    </text>
-                  )}
                 </Marker>
               );
             })}
 
-          {/* Selected city markers */}
+          {/* Stage 2: Selected city pins */}
           {selectedCities.map((city) => {
             const isHovered = hoveredId === city.id;
             const tod = getTimeOfDay(city.timezone, now);
             const pinColor = tod === "night" ? "#94a3b8" : highlightColor;
             const s = Math.pow(zoom, 0.6);
-            const placement = labelPlacements[city.id] || "top";
-            const offset = getLabelOffset(placement, s);
             
             // Use standard offset for highlighting to match the geographical grid
             const cityOffset = getTzidStandardOffset(city.timezone);
@@ -763,7 +792,7 @@ export function WorldMapSVG({
 
             return (
               <Marker
-                key={city.id}
+                key={`sel-pin-${city.id}`}
                 coordinates={[city.lng || city.coordinates[0], city.lat || city.coordinates[1]]}
                 onMouseEnter={(e) => handlePinEnter(city, e as unknown as React.MouseEvent)}
                 onMouseLeave={handlePinLeave}
@@ -779,6 +808,56 @@ export function WorldMapSVG({
                   stroke="white"
                   strokeWidth={1.2 / s}
                 />
+              </Marker>
+            );
+          })}
+
+          {/* Stage 3: Labels (Drawn last to be on top of all pins) */}
+          {allCities
+            .filter((c) => !selectedCities.some((sc) => sc.id === c.id))
+            .map((city) => {
+              const isHovered = hoveredId === city.id;
+              if (!isHovered) return null;
+              const s = Math.pow(zoom, 0.6);
+              return (
+                <Marker
+                  key={`all-label-${city.id}`}
+                  coordinates={[city.lng || city.coordinates[0], city.lat || city.coordinates[1]]}
+                  className="pointer-events-none"
+                >
+                  <text
+                    y={-10 / s}
+                    textAnchor="middle"
+                    fontSize={10 / s}
+                    fontWeight={700}
+                    fontFamily="'Inter', sans-serif"
+                    fill="white"
+                    stroke="black"
+                    strokeWidth={3 / s}
+                    paintOrder="stroke"
+                    className="select-none"
+                  >
+                    {city.name}
+                  </text>
+                </Marker>
+              );
+            })}
+
+          {selectedCities.map((city) => {
+            const isHovered = hoveredId === city.id;
+            const s = Math.pow(zoom, 0.6);
+            const placement = labelPlacements[city.id] || "top";
+            const offset = getLabelOffset(placement, s);
+            
+            const cityOffset = getTzidStandardOffset(city.timezone);
+            const isInHoveredTz = hoveredTimezone === cityOffset;
+
+            return (
+              <Marker
+                key={`sel-label-${city.id}`}
+                coordinates={[city.lng || city.coordinates[0], city.lat || city.coordinates[1]]}
+                className="pointer-events-none"
+              >
                 <text
                   x={offset.x}
                   y={offset.y}
@@ -790,7 +869,7 @@ export function WorldMapSVG({
                   stroke="black"
                   strokeWidth={3 / s}
                   paintOrder="stroke"
-                  className="pointer-events-none select-none"
+                  className="select-none"
                 >
                   {city.name}
                 </text>
