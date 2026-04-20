@@ -46,11 +46,11 @@ function SectionItem({
       <button
         type="button"
         onPointerDown={(e) => dragControls.start(e)}
-        className="sm:hidden absolute top-1 right-1 z-[5] cursor-grab active:cursor-grabbing p-1 bg-background/70 rounded-md backdrop-blur-sm"
+        className="sm:hidden absolute top-2 left-2 z-[5] cursor-grab active:cursor-grabbing p-1.5 bg-background/80 rounded-md shadow-sm border border-border/50 backdrop-blur-sm"
         style={{ touchAction: "none" }}
         aria-label="Reorder section"
       >
-        <GripVertical className="h-3 w-3" style={{ color: highlightColor }} />
+        <GripVertical className="h-3.5 w-3.5" style={{ color: highlightColor }} />
       </button>
       <Component />
     </Reorder.Item>

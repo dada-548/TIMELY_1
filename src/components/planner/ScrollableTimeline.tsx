@@ -67,6 +67,7 @@ interface City {
   name: string;
   timezone: string;
   country: string;
+  airportCode?: string;
 }
 
 interface ScrollableTimelineProps {
@@ -606,8 +607,7 @@ export function ScrollableTimeline({
       {visible && (
         <>
           <div
-            className="flex w-full min-w-0 overflow-y-auto scrollbar-thin scrollbar-thumb-border"
-            style={maxHeight ? { maxHeight } : undefined}
+            className="flex w-full min-w-0"
           >
             {/* Fixed labels column */}
             <div className="w-16 sm:w-44 flex-shrink-0 border-r border-border/50 bg-card/50">
@@ -644,7 +644,12 @@ export function ScrollableTimeline({
                               isBase ? { color: highlightColor } : undefined
                             }
                           >
-                            {city.name}
+                            <span className="inline sm:hidden">
+                              {city.airportCode || city.name.slice(0, 3).toUpperCase()}
+                            </span>
+                            <span className="hidden sm:inline">
+                              {city.name}
+                            </span>
                           </span>
                         </div>
                         {/* Country name on mobile, abbreviation on desktop */}

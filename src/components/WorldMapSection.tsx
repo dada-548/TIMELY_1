@@ -24,10 +24,10 @@ export function WorldMapSection() {
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="w-full flex items-center justify-between px-4 py-3">
+      <div className="w-full flex items-center justify-between px-4 sm:px-4 py-3 pl-12 sm:pl-4">
         <button
           onClick={() => setVisible((v) => !v)}
-          className="flex flex-col items-start hover:text-foreground/80 transition-colors"
+          className="flex flex-col items-start hover:text-foreground/80 transition-colors py-0.5"
         >
           <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-1">
             <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
@@ -54,52 +54,58 @@ export function WorldMapSection() {
           </span>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 relative z-20">
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setShowNightShade((v) => !v)}
-                    className={`p-1.5 transition-colors ${
-                      showNightShade
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={
-                      showNightShade
-                        ? { backgroundColor: `${highlightColor}25` }
-                        : undefined
-                    }
-                  >
-                    <CloudMoon className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Night shade</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={() => setShowAllCities((v) => !v)}
-                    className={`p-1.5 transition-colors ${
-                      showAllCities
-                        ? "text-foreground"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                    style={
-                      showAllCities
-                        ? { backgroundColor: `${highlightColor}25` }
-                        : undefined
-                    }
-                  >
-                    <Globe className="h-3.5 w-3.5" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent>Show all cities</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowNightShade((v) => !v);
+                  }}
+                  className={`p-1.5 transition-colors touch-manipulation focus:outline-none ${
+                    showNightShade
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  style={
+                    showNightShade
+                      ? { backgroundColor: `${highlightColor}25` }
+                      : undefined
+                  }
+                  aria-label="Toggle night shade"
+                >
+                  <CloudMoon className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Night shade</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowAllCities((v) => !v);
+                  }}
+                  className={`p-1.5 transition-colors touch-manipulation focus:outline-none ${
+                    showAllCities
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  style={
+                    showAllCities
+                      ? { backgroundColor: `${highlightColor}25` }
+                      : undefined
+                  }
+                  aria-label="Toggle all cities visibility"
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Show all cities</TooltipContent>
+            </Tooltip>
           </div>
 
           <button

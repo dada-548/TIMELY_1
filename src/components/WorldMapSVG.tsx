@@ -56,31 +56,40 @@ function hexToHsl(hex: string): { h: number; s: number; l: number } | null {
 const TIMEZONE_OFFSETS = Array.from({ length: 25 }, (_, i) => i - 12);
 const OCEAN_BOUNDARIES = Array.from({ length: 24 }, (_, i) => -172.5 + i * 15);
 
-// Cache for tzid → UTC offset (in whole hours)
-const tzidOffsetCache: Record<string, number> = {};
+// Cache for tzid → Standard UTC offset (in whole hours)
+const tzidStandardOffsetCache: Record<string, number> = {};
 
-function getTzidOffset(tzid: string, now: Date): number {
-  // Use cache for performance
-  const cacheKey = tzid;
-  if (tzidOffsetCache[cacheKey] !== undefined) return tzidOffsetCache[cacheKey];
+function getTzidStandardOffset(tzid: string): number {
+  if (tzidStandardOffsetCache[tzid] !== undefined) return tzidStandardOffsetCache[tzid];
+  
+  // Manual overrides for specific zones to align with geographical expectations 
+  // or historical mapping preferred by the user.
+  // Greenland (mostly Nuuk) shifted to -2 standard in 2023, but geographically -3 
+  // is often preferred for balanced map visualization.
+  if (
+    tzid === "America/Nuuk" || 
+    tzid === "America/Godthab" || 
+    tzid === "America/Upernavik" || 
+    tzid === "America/Scoresbysund" ||
+    tzid === "America/Danmarkshavn"
+  ) {
+    tzidStandardOffsetCache[tzid] = -3;
+    return -3;
+  }
   
   try {
-    const offsetMin = getOffsetMinutes(tzid, now);
-    const offsetHours = offsetMin / 60;
-    tzidOffsetCache[cacheKey] = offsetHours;
-    return offsetHours;
+    // Use January and July to find the standard (non-daylight) offset
+    // Standard time is typically the one with the smaller offset
+    const now = new Date();
+    const jan = new Date(now.getFullYear(), 0, 1);
+    const jul = new Date(now.getFullYear(), 6, 1);
+    const janOff = getOffsetMinutes(tzid, jan) / 60;
+    const julOff = getOffsetMinutes(tzid, jul) / 60;
+    const standardOffset = Math.min(janOff, julOff);
+    tzidStandardOffsetCache[tzid] = standardOffset;
+    return standardOffset;
   } catch {
-    // Fallback for Etc/ zones
-    if (tzid.startsWith("Etc/GMT")) {
-      const match = tzid.match(/GMT([+-]?\d+)/);
-      if (match) {
-        // Etc/GMT zones have inverted sign
-        const val = -parseInt(match[1]);
-        tzidOffsetCache[cacheKey] = val;
-        return val;
-      }
-    }
-    tzidOffsetCache[cacheKey] = 0;
+    tzidStandardOffsetCache[tzid] = 0;
     return 0;
   }
 }
@@ -169,7 +178,7 @@ export function WorldMapSVG({
   } | null>(null);
   const { use24h } = useWorldClock();
   const [zoom, setZoom] = useState(1);
-  const [center, setCenter] = useState<[number, number]>([0, 0]);
+  const [center, setCenter] = useState<[number, number]>([0, 12]);
   const [isTwoFingerTouch, setIsTwoFingerTouch] = useState(false);
   const isTwoFingerRef = useRef(false);
   const [showTwoFingerOverlay, setShowTwoFingerOverlay] = useState(false);
@@ -194,14 +203,24 @@ export function WorldMapSVG({
   }, [hsl]);
 
   const tzLineColor = useMemo(() => `${highlightColor}40`, [highlightColor]);
-  const tzLabelColor = useMemo(() => `${highlightColor}90`, [highlightColor]);
+  const tzLabelColor = useMemo(() => `${highlightColor}95`, [highlightColor]);
+
+  const tzHoverFill = useMemo(() => {
+    if (!hsl) return `${highlightColor}cc`;
+    // Lower the brightness boost to +5% instead of +15%
+    return `hsl(${hsl.h}, ${Math.round(hsl.s * 90)}%, ${Math.min(100, Math.round(hsl.l * 100 + 5))}%)`;
+  }, [hsl, highlightColor]);
+
+  const tzHoverStroke = useMemo(() => {
+    return highlightColor;
+  }, [highlightColor]);
 
   const getTzFill = useCallback((offset: number, isHovered: boolean) => {
-    if (isHovered) return `${highlightColor}60`;
+    if (isHovered) return tzHoverFill;
     // Generate a distinct but subtle color for each timezone offset
     const hue = ((offset + 12) * 137.5) % 360; // Use golden angle for distribution
     return `hsla(${hue}, 45%, 45%, 0.12)`;
-  }, [highlightColor]);
+  }, [tzHoverFill]);
 
   const handlePinEnter = useCallback(
     (city: City, e: React.MouseEvent) => {
@@ -217,16 +236,34 @@ export function WorldMapSVG({
     setTooltipCity(null);
   }, [onHoverCity]);
 
+  const lastTapRef = useRef<{ cityId: string; time: number } | null>(null);
+
   const handlePinTouch = useCallback(
     (city: City, e: React.TouchEvent) => {
       e.stopPropagation();
+      const nowTime = Date.now();
       const touch = e.touches[0];
-      if (tooltipCity?.city.id === city.id) {
-        onHoverCity(null);
-        setTooltipCity(null);
+
+      // Clear the "Use two fingers" overlay timeout immediately if a pin is touched
+      if (overlayTimeoutRef.current) {
+        clearTimeout(overlayTimeoutRef.current);
+        setShowTwoFingerOverlay(false);
+      }
+      
+      if (lastTapRef.current && lastTapRef.current.cityId === city.id && nowTime - lastTapRef.current.time < 500) {
+        // Double tap - show/toggle tooltip
+        e.preventDefault(); // Prevent browser zoom/default behaviors on double tap
+        if (tooltipCity?.city.id === city.id) {
+          setTooltipCity(null);
+        } else {
+          setTooltipCity({ city, screenX: touch.clientX, screenY: touch.clientY });
+        }
+        lastTapRef.current = null;
       } else {
+        // Single tap - highlight city
+        e.preventDefault(); // Prevent ghost clicks and double-tap zoom
         onHoverCity(city);
-        setTooltipCity({ city, screenX: touch.clientX, screenY: touch.clientY });
+        lastTapRef.current = { cityId: city.id, time: nowTime };
       }
     },
     [onHoverCity, tooltipCity],
@@ -274,6 +311,7 @@ export function WorldMapSVG({
     <div
       className={`relative touch-pan-y sm:touch-auto ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"}`}
       ref={containerRef}
+      onMouseLeave={() => onHoverTimezone(null)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchMove={(e) => {
@@ -314,7 +352,7 @@ export function WorldMapSVG({
         </button>
         {zoom > 1 && (
           <button
-            onClick={() => { setZoom(1); setCenter([0, 0]); }}
+          onClick={() => { setZoom(1); setCenter([0, 12]); }}
             className="w-10 h-10 sm:w-7 sm:h-7 rounded-md bg-card/80 border border-border text-muted-foreground text-[10px] font-medium hover:bg-secondary/80 backdrop-blur-sm flex items-center justify-center"
             title="Reset zoom"
           >
@@ -333,6 +371,46 @@ export function WorldMapSVG({
         onClick={() => { onHoverCity(null); setTooltipCity(null); }}
       >
         <defs>
+          <clipPath id="clip-map-area">
+            <rect x="0" y={TOP_BAR_Y} width={MAP_W} height={BOTTOM_BAR_Y + BAR_H - TOP_BAR_Y} />
+          </clipPath>
+          <mask id="land-mask" maskUnits="userSpaceOnUse">
+            <rect x={-CX} y={-PROJ_SCALE} width={MAP_W * 2} height={MAP_H * 2} fill="black" />
+            <Geographies geography={COUNTRY_URL}>
+              {({ geographies }) =>
+                geographies
+                  .filter((geo) => geo.properties?.name !== "Antarctica" && geo.id !== "010")
+                  .map((geo) => (
+                    <Geography
+                      key={`mask-${geo.rsmKey}`}
+                      geography={geo}
+                      fill="white"
+                      style={{
+                        default: { outline: "none" },
+                        hover: { outline: "none" },
+                        pressed: { outline: "none" },
+                      }}
+                    />
+                  ))
+              }
+            </Geographies>
+          </mask>
+          <mask id="ocean-mask" maskUnits="userSpaceOnUse">
+            <rect x={-CX} y={-PROJ_SCALE} width={MAP_W * 2} height={MAP_H * 2} fill="white" />
+            <Geographies geography={COUNTRY_URL}>
+              {({ geographies }) =>
+                geographies
+                  .filter((geo) => geo.properties?.name !== "Antarctica" && geo.id !== "010")
+                  .map((geo) => (
+                    <Geography key={`omask-${geo.rsmKey}`} geography={geo} fill="black" />
+                  ))
+              }
+            </Geographies>
+          </mask>
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="1.2" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+          </filter>
           <pattern
             id="pattern-stripes"
             width="8"
@@ -382,19 +460,17 @@ export function WorldMapSVG({
             return true;
           }}
         >
-          {/* Ocean Timezone Lines */}
-          {OCEAN_BOUNDARIES.map((lon) => (
-            <Line
-              key={`ocean-line-${lon}`}
-              from={[lon, -90]}
-              to={[lon, 90]}
-              stroke={tzLineColor}
-              strokeWidth={0.5 / zoom}
-              className="pointer-events-none"
-            />
-          ))}
+          {/* Global Background Clear Hover */}
+          <rect 
+            x={-1000} 
+            y={-1000} 
+            width={3000} 
+            height={3000} 
+            fill="transparent" 
+            onMouseEnter={() => onHoverTimezone(null)} 
+          />
 
-          {/* Base Country layer for continent/country shapes */}
+          {/* Base Country layer (Visual Only, No Events) */}
           <Geographies geography={COUNTRY_URL}>
             {({ geographies }) =>
               geographies
@@ -417,78 +493,118 @@ export function WorldMapSVG({
             }
           </Geographies>
 
-          {/* Timezone shapes from timezone-boundary-builder (jagged political borders) */}
-          <Geographies geography={TZ_GEO_URL}>
-            {({ geographies }) => {
-              // Group geometries by their UTC offset for synchronized highlighting
-              const offsetGroups: Record<number, { tzid: string; geo: any }[]> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
-              geographies.forEach((geo) => {
-                const tzid = geo.properties?.tzid;
-                if (!tzid) return;
-                // Skip Antarctica-related zones
-                if (tzid === "Antarctica/McMurdo" || tzid === "Antarctica/South_Pole" || tzid.startsWith("Antarctica/")) return;
-                const offset = getTzidOffset(tzid, now);
-                if (!offsetGroups[offset]) offsetGroups[offset] = [];
-                offsetGroups[offset].push({ tzid, geo });
-              });
+          {/* Interactive Layer Group (Placed here to be on top of base land) */}
+          <g>
+            {/* 1. Timezone highlights on land (Masked to Land) */}
+            <g mask="url(#land-mask)">
+              <Geographies geography={TZ_GEO_URL}>
+                {({ geographies }) => {
+                  const offsetGroups: Record<number, { tzid: string; geo: any }[]> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+                  geographies.forEach((geo) => {
+                    const tzid = geo.properties?.tzid;
+                    if (!tzid) return;
+                    if (tzid === "Antarctica/McMurdo" || tzid === "Antarctica/South_Pole" || tzid.startsWith("Antarctica/")) return;
+                    const offset = getTzidStandardOffset(tzid);
+                    if (!offsetGroups[offset]) offsetGroups[offset] = [];
+                    offsetGroups[offset].push({ tzid, geo });
+                  });
 
-              return Object.entries(offsetGroups)
-                .sort(([a], [b]) => Number(a) - Number(b))
-                .map(([offsetStr, items]) => {
-                  const offset = Number(offsetStr);
-                  const isOffsetHovered = hoveredTimezone === offset;
-                  const isFractional = offset % 1 !== 0;
+                  return Object.entries(offsetGroups)
+                    .sort(([aStr], [bStr]) => {
+                      const a = Number(aStr);
+                      const b = Number(bStr);
+                      const aHover = hoveredTimezone !== null && Math.abs(hoveredTimezone - a) < 0.1;
+                      const bHover = hoveredTimezone !== null && Math.abs(hoveredTimezone - b) < 0.1;
+                      if (aHover && !bHover) return 1;
+                      if (!aHover && bHover) return -1;
+                      return a - b;
+                    })
+                    .map(([offsetStr, items]) => {
+                      const offset = Number(offsetStr);
+                      const isOffsetHovered = hoveredTimezone !== null && Math.abs(hoveredTimezone - offset) < 0.1;
+                      const isFractional = offset % 1 !== 0;
 
-                  return (
-                    <g key={`tz-offset-${offset}`} id={`zone-${offset}`} data-timezone={offset}>
-                      {items.map(({ tzid, geo }) => (
-                        <React.Fragment key={geo.rsmKey}>
-                          <Geography
-                            geography={geo}
-                            data-timezone={offset}
-                            data-tzid={tzid}
-                            fill={getTzFill(offset, isOffsetHovered)}
-                            stroke={isOffsetHovered ? highlightColor : `${highlightColor}40`}
-                            strokeWidth={(isOffsetHovered ? 0.8 : 0.3) / zoom}
-                            style={{
-                              default: {
-                                outline: "none",
-                                transition: "fill 0.2s ease, stroke 0.2s ease",
-                                cursor: "pointer",
-                              },
-                              hover: {
-                                outline: "none",
-                                fill: `${highlightColor}60`,
-                                stroke: highlightColor,
-                                strokeWidth: 0.8 / zoom,
-                                transition: "fill 0.2s ease, stroke 0.2s ease",
-                                cursor: "pointer",
-                              },
-                              pressed: { outline: "none" },
-                            }}
-                            onMouseEnter={() => onHoverTimezone(offset)}
-                            onMouseLeave={() => onHoverTimezone(null)}
-                          />
-                          {isFractional && (
-                            <Geography
-                              geography={geo}
-                              fill={isOffsetHovered ? "url(#pattern-stripes-hover)" : "url(#pattern-stripes)"}
-                              stroke="transparent"
-                              className="pointer-events-none"
-                              style={{
-                                default: { outline: "none" },
-                                hover: { outline: "none" },
-                                pressed: { outline: "none" },
-                              }}
-                            />
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </g>
-                  );
-                });
-            }}
-          </Geographies>
+                      return (
+                        <g 
+                          key={`tz-land-${offset}`} 
+                          filter={isOffsetHovered ? "url(#glow)" : undefined}
+                          style={{ pointerEvents: "visiblePainted" }}
+                        >
+                          {items.map(({ tzid, geo }) => (
+                            <React.Fragment key={geo.rsmKey}>
+                              <Geography
+                                geography={geo}
+                                fill={getTzFill(offset, isOffsetHovered)}
+                                stroke={isOffsetHovered ? tzHoverStroke : `${highlightColor}40`}
+                                strokeWidth={(isOffsetHovered ? 1.5 : 0.3) / zoom}
+                                strokeLinejoin="round"
+                                style={{
+                                  default: { outline: "none", cursor: "pointer" },
+                                  hover: { outline: "none", fill: tzHoverFill, stroke: tzHoverStroke, cursor: "pointer" },
+                                  pressed: { outline: "none" },
+                                }}
+                                onMouseEnter={() => onHoverTimezone(offset)}
+                                onTouchStart={(e) => {
+                                  e.stopPropagation();
+                                  if (hoveredTimezone === offset) {
+                                    onHoverTimezone(null);
+                                  } else {
+                                    onHoverTimezone(offset);
+                                  }
+                                }}
+                              />
+                              {isFractional && (
+                                <Geography
+                                  geography={geo}
+                                  fill={isOffsetHovered ? "url(#pattern-stripes-hover)" : "url(#pattern-stripes)"}
+                                  stroke="transparent"
+                                  className="pointer-events-none"
+                                />
+                              )}
+                            </React.Fragment>
+                          ))}
+                        </g>
+                      );
+                    });
+                }}
+              </Geographies>
+            </g>
+
+            {/* 2. Ocean Interaction (Masked to Ocean, Top of standard land) */}
+            <g clipPath="url(#clip-map-area)" mask="url(#ocean-mask)">
+              {/* Clear hover when in standard ocean area if not hit by a specific strip */}
+              <rect 
+                x={-CX} y={-PROJ_SCALE} width={MAP_W * 2} height={MAP_H * 2} 
+                fill="transparent" 
+                onMouseEnter={() => onHoverTimezone(null)} 
+              />
+              {TIMEZONE_OFFSETS.map((offset) => {
+                const isEdge = offset === -12 || offset === 12;
+                const width = isEdge ? STRIP_W / 2 : STRIP_W;
+                const lonStart = offset === -12 ? -180 : -172.5 + (offset + 11) * 15;
+                const xPx = CX + lonStart * PX_PER_DEG;
+                const isHovered = hoveredTimezone !== null && Math.abs(hoveredTimezone - offset) < 0.1;
+
+                return (
+                  <rect
+                    key={`ocean-strip-${offset}`}
+                    x={xPx} y={-500} width={width} height={1500}
+                    fill={isHovered ? `${highlightColor}35` : "transparent"}
+                    pointerEvents="all"
+                    onMouseEnter={() => onHoverTimezone(offset)}
+                  />
+                );
+              })}
+              {OCEAN_BOUNDARIES.map((lon) => (
+                <Line
+                  key={`ocean-line-${lon}`}
+                  from={[lon, -90]} to={[lon, 90]}
+                  stroke={tzLineColor} strokeWidth={0.5 / zoom}
+                  className="pointer-events-none"
+                />
+              ))}
+            </g>
+          </g>
 
           {/* US State boundaries overlay removed */}
 
@@ -506,7 +622,7 @@ export function WorldMapSVG({
             
             const isEven = Math.abs(offset) % 2 === 0;
             const barBgColor = isEven ? `${highlightColor}25` : `${highlightColor}12`;
-            const hoveredBarBg = isEven ? `${highlightColor}50` : `${highlightColor}35`;
+            const hoveredBarBg = isEven ? `${highlightColor}85` : `${highlightColor}70`;
             const label = offset === 0 ? "0" : `${offset > 0 ? "+" : ""}${offset}`;
             const fSize = isEdge ? 7 : 9;
 
@@ -520,6 +636,14 @@ export function WorldMapSVG({
                   fill={isHovered ? hoveredBarBg : barBgColor}
                   onMouseEnter={() => onHoverTimezone(offset)}
                   onMouseLeave={() => onHoverTimezone(null)}
+                  onTouchStart={(e) => {
+                    e.stopPropagation();
+                    if (hoveredTimezone === offset) {
+                      onHoverTimezone(null);
+                    } else {
+                      onHoverTimezone(offset);
+                    }
+                  }}
                   className="cursor-pointer transition-colors duration-200"
                 />
                 <text
@@ -544,6 +668,14 @@ export function WorldMapSVG({
                   fill={isHovered ? hoveredBarBg : barBgColor}
                   onMouseEnter={() => onHoverTimezone(offset)}
                   onMouseLeave={() => onHoverTimezone(null)}
+                  onTouchStart={(e) => {
+                    e.stopPropagation();
+                    if (hoveredTimezone === offset) {
+                      onHoverTimezone(null);
+                    } else {
+                      onHoverTimezone(offset);
+                    }
+                  }}
                   className="cursor-pointer transition-colors duration-200"
                 />
                 <text
@@ -586,6 +718,7 @@ export function WorldMapSVG({
                   onMouseEnter={(e) => handlePinEnter(city, e as unknown as React.MouseEvent)}
                   onMouseLeave={handlePinLeave}
                   onTouchStart={(e: React.TouchEvent) => handlePinTouch(city, e)}
+                  onClick={(e) => e.stopPropagation()}
                   className="cursor-pointer"
                 >
                   <circle r={12 / s} fill="transparent" />
@@ -597,14 +730,14 @@ export function WorldMapSVG({
                   <circle r={(isHovered ? 3.5 : 2) / s} fill="hsl(var(--card))" />
                   {isHovered && (
                     <text
-                      y={-8 / s}
+                      y={-10 / s}
                       textAnchor="middle"
-                      fontSize={8 / s}
-                      fontWeight={500}
+                      fontSize={10 / s}
+                      fontWeight={700}
                       fontFamily="'Inter', sans-serif"
-                      fill="hsl(var(--foreground))"
-                      stroke="hsl(var(--card))"
-                      strokeWidth={2 / s}
+                      fill="white"
+                      stroke="black"
+                      strokeWidth={3 / s}
                       paintOrder="stroke"
                       className="pointer-events-none select-none"
                     >
@@ -623,7 +756,9 @@ export function WorldMapSVG({
             const s = Math.pow(zoom, 0.6);
             const placement = labelPlacements[city.id] || "top";
             const offset = getLabelOffset(placement, s);
-            const cityOffset = Math.round((city.lng || city.coordinates[0]) / 15);
+            
+            // Use standard offset for highlighting to match the geographical grid
+            const cityOffset = getTzidStandardOffset(city.timezone);
             const isInHoveredTz = hoveredTimezone === cityOffset;
 
             return (
@@ -633,6 +768,7 @@ export function WorldMapSVG({
                 onMouseEnter={(e) => handlePinEnter(city, e as unknown as React.MouseEvent)}
                 onMouseLeave={handlePinLeave}
                 onTouchStart={(e: React.TouchEvent) => handlePinTouch(city, e)}
+                onClick={(e) => e.stopPropagation()}
                 className="cursor-pointer"
               >
                 <circle r={15 / s} fill="transparent" />
@@ -647,12 +783,12 @@ export function WorldMapSVG({
                   x={offset.x}
                   y={offset.y}
                   textAnchor={offset.anchor}
-                  fontSize={9 / s}
-                  fontWeight={isHovered || isInHoveredTz ? 700 : 600}
+                  fontSize={10 / s}
+                  fontWeight={isHovered || isInHoveredTz ? 800 : 600}
                   fontFamily="'Inter', sans-serif"
-                  fill={isHovered || isInHoveredTz ? highlightColor : "hsl(var(--foreground))"}
-                  stroke="hsl(var(--card))"
-                  strokeWidth={2.5 / s}
+                  fill={isHovered || isInHoveredTz ? highlightColor : "white"}
+                  stroke="black"
+                  strokeWidth={3 / s}
                   paintOrder="stroke"
                   className="pointer-events-none select-none"
                 >
@@ -667,10 +803,10 @@ export function WorldMapSVG({
       {/* HTML Tooltip */}
       {tooltipCity && (
         <div
-          className="fixed z-50 pointer-events-none"
-          style={{ left: tooltipCity.screenX + 12, top: tooltipCity.screenY - 20 }}
+          className="fixed z-50 pointer-events-none transition-all duration-75"
+          style={{ left: tooltipCity.screenX + 36, top: tooltipCity.screenY - 64 }}
         >
-          <div className="bg-card border border-border rounded-lg shadow-lg px-3 py-2 min-w-[130px]">
+          <div className="bg-card/95 border border-border shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md rounded-xl px-4 py-3 min-w-[160px]">
             <p className="text-xs font-semibold text-foreground">
               {tooltipCity.city.name}, {tooltipCity.city.country}
             </p>
