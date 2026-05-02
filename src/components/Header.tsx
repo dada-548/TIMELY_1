@@ -5,13 +5,15 @@ import { motion } from "framer-motion";
 import { ColorSettingsMenu } from "@/components/planner/ColorSettingsMenu";
 
 const navItems = [
-  { path: "/dashboard", label: "DASHBOARD" },
-  { path: "/timesync", label: "TIME SYNC" },
+  { path: "/", label: "DASHBOARD" },
+  { path: "/planner", label: "TIMELINE" },
 ];
 
 export function Header() {
-  const { theme, toggleTheme, highlightColor, use24h, setUse24h } =
-    useWorldClock();
+  const { 
+    theme, toggleTheme, highlightColor, 
+    use24h, setUse24h
+  } = useWorldClock();
   const location = useLocation();
 
   return (
@@ -58,11 +60,7 @@ export function Header() {
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
-                style={
-                  !use24h
-                    ? { backgroundColor: `${highlightColor}25` }
-                    : undefined
-                }
+                style={!use24h ? { backgroundColor: `${highlightColor}25` } : undefined}
               >
                 12H
               </button>
@@ -73,11 +71,7 @@ export function Header() {
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
-                style={
-                  use24h
-                    ? { backgroundColor: `${highlightColor}25` }
-                    : undefined
-                }
+                style={use24h ? { backgroundColor: `${highlightColor}25` } : undefined}
               >
                 24H
               </button>

@@ -66,62 +66,15 @@ function getTzidStandardOffset(tzid: string): number {
   // or historical mapping preferred by the user.
   // Greenland (mostly Nuuk) shifted to -2 standard in 2023, but geographically -3 
   // is often preferred for balanced map visualization.
-  // Greenland Northwest (Thule/Qaanaaq)
   if (
-    tzid.includes("Thule") || 
-    tzid.includes("Qaanaaq") || 
-    tzid === "Etc/GMT+4" ||
-    tzid.includes("Greenland/Northwest")
-  ) {
-    tzidStandardOffsetCache[tzid] = -4;
-    return -4;
-  }
-
-  // Greenland Main (Nuuk/Upernavik/West)
-  if (
-    tzid.includes("Nuuk") || 
-    tzid.includes("Godthab") || 
-    tzid.includes("Upernavik") ||
-    tzid.includes("Tasiilaq") ||
-    tzid.includes("Angmagssalik") ||
-    tzid.includes("Kangerlussuaq") ||
-    tzid.includes("Ilulissat") ||
-    tzid.includes("Sisimiut") ||
-    tzid.includes("Qaqortoq") ||
-    tzid === "Etc/GMT+3" ||
-    tzid.includes("Greenland/West")
+    tzid === "America/Nuuk" || 
+    tzid === "America/Godthab" || 
+    tzid === "America/Upernavik" || 
+    tzid === "America/Scoresbysund" ||
+    tzid === "America/Danmarkshavn"
   ) {
     tzidStandardOffsetCache[tzid] = -3;
     return -3;
-  }
-
-  // East Greenland (strictly Scoresbysund area / Ittoqqortoormiut)
-  if (
-    tzid.includes("Scoresbysund") || 
-    tzid.includes("Ittoqqortoormiut") ||
-    tzid.includes("Scoresby") ||
-    tzid.includes("East_Greenland") ||
-    tzid.includes("Greenland/East") ||
-    tzid === "Etc/GMT+1"
-  ) {
-    tzidStandardOffsetCache[tzid] = -1;
-    return -1;
-  }
-  
-  // Danmarkshavn (Northeast Greenland) and Iceland
-  if (
-    tzid.includes("Danmarkshavn") || 
-    tzid.includes("Nord") ||
-    tzid.includes("Iceland") || 
-    tzid.includes("Reykjavik") ||
-    tzid.includes("GMT+0") ||
-    tzid.includes("GMT-0") ||
-    tzid.includes("Greenland/Northeast") ||
-    tzid === "Etc/GMT" ||
-    tzid === "UTC"
-  ) {
-    tzidStandardOffsetCache[tzid] = 0;
-    return 0;
   }
   
   try {
@@ -228,9 +181,9 @@ export function WorldMapSVG({
   const [center, setCenter] = useState<[number, number]>([0, 12]);
   const [isTwoFingerTouch, setIsTwoFingerTouch] = useState(false);
   const isTwoFingerRef = useRef(false);
-  const [showTwoFingerOverlay, setShowTwoFingerOverlay] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const overlayTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const touchStartPosRef = useRef<{ x: number; y: number } | null>(null);
 
   const labelPlacements = useMemo(
     () => computeLabelPlacements(selectedCities),
@@ -287,16 +240,11 @@ export function WorldMapSVG({
 
   const handlePinTouch = useCallback(
     (city: City, e: React.TouchEvent) => {
+      if (e.touches.length >= 2) return; // Let multi-touch bubble up for pinch-zoom
       e.stopPropagation();
       const nowTime = Date.now();
       const touch = e.touches[0];
 
-      // Clear the "Use two fingers" overlay timeout immediately if a pin is touched
-      if (overlayTimeoutRef.current) {
-        clearTimeout(overlayTimeoutRef.current);
-        setShowTwoFingerOverlay(false);
-      }
-      
       if (lastTapRef.current && lastTapRef.current.cityId === city.id && nowTime - lastTapRef.current.time < 500) {
         // Double tap - show/toggle tooltip
         e.preventDefault(); // Prevent browser zoom/default behaviors on double tap
@@ -317,26 +265,41 @@ export function WorldMapSVG({
   );
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartTimeRef.current = Date.now();
+    if (e.touches.length === 1) {
+      touchStartPosRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+
     if (e.touches.length >= 2) {
       setIsTwoFingerTouch(true);
       isTwoFingerRef.current = true;
-      setShowTwoFingerOverlay(false);
-      if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
     } else {
       setIsTwoFingerTouch(false);
       isTwoFingerRef.current = false;
-      if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
-      overlayTimeoutRef.current = setTimeout(() => {
-        if (!isTwoFingerRef.current) setShowTwoFingerOverlay(true);
-      }, 400);
     }
   }, []);
 
-  const handleTouchEnd = useCallback(() => {
-    setIsTwoFingerTouch(false);
-    isTwoFingerRef.current = false;
-    if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
-    setShowTwoFingerOverlay(false);
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const nowTime = Date.now();
+    
+    // Detect double tap for zoom
+    if (e.touches.length === 0 && touchStartPosRef.current) {
+      if (nowTime - touchStartTimeRef.current < 300) {
+        // This was a quick tap
+      }
+    }
+
+    if (e.touches.length < 2) {
+      setIsTwoFingerTouch(false);
+      isTwoFingerRef.current = false;
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length >= 2) {
+      setIsTwoFingerTouch(true);
+      isTwoFingerRef.current = true;
+    }
   }, []);
 
   const hoveredId = hoveredCity?.id;
@@ -356,33 +319,13 @@ export function WorldMapSVG({
 
   return (
     <div
-      className={`relative touch-pan-y sm:touch-auto ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"}`}
+      className={`relative ${isTwoFingerTouch ? "touch-none" : "touch-pan-y"} sm:touch-auto ${zoom > 1 ? "cursor-grab active:cursor-grabbing" : "cursor-default"}`}
       ref={containerRef}
       onMouseLeave={() => onHoverTimezone(null)}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      onTouchMove={(e) => {
-        if (e.touches.length >= 2) {
-          setIsTwoFingerTouch(true);
-          isTwoFingerRef.current = true;
-          setShowTwoFingerOverlay(false);
-          if (overlayTimeoutRef.current) clearTimeout(overlayTimeoutRef.current);
-        }
-      }}
+      onTouchMove={handleTouchMove}
     >
-      {/* Two-finger overlay for mobile */}
-      {showTwoFingerOverlay && (
-        <div className="absolute inset-0 z-20 bg-black/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-none transition-opacity duration-300 rounded-lg">
-          <div className="bg-card/90 border border-border px-4 py-3 rounded-xl shadow-2xl flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-300">
-            <div className="flex gap-2">
-              <div className="w-2 h-8 bg-primary rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-              <div className="w-2 h-8 bg-primary rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-            </div>
-            <p className="text-sm font-medium text-foreground">Use two fingers to move the map</p>
-          </div>
-        </div>
-      )}
-
       {/* Zoom controls */}
       <div className="absolute top-2 right-2 z-10 flex flex-col gap-2 sm:gap-1">
         <button
@@ -503,7 +446,11 @@ export function WorldMapSVG({
           filterZoomEvent={(e) => {
             if (e.type === "wheel") return true;
             if (e.type === "mousedown") return true;
-            if (e.type.startsWith("touch")) return isTwoFingerRef.current;
+            if (e.type.startsWith("touch")) {
+              // On touch devices, only zoom/pan with 2 fingers
+              // The return value determines if d3-zoom should process the event
+              return e.touches.length > 1 || isTwoFingerRef.current;
+            }
             return true;
           }}
         >
@@ -592,6 +539,7 @@ export function WorldMapSVG({
                                 }}
                                 onMouseEnter={() => onHoverTimezone(offset)}
                                 onTouchStart={(e) => {
+                                  if (e.touches.length >= 2) return;
                                   e.stopPropagation();
                                   if (hoveredTimezone === offset) {
                                     onHoverTimezone(null);
@@ -684,6 +632,7 @@ export function WorldMapSVG({
                   onMouseEnter={() => onHoverTimezone(offset)}
                   onMouseLeave={() => onHoverTimezone(null)}
                   onTouchStart={(e) => {
+                    if (e.touches.length >= 2) return;
                     e.stopPropagation();
                     if (hoveredTimezone === offset) {
                       onHoverTimezone(null);
@@ -716,6 +665,7 @@ export function WorldMapSVG({
                   onMouseEnter={() => onHoverTimezone(offset)}
                   onMouseLeave={() => onHoverTimezone(null)}
                   onTouchStart={(e) => {
+                    if (e.touches.length >= 2) return;
                     e.stopPropagation();
                     if (hoveredTimezone === offset) {
                       onHoverTimezone(null);

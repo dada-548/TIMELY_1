@@ -526,10 +526,6 @@ export const CITIES: City[] = [
   { id: 'zapopan', name: 'Zapopan', timezone: 'America/Mexico_City', country: 'Mexico', coordinates: [-103.385, 20.7167], lat: 20.7167, lng: -103.385 },
   { id: 'zhengzhou', name: 'Zhengzhou', timezone: 'Asia/Shanghai', country: 'China', coordinates: [113.6249, 34.7466], lat: 34.7466, lng: 113.6249, airportCode: 'CGO' },
   { id: 'zibo', name: 'Zibo', timezone: 'Asia/Shanghai', country: 'China', coordinates: [118.0476, 36.8149], lat: 36.8149, lng: 118.0476 },
-  { id: 'itqqortoormiut', name: 'Ittoqqortoormiut', timezone: 'America/Scoresbysund', country: 'Greenland', coordinates: [-21.9667, 70.4833], lat: 70.4833, lng: -21.9667, airportCode: 'OBY' },
-  { id: 'scoresbysund', name: 'Scoresbysund', timezone: 'America/Scoresbysund', country: 'Greenland', coordinates: [-21.9667, 70.4833], lat: 70.4833, lng: -21.9667, airportCode: 'OBY' },
-  { id: 'qaanaaq', name: 'Qaanaaq', timezone: 'America/Thule', country: 'Greenland', coordinates: [-69.2333, 77.4667], lat: 77.4667, lng: -69.2333, airportCode: 'THU' },
-  { id: 'danmarkshavn', name: 'Danmarkshavn', timezone: 'America/Danmarkshavn', country: 'Greenland', coordinates: [-18.6667, 76.7667], lat: 76.7667, lng: -18.6667 },
 ];
 
 export function searchCities(query: string): City[] {

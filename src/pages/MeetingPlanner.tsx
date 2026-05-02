@@ -15,13 +15,7 @@ import { DurationSelector } from "@/components/planner/DurationSelector";
 import { ScrollableTimeline } from "@/components/planner/ScrollableTimeline";
 import { ConversionPanel } from "@/components/planner/ConversionPanel";
 import { ShareMeetingPanel } from "@/components/planner/ShareMeetingPanel";
-import {
-  Clock,
-  CalendarDays,
-  Sun,
-  MessageSquare,
-  Briefcase,
-} from "lucide-react";
+import { Clock, LayoutGrid, Sun, MessageSquare, Briefcase } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -37,19 +31,19 @@ import {
 } from "@/components/ui/select";
 
 export default function MeetingPlanner() {
-  const {
-    selectedCities,
-    highlightColor,
-    selectedDate,
-    setSelectedDate,
-    selectedHour,
-    setSelectedHour,
-    duration,
+  const { 
+    selectedCities, 
+    highlightColor, 
+    selectedDate, 
+    setSelectedDate, 
+    selectedHour, 
+    setSelectedHour, 
+    duration, 
     setDuration,
     fromCityIdx,
     setFromCityIdx,
     timelineMode,
-    setTimelineMode,
+    setTimelineMode
   } = useWorldClock();
   const now = useClock();
   const localTz = getLocalTimezone();
@@ -100,19 +94,13 @@ export default function MeetingPlanner() {
     setSelectedMinute(0);
   }, [fromCity, now, setSelectedDate, setSelectedHour]);
 
-  const handleDragMove = useCallback(
-    (newStart: number) => {
-      setSelectedHour(newStart);
-    },
-    [setSelectedHour],
-  );
+  const handleDragMove = useCallback((newStart: number) => {
+    setSelectedHour(newStart);
+  }, [setSelectedHour]);
 
-  const handleResizeEnd = useCallback(
-    (newDuration: number) => {
-      setDuration(newDuration);
-    },
-    [setDuration],
-  );
+  const handleResizeEnd = useCallback((newDuration: number) => {
+    setDuration(newDuration);
+  }, [setDuration]);
 
   const getDiffLabel = useCallback((offset: number) => {
     if (offset === 0) return "";
@@ -127,11 +115,8 @@ export default function MeetingPlanner() {
         {/* Title */}
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <CalendarDays
-              className="h-6 w-6"
-              style={{ color: highlightColor }}
-            />
-            TIME BAR
+            <LayoutGrid className="h-6 w-6" style={{ color: highlightColor }} />
+            TIMELINE
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Find the perfect meeting time across time zones.

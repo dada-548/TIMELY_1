@@ -28,7 +28,7 @@ import {
   MessageSquare,
   Briefcase,
   PaintRoller,
-  LocateFixed,
+  Target,
   X,
 } from "lucide-react";
 import {
@@ -484,7 +484,7 @@ export function ScrollableTimeline({
         >
           <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2 px-2">
             <LayoutGrid className="h-4 w-4" style={{ color: highlightColor }} />
-            <span>TIMELINE</span>
+            <span>TIME GRID</span>
           </div>
           <span
             className="text-xs  sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2 py-0.5"
@@ -597,7 +597,7 @@ export function ScrollableTimeline({
           >
             <ChevronLeft className="h-3.5 w-3.5" />
           </button>
-
+          
           <Tooltip>
             <TooltipTrigger asChild>
               <button
@@ -605,7 +605,7 @@ export function ScrollableTimeline({
                 className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
                 aria-label="Reset to now"
               >
-                <LocateFixed className="h-3.5 w-3.5" />
+                <Target className="h-3.5 w-3.5" />
               </button>
             </TooltipTrigger>
             <TooltipContent>Now</TooltipContent>
@@ -635,7 +635,9 @@ export function ScrollableTimeline({
       {/* Two-column layout: fixed labels + scrollable cells */}
       {visible && (
         <>
-          <div className="flex w-full min-w-0">
+          <div
+            className="flex w-full min-w-0"
+          >
             {/* Fixed labels column */}
             <div className="w-16 sm:w-44 flex-shrink-0 border-r border-border/50 bg-card/50">
               <div className="h-6" />
@@ -672,8 +674,7 @@ export function ScrollableTimeline({
                             }
                           >
                             <span className="inline sm:hidden">
-                              {city.airportCode ||
-                                city.name.slice(0, 3).toUpperCase()}
+                              {city.airportCode || city.name.slice(0, 3).toUpperCase()}
                             </span>
                             <span className="hidden sm:inline">
                               {city.name}
