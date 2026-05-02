@@ -484,7 +484,7 @@ export function ScrollableTimeline({
         >
           <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2 px-2">
             <LayoutGrid className="h-4 w-4" style={{ color: highlightColor }} />
-            <span>TIME GRID</span>
+            <span>TIMELINE</span>
           </div>
           <span
             className="text-xs  sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2 py-0.5"

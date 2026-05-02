@@ -122,7 +122,7 @@ export default function MeetingPlanner() {
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <LayoutGrid className="h-6 w-6" style={{ color: highlightColor }} />
-            TIMELINE
+            TIME BAR
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Find the perfect meeting time across time zones.
