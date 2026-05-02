@@ -15,7 +15,13 @@ import { DurationSelector } from "@/components/planner/DurationSelector";
 import { ScrollableTimeline } from "@/components/planner/ScrollableTimeline";
 import { ConversionPanel } from "@/components/planner/ConversionPanel";
 import { ShareMeetingPanel } from "@/components/planner/ShareMeetingPanel";
-import { Clock, LayoutGrid, Sun, MessageSquare, Briefcase } from "lucide-react";
+import {
+  Clock,
+  CalendarDays,
+  Sun,
+  MessageSquare,
+  Briefcase,
+} from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -121,7 +127,10 @@ export default function MeetingPlanner() {
         {/* Title */}
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <LayoutGrid className="h-6 w-6" style={{ color: highlightColor }} />
+            <CalendarDays
+              className="h-6 w-6"
+              style={{ color: highlightColor }}
+            />
             TIME BAR
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
