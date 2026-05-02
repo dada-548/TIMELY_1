@@ -70,9 +70,9 @@ export function LocalTimeDisplay() {
         )}
       </p>
       <div className="flex flex-row flex-wrap sm:flex-nowrap items-baseline gap-x-3 sm:gap-4 text-xl sm:text-4xl lg:text-5xl font-mono font-semibold tracking-tight text-foreground min-w-0">
-        <span className="shrink-0">{formatDate(tz, now).toUpperCase()}</span>
-        <span className="hidden sm:block w-px h-8 bg-border self-center shrink-0" />
         <span className="shrink-0">{formatTime(tz, now, use24h)}</span>
+        <span className="hidden sm:block w-0.5 h-8 bg-border self-center shrink-0" />
+        <span className="shrink-0">{formatDate(tz, now).toUpperCase()}</span>
       </div>
 
       {info.otherCities.length > 0 && (

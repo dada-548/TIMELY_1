@@ -53,7 +53,7 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
       dragListener={false}
       dragControls={dragControls}
       className={`group rounded-xl border border-border p-3 sm:p-4 ${
-        isNight ? "bg-night/30" : "bg-card"
+        isNight ? "bg-night/40" : "bg-card"
       }`}
       whileDrag={{ scale: 1.02, boxShadow: "0 8px 30px -10px rgba(0,0,0,0.3)" }}
     >
@@ -102,7 +102,9 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
                     className="text-[10px] sm:text-xs font-semibold"
                     style={{ color: dayIndicationColor }}
                   >
-                    {diff.dayOffset > 0 ? `+${diff.dayOffset}d` : `${diff.dayOffset}d`}
+                    {diff.dayOffset > 0
+                      ? `+${diff.dayOffset}d`
+                      : `${diff.dayOffset}d`}
                   </span>
                 )}
               </div>
@@ -197,4 +199,3 @@ export function CityList() {
     </Reorder.Group>
   );
 }
-
