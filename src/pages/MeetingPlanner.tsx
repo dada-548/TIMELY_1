@@ -31,19 +31,19 @@ import {
 } from "@/components/ui/select";
 
 export default function MeetingPlanner() {
-  const { 
-    selectedCities, 
-    highlightColor, 
-    selectedDate, 
-    setSelectedDate, 
-    selectedHour, 
-    setSelectedHour, 
-    duration, 
+  const {
+    selectedCities,
+    highlightColor,
+    selectedDate,
+    setSelectedDate,
+    selectedHour,
+    setSelectedHour,
+    duration,
     setDuration,
     fromCityIdx,
     setFromCityIdx,
     timelineMode,
-    setTimelineMode
+    setTimelineMode,
   } = useWorldClock();
   const now = useClock();
   const localTz = getLocalTimezone();
@@ -94,13 +94,19 @@ export default function MeetingPlanner() {
     setSelectedMinute(0);
   }, [fromCity, now, setSelectedDate, setSelectedHour]);
 
-  const handleDragMove = useCallback((newStart: number) => {
-    setSelectedHour(newStart);
-  }, [setSelectedHour]);
+  const handleDragMove = useCallback(
+    (newStart: number) => {
+      setSelectedHour(newStart);
+    },
+    [setSelectedHour],
+  );
 
-  const handleResizeEnd = useCallback((newDuration: number) => {
-    setDuration(newDuration);
-  }, [setDuration]);
+  const handleResizeEnd = useCallback(
+    (newDuration: number) => {
+      setDuration(newDuration);
+    },
+    [setDuration],
+  );
 
   const getDiffLabel = useCallback((offset: number) => {
     if (offset === 0) return "";
