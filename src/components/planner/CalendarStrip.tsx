@@ -13,7 +13,7 @@ import {
   startOfDay,
   differenceInCalendarDays,
 } from "date-fns";
-import { CalendarDays, LocateFixed } from "lucide-react";
+import { CalendarCheck, LocateFixed } from "lucide-react";
 import { useWorldClock } from "@/hooks/useWorldClock";
 
 interface CalendarStripProps {
@@ -151,7 +151,7 @@ export function CalendarStrip({
               boxShadow: todayFlash ? `0 0 8px ${highlightColor}40` : undefined,
             }}
           >
-            <CalendarDays className="h-3.5 w-3.5" />
+            <CalendarCheck className="h-3.5 w-3.5" />
             Today
           </button>
           <button
