@@ -28,7 +28,7 @@ import {
   MessageSquare,
   Briefcase,
   PaintRoller,
-  Target,
+  LocateFixed,
   X,
 } from "lucide-react";
 import {
@@ -605,7 +605,7 @@ export function ScrollableTimeline({
                 className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
                 aria-label="Reset to now"
               >
-                <Target className="h-3.5 w-3.5" />
+                <LocateFixed className="h-3.5 w-3.5" />
               </button>
             </TooltipTrigger>
             <TooltipContent>Now</TooltipContent>
