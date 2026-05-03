@@ -473,7 +473,7 @@ export function WorldMapSVG({
           </filter>
           <pattern
             id="pattern-stripes"
-            width="8"
+            width="4"
             height="8"
             patternUnits="userSpaceOnUse"
             patternTransform="rotate(45)"
@@ -483,13 +483,13 @@ export function WorldMapSVG({
               y1="0"
               x2="0"
               y2="8"
-              stroke="rgba(255,255,255,0.12)"
-              strokeWidth="2"
+              stroke="rgba(255,255,255,0.25)"
+              strokeWidth="3"
             />
           </pattern>
           <pattern
             id="pattern-stripes-hover"
-            width="8"
+            width="4"
             height="8"
             patternUnits="userSpaceOnUse"
             patternTransform="rotate(45)"
@@ -499,8 +499,8 @@ export function WorldMapSVG({
               y1="0"
               x2="0"
               y2="8"
-              stroke="rgba(255,255,255,0.35)"
-              strokeWidth="2"
+              stroke="rgba(255,255,255,0.25)"
+              strokeWidth="3"
             />
           </pattern>
         </defs>
