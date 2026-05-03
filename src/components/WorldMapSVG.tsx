@@ -219,7 +219,7 @@ export function WorldMapSVG({
 
   const landStroke = useMemo(() => {
     if (!hsl) return "white";
-    return `hsl(${hsl.h}, ${Math.round(hsl.s * 30)}%, 95%)`;
+    return `hsl(${hsl.h}, ${Math.round(hsl.s * 80)}%, 50%)`;
   }, [hsl]);
 
   const tzLineColor = useMemo(() => `${highlightColor}40`, [highlightColor]);
@@ -548,7 +548,7 @@ export function WorldMapSVG({
                     geography={geo}
                     fill={landFill}
                     stroke={landStroke}
-                    strokeWidth={0.2 / zoom}
+                    strokeWidth={0.8 / zoom}
                     style={{
                       default: { outline: "none" },
                       hover: { outline: "none" },
