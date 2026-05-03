@@ -219,7 +219,7 @@ export function WorldMapSVG({
 
   const landStroke = useMemo(() => {
     if (!hsl) return "white";
-    return `hsl(${hsl.h}, ${Math.round(hsl.s * 80)}%, 50%)`;
+    return `hsl(${hsl.h}, ${Math.round(hsl.s * 80)}%, 70%)`;
   }, [hsl]);
 
   const tzLineColor = useMemo(() => `${highlightColor}40`, [highlightColor]);
