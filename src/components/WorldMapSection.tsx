@@ -40,17 +40,17 @@ export function WorldMapSection() {
               border: "1px solid transparent",
             }}
           >
+            {now.toLocaleTimeString(undefined, {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: !use24h,
+            })}{" "}
+            ·{" "}
             {now.toLocaleDateString(undefined, {
               weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
-            })}{" "}
-            ·{" "}
-            {now.toLocaleTimeString(undefined, {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: !use24h,
             })}
           </span>
         </button>
