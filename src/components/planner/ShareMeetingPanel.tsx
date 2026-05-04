@@ -8,9 +8,9 @@ import ReactCountryFlag from "react-country-flag";
 
 const COUNTRY_CODES: Record<string, string> = {
   "United States": "US",
-  "USA": "US",
+  USA: "US",
   "United Kingdom": "GB",
-  "UK": "GB",
+  UK: "GB",
   Canada: "CA",
   Australia: "AU",
   Germany: "DE",
@@ -193,15 +193,14 @@ export function ShareMeetingPanel({
                 }
           }
         >
+          {/* Copy button */}
           {copied ? (
             <>
               <Check className="h-3.5 w-3.5" />
-              Copied!
             </>
           ) : (
             <>
               <Copy className="h-3.5 w-3.5" />
-              Copy
             </>
           )}
         </button>
@@ -209,17 +208,22 @@ export function ShareMeetingPanel({
 
       <div className="bg-secondary/50 rounded-lg p-3 font-mono text-xs text-foreground whitespace-pre-line select-text">
         <div className="mb-1 text-muted-foreground">📅 Meeting Proposal</div>
-        <div className="mb-2 text-muted-foreground">⏱️ Duration: {duration} hour{duration > 1 ? "s" : ""}</div>
-        
+        <div className="mb-2 text-muted-foreground">
+          ⏱️ Duration: {duration} hour{duration > 1 ? "s" : ""}
+        </div>
+
         <div className="space-y-1.5">
           <div className="flex items-center gap-2">
-            <ReactCountryFlag 
-              countryCode={getCountryCode(fromCity.country)} 
-              svg 
-              style={{ width: '1.2em', height: '1.2em' }}
+            <ReactCountryFlag
+              countryCode={getCountryCode(fromCity.country)}
+              svg
+              style={{ width: "1.2em", height: "1.2em" }}
             />
             <span>
-              <span className="font-bold">{fromCity.name}</span>: {formatDate(selectedDate)} @ {formatTime(selectedHour, selectedMinute)} - {formatTime(endHour, selectedMinute)}
+              <span className="font-bold">{fromCity.name}</span>:{" "}
+              {formatDate(selectedDate)} @{" "}
+              {formatTime(selectedHour, selectedMinute)} -{" "}
+              {formatTime(endHour, selectedMinute)}
             </span>
           </div>
           {selectedCities
@@ -229,13 +233,16 @@ export function ShareMeetingPanel({
               const endConvHour = (conv.hour + duration) % 24;
               return (
                 <div key={city.id} className="flex items-center gap-2">
-                  <ReactCountryFlag 
-                    countryCode={getCountryCode(city.country)} 
-                    svg 
-                    style={{ width: '1.2em', height: '1.2em' }}
+                  <ReactCountryFlag
+                    countryCode={getCountryCode(city.country)}
+                    svg
+                    style={{ width: "1.2em", height: "1.2em" }}
                   />
                   <span>
-                    <span className="font-bold">{city.name}</span>: {formatDate(selectedDate, conv.dayOffset)} @ {formatTime(conv.hour, conv.minute)} - {formatTime(endConvHour, conv.minute)}
+                    <span className="font-bold">{city.name}</span>:{" "}
+                    {formatDate(selectedDate, conv.dayOffset)} @{" "}
+                    {formatTime(conv.hour, conv.minute)} -{" "}
+                    {formatTime(endConvHour, conv.minute)}
                   </span>
                 </div>
               );
