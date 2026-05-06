@@ -14,7 +14,7 @@ export const CITIES: City[] = [
     id: "seattle",
     name: "Seattle",
     timezone: "America/Los_Angeles",
-    country: "USA",
+    country: "United States",
     coordinates: [-122.3321, 47.6062],
     lat: 47.6062,
     lng: -122.3321,
@@ -38,7 +38,7 @@ export const CITIES: City[] = [
     coordinates: [126.978, 37.5665],
     lat: 37.5665,
     lng: 126.978,
-    airportCode: "ICN",
+    airportCode: "SEO",
   },
   {
     id: "sydney",
