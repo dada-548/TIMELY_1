@@ -477,9 +477,9 @@ export function ScrollableTimeline({
   const selWidth = getCellLeft(selectionAbsStart + duration) - selLeft;
 
   return (
-    <div className="rounded-xl border border-border bg-card p-1.5 sm:p-5 overflow-hidden">
+    <div className="rounded-xl border border-border bg-card p-1.5 sm:p-4 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 mb-3">
+      <div className="w-full flex sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 py-1.5">
         <button
           onClick={() => setVisible((v) => !v)}
           className="flex flex-col items-start hover:text-foreground/80 transition-colors text-left"
@@ -502,7 +502,7 @@ export function ScrollableTimeline({
             {format(selectedDate, "EEEE, MMMM d, yyyy")}
           </span>
         </button>
-        <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
+        <div className="flex flex-wrap items-center gap-1.5 ml-auto sm:ml-0">
           {/* Timeline Modes */}
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card mr-1">
             <TooltipProvider>
