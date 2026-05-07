@@ -23,6 +23,7 @@ import {
   getTimeOfDay,
   getOffsetMinutes,
 } from "@/utils/timezone";
+import { getCountryNames } from "@/utils/country";
 
 // Timezone-boundary-builder simplified TopoJSON with tzid properties
 const TZ_GEO_URL = "/timezones.json";
@@ -1000,7 +1001,7 @@ export function WorldMapSVG({
         >
           <div className="bg-card/95 border border-border shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md rounded-xl px-4 py-3 min-w-[160px]">
             <p className="text-xs font-semibold text-foreground">
-              {tooltipCity.city.name}, {tooltipCity.city.country}
+              {tooltipCity.city.name}, {getCountryNames(tooltipCity.city.country).full}
             </p>
             <p
               className="text-sm font-mono font-semibold mt-0.5"

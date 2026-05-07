@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Search, Plus, X, Globe, MapPin } from "lucide-react";
 import { City, searchCities, CITIES } from "@/data/cities";
 import { useWorldClock } from "@/hooks/useWorldClock";
+import { getCountryNames } from "@/utils/country";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
@@ -156,35 +157,43 @@ export function CitySearch() {
                     onClick={() => handleAdd(city)}
                     className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left group"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
-                        {isTz ? (
-                          <Globe className="h-3.5 w-3.5 text-muted-foreground" />
-                        ) : (
-                          <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="font-medium text-foreground">
-                          {city.name}
+                    {(() => {
+                      const countryNames = getCountryNames(city.country);
+                      return (
+                        <div className="flex items-center gap-3">
+                          <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
+                            {isTz ? (
+                              <Globe className="h-3.5 w-3.5 text-muted-foreground" />
+                            ) : (
+                              <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-medium text-foreground">
+                              {city.name}
+                            </div>
+                            <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                              <span>
+                                <span className="hidden sm:inline">{countryNames.full}</span>
+                                <span className="sm:hidden inline">{countryNames.short}</span>
+                              </span>
+                              {city.airportCode && (
+                                <>
+                                  <span className="w-1 h-1 rounded-full bg-border" />
+                                  <span className="font-mono uppercase">{city.airportCode}</span>
+                                </>
+                              )}
+                              {isTz && (
+                                <>
+                                  <span className="w-1 h-1 rounded-full bg-border" />
+                                  <span className="text-[9px] font-mono opacity-70">{city.timezone}</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                          <span>{city.country}</span>
-                          {city.airportCode && (
-                            <>
-                              <span className="w-1 h-1 rounded-full bg-border" />
-                              <span className="font-mono uppercase">{city.airportCode}</span>
-                            </>
-                          )}
-                          {isTz && (
-                            <>
-                              <span className="w-1 h-1 rounded-full bg-border" />
-                              <span className="text-[9px] font-mono opacity-70">{city.timezone}</span>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                      );
+                    })()}
                     <Plus className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: highlightColor }} />
                   </button>
                 );
@@ -203,25 +212,33 @@ export function CitySearch() {
                   onClick={() => handleAdd(closestCity)}
                   className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left group"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
-                      <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-foreground">
-                        {closestCity.name}
+                  {(() => {
+                    const countryNames = getCountryNames(closestCity.country);
+                    return (
+                      <div className="flex items-center gap-3">
+                        <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
+                          <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-foreground">
+                            {closestCity.name}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+                            <span>
+                              <span className="hidden sm:inline">{countryNames.full}</span>
+                              <span className="sm:hidden inline">{countryNames.short}</span>
+                            </span>
+                            {closestCity.airportCode && (
+                              <>
+                                <span className="w-1 h-1 rounded-full bg-border" />
+                                <span className="font-mono uppercase">{closestCity.airportCode}</span>
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                        <span>{closestCity.country}</span>
-                        {closestCity.airportCode && (
-                          <>
-                            <span className="w-1 h-1 rounded-full bg-border" />
-                            <span className="font-mono uppercase">{closestCity.airportCode}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
                   <Plus className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: highlightColor }} />
                 </button>
               </div>

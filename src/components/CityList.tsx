@@ -11,6 +11,7 @@ import {
   observesDST,
   getTimezoneAbbreviation,
 } from "@/utils/timezone";
+import { getCountryNames } from "@/utils/country";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { X, GripVertical, Sun, Moon, Sunrise, Sunset } from "lucide-react";
 import {
@@ -46,6 +47,7 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
   const tod = getTimeOfDay(city.timezone, now);
   const isNight = tod === "night";
   const diff = getDiffFromLocal(city.timezone, now);
+  const countryNames = getCountryNames(city.country);
 
   return (
     <Reorder.Item
@@ -90,7 +92,8 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
                   {city.name}
                 </span>
                 <span className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap block sm:inline">
-                  {city.country}
+                  <span className="hidden md:inline">{countryNames.full}</span>
+                  <span className="md:hidden">{countryNames.short}</span>
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-0.5">

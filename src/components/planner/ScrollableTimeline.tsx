@@ -12,6 +12,8 @@ import {
   getTimeInTimezone,
   convertTime,
 } from "@/utils/timezone";
+import { getCountryNames } from "@/utils/country";
+import { getCityCode } from "@/utils/city";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -477,7 +479,7 @@ export function ScrollableTimeline({
   return (
     <div className="rounded-xl border border-border bg-card p-1.5 sm:p-5 overflow-hidden">
       {/* Header */}
-      <div className="w-full flex sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 py-2">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 mb-3">
         <button
           onClick={() => setVisible((v) => !v)}
           className="flex flex-col items-start hover:text-foreground/80 transition-colors text-left"
@@ -487,7 +489,7 @@ export function ScrollableTimeline({
             <span>TIMELINE</span>
           </div>
           <span
-            className="text-xs sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2 py-0.5"
+            className="text-xs  sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2 py-0.5"
             style={{
               fontFamily: "'Inter', sans-serif",
               color: dateFlash ? highlightColor : undefined,
@@ -500,7 +502,7 @@ export function ScrollableTimeline({
             {format(selectedDate, "EEEE, MMMM d, yyyy")}
           </span>
         </button>
-        <div className="flex flex-wrap items-center gap-1.5 ml-auto sm:ml-0">
+        <div className="flex items-center gap-1.5 ml-auto sm:ml-0">
           {/* Timeline Modes */}
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card mr-1">
             <TooltipProvider>
@@ -654,6 +656,7 @@ export function ScrollableTimeline({
                     now,
                   );
                   const dayOff = isBase ? 0 : (conv[0]?.dayOffset ?? 0);
+                  const countryNames = getCountryNames(city.country);
 
                   return (
                     <div
@@ -672,8 +675,7 @@ export function ScrollableTimeline({
                             }
                           >
                             <span className="inline sm:hidden">
-                              {city.airportCode ||
-                                city.name.slice(0, 3).toUpperCase()}
+                              {getCityCode(city.name, city.airportCode)}
                             </span>
                             <span className="hidden sm:inline">
                               {city.name}
@@ -683,7 +685,7 @@ export function ScrollableTimeline({
                         {/* Country name on mobile, abbreviation on desktop */}
                         <div className="flex items-center gap-1 sm:gap-1.5 sm:ml-[18px]">
                           <span className="text-[7px] text-muted-foreground truncate sm:hidden">
-                            {city.country}
+                            {countryNames.short}
                           </span>
                           <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline">
                             {abbrev}
