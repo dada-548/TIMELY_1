@@ -23,40 +23,39 @@ export function WorldMapSection() {
   const [showNightShade, setShowNightShade] = useState(true);
 
   return (
-    <div className="rounded-xl border border-border bg-card p-1.5 sm:p-4 overflow-hidden">
-      {/* Header */}
-      <div className="w-full flex sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 py-1.5">
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="w-full flex items-center justify-between px-4 py-3">
         <button
           onClick={() => setVisible((v) => !v)}
-          className="flex flex-col items-start hover:text-foreground/80 transition-colors text-left"
+          className="flex flex-col items-start hover:text-foreground/80 transition-colors py-0.5"
         >
-          <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2 px-2">
+          <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-1">
             <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
             <span>WORLD MAP</span>
           </div>
           <span
-            className="text-xs sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2 py-0.5"
+            className="text-xs sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg py-0.5"
             style={{
               fontFamily: "'Inter', sans-serif",
               border: "1px solid transparent",
             }}
           >
-            {now.toLocaleTimeString(undefined, {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: !use24h,
-            })}{" "}
-            ·{" "}
             {now.toLocaleDateString(undefined, {
               weekday: "long",
               year: "numeric",
               month: "long",
               day: "numeric",
+            })}{" "}
+            ·{" "}
+            {now.toLocaleTimeString(undefined, {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: !use24h,
             })}
           </span>
         </button>
 
-        <div className="flex flex-wrap items-center gap-1.5 ml-auto sm:ml-0">
+        <div className="flex items-center gap-2 relative z-20">
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">
             <Tooltip>
               <TooltipTrigger asChild>

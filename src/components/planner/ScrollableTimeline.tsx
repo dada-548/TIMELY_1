@@ -269,9 +269,22 @@ export function ScrollableTimeline({
   }, [cellWidth]);
 
   // Initial center on mount
+  const initialCentered = useRef(false);
   useEffect(() => {
-    centerScroll();
-  }, [centerScroll]); // Re-center if centerScroll changes (e.g. cellWidth changes)
+    if (!initialCentered.current) {
+      centerScroll();
+      initialCentered.current = true;
+    }
+  }, [centerScroll]);
+
+  // Re-center if cellWidth changes (e.g. mobile/desktop transition)
+  const prevCellWidth = useRef(cellWidth);
+  useEffect(() => {
+    if (prevCellWidth.current !== cellWidth) {
+      centerScroll();
+      prevCellWidth.current = cellWidth;
+    }
+  }, [cellWidth, centerScroll]);
 
   // When date changes externally (calendar strip), re-center
   const prevDateRef = useRef(selectedDate);
@@ -484,12 +497,12 @@ export function ScrollableTimeline({
           onClick={() => setVisible((v) => !v)}
           className="flex flex-col items-start hover:text-foreground/80 transition-colors text-left"
         >
-          <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2 px-2">
+          <div className="flex items-center gap-2 text-foreground text-sm font-bold px-2 py-1">
             <LayoutGrid className="h-4 w-4" style={{ color: highlightColor }} />
             <span>TIMELINE</span>
           </div>
           <span
-            className="text-xs  sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2 py-0.5"
+            className="text-xs sm:text-sm font-medium rounded-lg px-2 py-0.5 whitespace-nowrap"
             style={{
               fontFamily: "'Inter', sans-serif",
               color: dateFlash ? highlightColor : undefined,
@@ -502,7 +515,7 @@ export function ScrollableTimeline({
             {format(selectedDate, "EEEE, MMMM d, yyyy")}
           </span>
         </button>
-        <div className="flex flex-wrap items-center gap-1.5 ml-auto sm:ml-0">
+        <div className="flex flex-wrap items-center gap-1.5 ml-auto sm:ml-0 justify-end">
           {/* Timeline Modes */}
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card mr-1">
             <TooltipProvider>
@@ -592,45 +605,47 @@ export function ScrollableTimeline({
             </TooltipProvider>
           </div>
 
-          <button
-            onClick={() => onSelectDate(addDays(selectedDate, -1))}
-            className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
-            title="Previous day"
-          >
-            <ChevronLeft className="h-3.5 w-3.5" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => onSelectDate(addDays(selectedDate, -1))}
+              className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
+              title="Previous day"
+            >
+              <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={handleNow}
-                className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
-                aria-label="Reset to now"
-              >
-                <LocateFixed className="h-3.5 w-3.5" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent>Now</TooltipContent>
-          </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={handleNow}
+                  className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  aria-label="Reset to now"
+                >
+                  <LocateFixed className="h-3.5 w-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>Now</TooltipContent>
+            </Tooltip>
 
-          <button
-            onClick={() => onSelectDate(addDays(selectedDate, 1))}
-            className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
-            title="Next day"
-          >
-            <ChevronRight className="h-3.5 w-3.5" />
-          </button>
+            <button
+              onClick={() => onSelectDate(addDays(selectedDate, 1))}
+              className="p-1 rounded-md border border-border bg-background text-muted-foreground hover:text-foreground hover:bg-secondary"
+              title="Next day"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
 
-          <button
-            onClick={() => setVisible((v) => !v)}
-            className="p-1 text-muted-foreground hover:text-foreground ml-1"
-          >
-            {visible ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
+            <button
+              onClick={() => setVisible((v) => !v)}
+              className="p-1 text-muted-foreground hover:text-foreground ml-1"
+            >
+              {visible ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -712,7 +727,7 @@ export function ScrollableTimeline({
                           e.stopPropagation();
                           removeCity(city.id);
                         }}
-                        className="opacity-0 group-hover/label:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-opacity flex-shrink-0 ml-1"
+                        className="opacity-50 sm:opacity-0 sm:group-hover/label:opacity-100 p-1 text-muted-foreground hover:text-destructive transition-opacity flex-shrink-0 ml-1"
                         title="Remove city"
                       >
                         <X className="h-3 w-3" />

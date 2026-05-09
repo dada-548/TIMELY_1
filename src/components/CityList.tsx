@@ -122,7 +122,7 @@ function CityCard({ city }: { city: City; key?: React.Key }) {
         </button>
         <button
           onClick={() => removeCity(city.id)}
-          className="text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-destructive flex-shrink-0"
+          className="text-muted-foreground opacity-50 sm:opacity-0 sm:group-hover:opacity-100 hover:text-destructive flex-shrink-0"
         >
           <X className="h-4 w-4" />
         </button>

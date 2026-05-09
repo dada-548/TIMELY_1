@@ -1,8 +1,4 @@
-import {
-  getTimezoneAbbreviation,
-  getUTCOffset,
-  getOffsetMinutes,
-} from "@/utils/timezone";
+import { getTimezoneAbbreviation, getUTCOffset, getOffsetMinutes } from "@/utils/timezone";
 import {
   ArrowDown,
   Sun,
@@ -76,7 +72,7 @@ export function ConversionPanel({
   const fromOffset = getOffsetMinutes(fromCity.timezone, now);
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 sm:p-4">
+    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
         <ArrowLeftRight
           className="h-3.5 w-3.5"
@@ -136,8 +132,7 @@ export function ConversionPanel({
 
           const toOffset = getOffsetMinutes(city.timezone, now);
           const diffHours = Math.round((toOffset - fromOffset) / 60);
-          const diffLabel =
-            diffHours === 0 ? "" : `(${diffHours > 0 ? "+" : ""}${diffHours}h)`;
+          const diffLabel = diffHours === 0 ? "" : `(${diffHours > 0 ? "+" : ""}${diffHours}h)`;
 
           return (
             <div
@@ -156,12 +151,11 @@ export function ConversionPanel({
                     <span className="text-[10px] text-muted-foreground">
                       {diffLabel}
                       {conv.dayOffset !== 0 && (
-                        <span
+                        <span 
                           className="ml-1 font-bold"
                           style={{ color: dayIndicationColor }}
                         >
-                          {conv.dayOffset > 0 ? "+" : ""}
-                          {conv.dayOffset}d
+                          {conv.dayOffset > 0 ? "+" : ""}{conv.dayOffset}d
                         </span>
                       )}
                     </span>

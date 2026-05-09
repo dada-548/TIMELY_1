@@ -124,6 +124,20 @@ export default function MeetingPlanner() {
     <div className="min-h-screen bg-background w-full">
       <Header />
       <main className="w-full max-w-[1000px] mx-auto py-6 space-y-4 px-4 sm:px-12 lg:px-16 box-border">
+        {/* Title */}
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <CalendarDays
+              className="h-6 w-6"
+              style={{ color: highlightColor }}
+            />
+            TIME BAR
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Find the perfect meeting time across time zones.
+          </p>
+        </div>
+
         {selectedCities.length === 0 ? (
           <div className="text-center py-16">
             <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
