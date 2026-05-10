@@ -5,6 +5,7 @@ import { useClock } from "@/hooks/useClock";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { CITIES, City } from "@/data/cities";
 import { formatTime, getTimeOfDay } from "@/utils/timezone";
+import { getCountryInfo, getFlagUrl } from "@/utils/country";
 import { WorldMapSVG } from "./WorldMapSVG";
 import {
   Tooltip,
@@ -23,13 +24,13 @@ export function WorldMapSection() {
   const [showNightShade, setShowNightShade] = useState(true);
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="w-full flex items-center justify-between px-4 py-3">
+    <div className="rounded-xl border border-border bg-card overflow-hidden pt-4 px-5 pb-5 sm:p-6">
+      <div className="w-full flex items-center justify-between mb-4">
         <button
           onClick={() => setVisible((v) => !v)}
-          className="flex flex-col items-start hover:text-foreground/80 transition-colors py-0.5"
+          className="flex flex-col items-start hover:text-foreground/80 transition-colors py-0.5 text-left"
         >
-          <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-1">
+          <div className="flex items-center gap-2 text-foreground text-sm font-bold">
             <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
             <span>WORLD MAP</span>
           </div>
@@ -123,7 +124,7 @@ export function WorldMapSection() {
       </div>
 
       {visible && (
-        <div className="px-2 sm:px-4 pb-4">
+        <div>
           <div className="relative rounded-lg overflow-hidden border border-border mt-2">
             <WorldMapSVG
               now={now}
@@ -163,21 +164,33 @@ export function WorldMapSection() {
                         : tod === "dawn"
                           ? "text-sunriseicon"
                           : "text-sunseticon";
+                
+                const countryInfo = getCountryInfo(city.country);
+                const flagUrl = getFlagUrl(countryInfo.iso2);
+
                 return (
                   <button
                     key={city.id}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-background text-xs hover:bg-secondary"
+                    className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-border bg-background text-xs hover:bg-secondary transition-colors"
                     onMouseEnter={() => setHoveredCity(city)}
                     onMouseLeave={() => setHoveredCity(null)}
                   >
+                    {flagUrl && (
+                      <img 
+                        src={flagUrl} 
+                        alt={`${city.country} flag`} 
+                        className="w-4 h-auto rounded-[1px] shadow-sm flex-shrink-0"
+                        referrerPolicy="no-referrer"
+                      />
+                    )}
+                    <span className="font-medium text-foreground">
+                      {city.customName || city.name}
+                    </span>
                     <TodIcon
                       size={13}
-                      className={iconColorClass}
+                      className={`${iconColorClass} flex-shrink-0`}
                       strokeWidth={1.8}
                     />
-                    <span className="font-medium text-foreground">
-                      {city.name}
-                    </span>
                     <span className="text-muted-foreground font-mono">
                       {formatTime(city.timezone, now, use24h)}
                     </span>

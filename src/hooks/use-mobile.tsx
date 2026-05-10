@@ -19,3 +19,15 @@ export function useIsMobile() {
 
   return !!isMobile;
 }
+
+export function useIsMobileDevice() {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const userAgent = typeof window.navigator === "undefined" ? "" : navigator.userAgent;
+    const mobileMeta = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    setIsMobile(mobileMeta);
+  }, []);
+
+  return isMobile;
+}

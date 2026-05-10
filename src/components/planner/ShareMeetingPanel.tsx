@@ -118,12 +118,9 @@ export function ShareMeetingPanel({
 
   if (selectedCities.length < 1) return null;
 
-  const otherTimezones = selectedCities
-    .filter((c) => c.id !== fromCity.id)
-    .map((c) => c.timezone);
   const conversions = convertTime(
     fromCity.timezone,
-    otherTimezones,
+    selectedCities.map((c) => c.timezone),
     selectedHour,
     selectedMinute,
     now,
@@ -148,17 +145,14 @@ export function ShareMeetingPanel({
 
   // Generate text for clipboard
   const clipboardLines = [
-    `📅 Meeting Proposal`,
+    `📅 Meeting Time`,
     `⏱️ Duration: ${duration} hour${duration > 1 ? "s" : ""}`,
     "",
-    `${getEmojiFlag(fromCity.country)} ${fromCity.name}: ${formatDate(selectedDate)} @ ${formatTime(selectedHour, selectedMinute)} - ${formatTime(endHour, selectedMinute)}`,
-    ...selectedCities
-      .filter((c) => c.id !== fromCity.id)
-      .map((city, i) => {
-        const conv = conversions[i];
-        const endConvHour = (conv.hour + duration) % 24;
-        return `${getEmojiFlag(city.country)} ${city.name}: ${formatDate(selectedDate, conv.dayOffset)} @ ${formatTime(conv.hour, conv.minute)} - ${formatTime(endConvHour, conv.minute)}`;
-      }),
+    ...selectedCities.map((city, i) => {
+      const conv = conversions[i];
+      const endConvHour = (conv.hour + duration) % 24;
+      return `${getEmojiFlag(city.country)} ${city.name}: ${formatDate(selectedDate, conv.dayOffset)} @ ${formatTime(conv.hour, conv.minute)} - ${formatTime(endConvHour, conv.minute)}`;
+    }),
   ];
 
   const textToCopy = clipboardLines.join("\n");
@@ -170,21 +164,21 @@ export function ShareMeetingPanel({
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5 text-muted-foreground">
-          <Share2 className="h-3.5 w-3.5" style={{ color: highlightColor }} />{" "}
-          SHARE MEETING TIME
-        </h3>
+    <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-2 text-foreground text-sm font-bold">
+          <Share2 className="h-4 w-4" style={{ color: highlightColor }} />
+          <span>SHARE MEETING TIME</span>
+        </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border"
+          className="flex items-center justify-center h-8 w-8 rounded-lg border transition-all"
           style={
             copied
               ? {
                   borderColor: highlightColor,
                   backgroundColor: `${highlightColor}1a`,
-                  color: "hsl(var(--muted-foreground))",
+                  color: highlightColor,
                 }
               : {
                   borderColor: "hsl(var(--border))",
@@ -192,54 +186,37 @@ export function ShareMeetingPanel({
                   color: "hsl(var(--muted-foreground))",
                 }
           }
+          title={copied ? "Copied!" : "Copy to clipboard"}
         >
           {copied ? (
-            <>
-              <Check className="h-3.5 w-3.5" />
-              Copied!
-            </>
+            <Check className="h-4 w-4" />
           ) : (
-            <>
-              <Copy className="h-3.5 w-3.5" />
-              Copy
-            </>
+            <Copy className="h-4 w-4" />
           )}
         </button>
       </div>
 
       <div className="bg-secondary/50 rounded-lg p-3 font-mono text-xs text-foreground whitespace-pre-line select-text">
-        <div className="mb-1 text-muted-foreground">📅 Meeting Proposal</div>
-        <div className="mb-2 text-muted-foreground">⏱️ Duration: {duration} hour{duration > 1 ? "s" : ""}</div>
+        <div className="mb-1 text-foreground">📅 Meeting Time</div>
+        <div className="mb-2 text-foreground">⏱️ Duration: {duration} hour{duration > 1 ? "s" : ""}</div>
         
         <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <ReactCountryFlag 
-              countryCode={getCountryCode(fromCity.country)} 
-              svg 
-              style={{ width: '1.2em', height: '1.2em' }}
-            />
-            <span>
-              <span className="font-bold">{fromCity.name}</span>: {formatDate(selectedDate)} @ {formatTime(selectedHour, selectedMinute)} - {formatTime(endHour, selectedMinute)}
-            </span>
-          </div>
-          {selectedCities
-            .filter((c) => c.id !== fromCity.id)
-            .map((city, i) => {
-              const conv = conversions[i];
-              const endConvHour = (conv.hour + duration) % 24;
-              return (
-                <div key={city.id} className="flex items-center gap-2">
-                  <ReactCountryFlag 
-                    countryCode={getCountryCode(city.country)} 
-                    svg 
-                    style={{ width: '1.2em', height: '1.2em' }}
-                  />
-                  <span>
-                    <span className="font-bold">{city.name}</span>: {formatDate(selectedDate, conv.dayOffset)} @ {formatTime(conv.hour, conv.minute)} - {formatTime(endConvHour, conv.minute)}
-                  </span>
-                </div>
-              );
-            })}
+          {selectedCities.map((city, i) => {
+            const conv = conversions[i];
+            const endConvHour = (conv.hour + duration) % 24;
+            return (
+              <div key={city.id} className="flex items-center gap-2">
+                <ReactCountryFlag 
+                  countryCode={getCountryCode(city.country)} 
+                  svg 
+                  style={{ width: '1.2em', height: '1.2em' }}
+                />
+                <span>
+                  <span className="font-bold">{city.name}</span>: {formatDate(selectedDate, conv.dayOffset)} @ {formatTime(conv.hour, conv.minute)} - {formatTime(endConvHour, conv.minute)}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

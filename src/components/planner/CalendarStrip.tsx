@@ -13,7 +13,7 @@ import {
   startOfDay,
   differenceInCalendarDays,
 } from "date-fns";
-import { CalendarCheck, LocateFixed } from "lucide-react";
+import { CalendarCheck, LocateFixed, CalendarDays } from "lucide-react";
 import { useWorldClock } from "@/hooks/useWorldClock";
 
 interface CalendarStripProps {
@@ -39,7 +39,8 @@ export function CalendarStrip({
     prevScrollLeft: number;
   } | null>(null);
 
-  const today = useMemo(() => startOfDay(now), [startOfDay(now).getTime()]);
+  const nowTime = now.getTime();
+  const today = useMemo(() => startOfDay(new Date(nowTime)), [nowTime]);
   const { highlightColor } = useWorldClock();
   const [todayFlash, setTodayFlash] = useState(false);
   const [nowFlash, setNowFlash] = useState(false);
@@ -139,7 +140,15 @@ export function CalendarStrip({
   let lastMonth = -1;
 
   return (
-    <div className="rounded-xl border border-border bg-card p-3 sm:p-4">
+    <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6 space-y-4">
+      {/* Header */}
+      <div className="flex flex-col items-start">
+        <div className="flex items-center gap-2 text-foreground text-sm font-bold">
+          <CalendarDays className="h-4 w-4" style={{ color: highlightColor }} />
+          <span>TIME BAR</span>
+        </div>
+      </div>
+
       <div className="flex items-center gap-3">
         <div className="flex flex-col gap-1.5 flex-shrink-0">
           <button

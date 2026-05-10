@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Reorder, useDragControls } from "framer-motion";
+import { Reorder, useDragControls } from "motion/react";
 import { GripVertical } from "lucide-react";
 import { Header } from "@/components/Header";
 import { LocalTimeDisplay } from "@/components/LocalTimeDisplay";
@@ -81,7 +81,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Header />
-      <main className="w-full max-w-[1000px] mx-auto py-4 sm:py-8 px-4 sm:px-6 md:px-10 lg:px-12 box-border min-w-0">
+      <main className="w-full max-w-[1000px] mx-auto pt-2 sm:pt-8 pb-4 sm:pb-8 px-6 md:px-10 lg:px-12 box-border min-w-0">
         <Reorder.Group
           axis="y"
           values={order}

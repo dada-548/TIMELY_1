@@ -16,7 +16,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-xl">
-      <div className="w-full max-w-screen-2xl mx-auto flex h-14 items-center justify-between px-4 sm:px-6 md:px-10 lg:px-12 min-w-0">
+      <div className="w-full max-w-screen-2xl mx-auto flex h-14 items-center justify-between px-6 md:px-10 lg:px-12 min-w-0">
         <div className="flex items-center gap-1.5 sm:gap-8 min-w-0">
           <Link to="/" className="flex items-center gap-2">
             <Globe className="h-5 w-5" style={{ color: highlightColor }} />
@@ -50,38 +50,14 @@ export function Header() {
         <div className="flex items-center gap-1 sm:gap-4">
           <div className="flex items-center gap-1 sm:gap-2">
             {/* 12/24h toggle */}
-            <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card">
-              <button
-                onClick={() => setUse24h(false)}
-                className={`px-2 py-1.5 text-[10px] font-bold transition-colors ${
-                  !use24h
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                style={
-                  !use24h
-                    ? { backgroundColor: `${highlightColor}25` }
-                    : undefined
-                }
-              >
-                12H
-              </button>
-              <button
-                onClick={() => setUse24h(true)}
-                className={`px-2 py-1.5 text-[10px] font-bold border-l border-border transition-colors ${
-                  use24h
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                style={
-                  use24h
-                    ? { backgroundColor: `${highlightColor}25` }
-                    : undefined
-                }
-              >
-                24H
-              </button>
-            </div>
+            <button
+              onClick={() => setUse24h(!use24h)}
+              className="h-9 w-9 flex items-center justify-center rounded-lg border border-border bg-card text-[10px] font-bold hover:bg-secondary transition-colors"
+              style={{ color: highlightColor }}
+              title={use24h ? "Switch to 12h format" : "Switch to 24h format"}
+            >
+              {use24h ? "24H" : "12H"}
+            </button>
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">

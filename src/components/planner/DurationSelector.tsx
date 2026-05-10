@@ -8,10 +8,8 @@ interface DurationSelectorProps {
 }
 
 const DURATIONS = [
-  { label: "30m", value: 0.5 },
-  { label: "1h", value: 1 },
-  { label: "1.5h", value: 1.5 },
-  { label: "2h", value: 2 },
+  { label: "30M", value: 0.5 },
+  { label: "1H", value: 1 },
 ];
 
 export function DurationSelector({

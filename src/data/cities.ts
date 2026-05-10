@@ -1,6 +1,7 @@
 export interface City {
   id: string;
   name: string;
+  customName?: string;
   timezone: string;
   country: string;
   coordinates: [number, number];

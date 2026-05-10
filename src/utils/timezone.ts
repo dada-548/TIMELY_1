@@ -168,12 +168,17 @@ export function formatTime(
   });
 }
 
-export function formatDate(timezone: string, date: Date = new Date()): string {
+export function formatDate(
+  timezone: string, 
+  date: Date = new Date(),
+  includeYear: boolean = false
+): string {
   return date.toLocaleDateString("en-US", {
     timeZone: timezone,
     weekday: "short",
     month: "short",
     day: "numeric",
+    year: includeYear ? "numeric" : undefined,
   });
 }
 
@@ -192,8 +197,8 @@ export function getTimeOfDay(
     hour !== undefined ? hour : getTimeInTimezone(timezone, date).getHours();
   if (h >= 5 && h < 8) return "dawn";
   if (h >= 8 && h < 13) return "day";
-  if (h >= 13 && h < 18) return "afternoon";
-  if (h >= 18 && h < 22) return "dusk";
+  if (h >= 13 && h < 19) return "afternoon";
+  if (h >= 19 && h < 22) return "dusk";
   return "night";
 }
 

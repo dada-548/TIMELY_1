@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Search, Plus, X, Globe, MapPin } from "lucide-react";
 import { City, searchCities, CITIES } from "@/data/cities";
 import { useWorldClock } from "@/hooks/useWorldClock";
-import { getCountryNames } from "@/utils/country";
+import { getCountryInfo } from "@/utils/country";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
@@ -105,6 +105,9 @@ export function CitySearch() {
     addCity(city);
     setQuery("");
     setOpen(false);
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
   };
 
   return (
@@ -117,7 +120,7 @@ export function CitySearch() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search cities or time zones"
-          className="h-10 w-full rounded-lg border border-border bg-card pl-10 pr-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2"
+          className="h-10 w-full rounded-lg border border-border bg-card pl-10 pr-10 text-base sm:text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2"
           style={
             { "--tw-ring-color": `${highlightColor}4d` } as React.CSSProperties
           }
@@ -158,7 +161,7 @@ export function CitySearch() {
                     className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left group"
                   >
                     {(() => {
-                      const countryNames = getCountryNames(city.country);
+                      const countryInfo = getCountryInfo(city.country);
                       return (
                         <div className="flex items-center gap-3">
                           <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
@@ -174,8 +177,8 @@ export function CitySearch() {
                             </div>
                             <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
                               <span>
-                                <span className="hidden sm:inline">{countryNames.full}</span>
-                                <span className="sm:hidden inline">{countryNames.short}</span>
+                                <span className="hidden sm:inline">{countryInfo.full}</span>
+                                <span className="sm:hidden inline">{countryInfo.short}</span>
                               </span>
                               {city.airportCode && (
                                 <>
@@ -213,7 +216,7 @@ export function CitySearch() {
                   className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left group"
                 >
                   {(() => {
-                    const countryNames = getCountryNames(closestCity.country);
+                    const countryInfo = getCountryInfo(closestCity.country);
                     return (
                       <div className="flex items-center gap-3">
                         <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
@@ -225,8 +228,8 @@ export function CitySearch() {
                           </div>
                           <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
                             <span>
-                              <span className="hidden sm:inline">{countryNames.full}</span>
-                              <span className="sm:hidden inline">{countryNames.short}</span>
+                              <span className="hidden sm:inline">{countryInfo.full}</span>
+                              <span className="sm:hidden inline">{countryInfo.short}</span>
                             </span>
                             {closestCity.airportCode && (
                               <>

@@ -23,7 +23,7 @@ import {
   getTimeOfDay,
   getOffsetMinutes,
 } from "@/utils/timezone";
-import { getCountryNames } from "@/utils/country";
+import { getCountryInfo } from "@/utils/country";
 
 // Timezone-boundary-builder simplified TopoJSON with tzid properties
 const TZ_GEO_URL = "/timezones.json";
@@ -569,10 +569,10 @@ export function WorldMapSVG({
                 {({ geographies }) => {
                   const offsetGroups: Record<
                     number,
-                    { tzid: string; geo: any }[]
-                  > = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+                    { tzid: string; geo: { rsmKey: string; properties?: { tzid?: string } } }[]
+                  > = {};
                   geographies.forEach((geo) => {
-                    const tzid = geo.properties?.tzid;
+                    const tzid = (geo as { properties?: { tzid?: string } }).properties?.tzid;
                     if (!tzid) return;
                     if (
                       tzid === "Antarctica/McMurdo" ||
@@ -582,7 +582,7 @@ export function WorldMapSVG({
                       return;
                     const offset = getTzidStandardOffset(tzid);
                     if (!offsetGroups[offset]) offsetGroups[offset] = [];
-                    offsetGroups[offset].push({ tzid, geo });
+                    offsetGroups[offset].push({ tzid, geo: geo as { rsmKey: string; properties?: { tzid?: string } } });
                   });
 
                   return Object.entries(offsetGroups)
@@ -982,7 +982,7 @@ export function WorldMapSVG({
                   paintOrder="stroke"
                   className="select-none"
                 >
-                  {city.name}
+                  {city.customName || city.name}
                 </text>
               </Marker>
             );
@@ -1001,7 +1001,7 @@ export function WorldMapSVG({
         >
           <div className="bg-card/95 border border-border shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md rounded-xl px-4 py-3 min-w-[160px]">
             <p className="text-xs font-semibold text-foreground">
-              {tooltipCity.city.name}, {getCountryNames(tooltipCity.city.country).full}
+              {tooltipCity.city.customName || tooltipCity.city.name}, {getCountryInfo(tooltipCity.city.country).full}
             </p>
             <p
               className="text-sm font-mono font-semibold mt-0.5"
@@ -1051,7 +1051,7 @@ export function WorldMapSVG({
                         ? "Night"
                         : tod === "dawn"
                           ? "Dawn"
-                          : "Evening";
+                          : "Dusk";
                 return (
                   <span className="inline-flex items-center gap-0.5">
                     <TodIcon size={10} color={iconColor} strokeWidth={2} />{" "}

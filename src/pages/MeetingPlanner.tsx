@@ -17,7 +17,6 @@ import { ConversionPanel } from "@/components/planner/ConversionPanel";
 import { ShareMeetingPanel } from "@/components/planner/ShareMeetingPanel";
 import {
   Clock,
-  CalendarDays,
   Sun,
   MessageSquare,
   Briefcase,
@@ -65,26 +64,20 @@ export default function MeetingPlanner() {
       ? getTimeInTimezone(fromCity.timezone, now).getHours()
       : null;
 
-  const orderedCities = useMemo(() => {
-    if (!fromCity) return selectedCities;
-    const others = selectedCities.filter((_, i) => i !== fromCityIdx);
-    return [fromCity, ...others];
-  }, [selectedCities, fromCity, fromCityIdx]);
-
   const cityOffsets = useMemo(() => {
     if (!fromCity) return [];
-    return orderedCities.map((city) => {
+    return selectedCities.map((city) => {
       const diff =
         getOffsetMinutes(city.timezone, now) -
         getOffsetMinutes(fromCity.timezone, now);
       return Math.round(diff / 60);
     });
-  }, [orderedCities, fromCity, now]);
+  }, [selectedCities, fromCity, now]);
 
   const conversions = fromCity
     ? convertTime(
         fromCity.timezone,
-        otherCities.map((c) => c.timezone),
+        selectedCities.map((c) => c.timezone),
         selectedHour,
         selectedMinute,
         now,
@@ -107,6 +100,24 @@ export default function MeetingPlanner() {
     [setSelectedHour],
   );
 
+  const handleDragEnd = useCallback(() => {
+    let normalizedHour = selectedHour;
+    let dateShift = 0;
+    while (normalizedHour < 0) {
+      normalizedHour += 24;
+      dateShift--;
+    }
+    while (normalizedHour >= 24) {
+      normalizedHour -= 24;
+      dateShift++;
+    }
+
+    if (dateShift !== 0) {
+      setSelectedDate((prev) => addDays(prev, dateShift));
+      setSelectedHour(normalizedHour);
+    }
+  }, [selectedHour, setSelectedDate, setSelectedHour]);
+
   const handleResizeEnd = useCallback(
     (newDuration: number) => {
       setDuration(newDuration);
@@ -123,21 +134,7 @@ export default function MeetingPlanner() {
   return (
     <div className="min-h-screen bg-background w-full">
       <Header />
-      <main className="w-full max-w-[1000px] mx-auto py-6 space-y-4 px-4 sm:px-12 lg:px-16 box-border">
-        {/* Title */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <CalendarDays
-              className="h-6 w-6"
-              style={{ color: highlightColor }}
-            />
-            TIME BAR
-          </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Find the perfect meeting time across time zones.
-          </p>
-        </div>
-
+      <main className="w-full max-w-[1000px] mx-auto pt-3 sm:pt-10 pb-6 space-y-4 px-6 md:px-10 lg:px-16 box-border">
         {selectedCities.length === 0 ? (
           <div className="text-center py-16">
             <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -201,8 +198,8 @@ export default function MeetingPlanner() {
             </div>
 
             <ScrollableTimeline
-              selectedCities={orderedCities}
-              fromCityIdx={0}
+              selectedCities={selectedCities}
+              fromCityIdx={fromCityIdx}
               fromCity={fromCity}
               cityOffsets={cityOffsets}
               selectedDate={selectedDate}
@@ -216,14 +213,15 @@ export default function MeetingPlanner() {
               getDiffLabel={getDiffLabel}
               onDragMove={handleDragMove}
               onResizeEnd={handleResizeEnd}
+              onDragEnd={handleDragEnd}
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {fromCity && (
                 <ConversionPanel
-                  fromCity={fromCity}
-                  otherCities={otherCities}
+                  selectedCities={selectedCities}
                   conversions={conversions}
+                  fromCityIdx={fromCityIdx}
                   selectedHour={selectedHour}
                   selectedMinute={selectedMinute}
                   duration={duration}

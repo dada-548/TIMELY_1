@@ -58,7 +58,7 @@ export function LocalTimeDisplay() {
   const displayLocation = locationName || "My location";
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 sm:p-6 overflow-hidden">
+    <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6 overflow-hidden">
       <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2">
         <Timer className="h-4 w-4" style={{ color: highlightColor }} />
         <span>MY TIME</span>
@@ -69,10 +69,10 @@ export function LocalTimeDisplay() {
           <span className="text-muted-foreground"> | {info.timezoneName}</span>
         )}
       </p>
-      <div className="flex flex-row flex-wrap sm:flex-nowrap items-baseline gap-x-3 sm:gap-4 text-xl sm:text-4xl lg:text-5xl font-mono font-semibold tracking-tight text-foreground min-w-0">
+      <div className="flex flex-row items-baseline gap-1.5 sm:gap-4 text-lg sm:text-4xl lg:text-5xl font-mono font-semibold tracking-tight text-foreground min-w-0 whitespace-nowrap">
         <span className="shrink-0">{formatTime(tz, now, use24h)}</span>
-        <span className="hidden sm:block w-0.5 h-8 bg-border self-center shrink-0" />
-        <span className="shrink-0">{formatDate(tz, now).toUpperCase()}</span>
+        <span className="text-muted-foreground/30 font-light">|</span>
+        <span className="shrink-0">{formatDate(tz, now, true).toUpperCase()}</span>
       </div>
 
       {info.otherCities.length > 0 && (

@@ -1,4 +1,5 @@
 import { getTimezoneAbbreviation, getUTCOffset, getOffsetMinutes } from "@/utils/timezone";
+import { cn } from "@/lib/utils";
 import {
   ArrowDown,
   Sun,
@@ -18,9 +19,9 @@ interface ConversionResult {
 }
 
 interface ConversionPanelProps {
-  fromCity: City;
-  otherCities: City[];
+  selectedCities: City[];
   conversions: ConversionResult[];
+  fromCityIdx: number;
   selectedHour: number;
   selectedMinute: number;
   duration: number;
@@ -28,9 +29,9 @@ interface ConversionPanelProps {
 }
 
 export function ConversionPanel({
-  fromCity,
-  otherCities,
+  selectedCities,
   conversions,
+  fromCityIdx,
   selectedHour,
   selectedMinute,
   duration,
@@ -56,75 +57,39 @@ export function ConversionPanel({
     return `${startStr} – ${endStr}`;
   };
 
-  const sourceTimeIcon =
-    selectedHour >= 5 && selectedHour < 8 ? (
-      <Sunrise className="h-3.5 w-3.5 text-sunriseicon" />
-    ) : selectedHour >= 8 && selectedHour < 13 ? (
-      <Sun className="h-3.5 w-3.5 text-dayicon" />
-    ) : selectedHour >= 13 && selectedHour < 18 ? (
-      <Sun className="h-3.5 w-3.5 text-dayicon" />
-    ) : selectedHour >= 18 && selectedHour < 22 ? (
-      <Sunset className="h-3.5 w-3.5 text-sunseticon" />
-    ) : (
-      <Moon className="h-3.5 w-3.5 text-nighticon" />
-    );
+  const getSourceOffset = () => {
+    const fromCity = selectedCities[fromCityIdx];
+    return fromCity ? getOffsetMinutes(fromCity.timezone, now) : 0;
+  };
 
-  const fromOffset = getOffsetMinutes(fromCity.timezone, now);
+  const fromOffset = getSourceOffset();
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 sm:p-5">
-      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-1.5">
-        <ArrowLeftRight
-          className="h-3.5 w-3.5"
-          style={{ color: highlightColor }}
-        />{" "}
-        CONVERTED TIMES
-      </h3>
-
-      {/* Source */}
-      <div
-        className="flex items-center justify-between p-3 rounded-lg mb-2"
-        style={{
-          backgroundColor: `${highlightColor}0d`,
-          border: `1px solid ${highlightColor}33`,
-        }}
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
-          <span className="font-medium text-sm text-foreground">
-            {fromCity.name}
-          </span>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-muted-foreground font-medium">
-              {getTimezoneAbbreviation(fromCity.timezone, now)}
-            </span>
-          </div>
+    <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6">
+      <div className="flex flex-col items-start mb-3 sm:mb-4">
+        <div className="flex items-center gap-2 text-foreground text-sm font-bold">
+          <ArrowLeftRight
+            className="h-4 w-4"
+            style={{ color: highlightColor }}
+          />
+          <span>CONVERTED TIMES</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs flex items-center">{sourceTimeIcon}</span>
-          <span className="font-mono text-sm font-semibold">
-            {formatTimeRange(selectedHour, selectedMinute, duration)}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex justify-center py-1">
-        <ArrowDown className="h-3.5 w-3.5 text-muted-foreground" />
       </div>
 
       {/* Converted */}
       <div className="space-y-1.5">
-        {conversions.map((conv, i) => {
-          const city = otherCities[i];
-          if (!city) return null;
+        {selectedCities.map((city, i) => {
+          const conv = conversions[i];
+          if (!conv) return null;
           const h = conv.hour;
           const timeIcon =
             h >= 5 && h < 8 ? (
               <Sunrise className="h-3.5 w-3.5 text-sunriseicon" />
             ) : h >= 8 && h < 13 ? (
               <Sun className="h-3.5 w-3.5 text-dayicon" />
-            ) : h >= 13 && h < 18 ? (
+            ) : h >= 13 && h < 19 ? (
               <Sun className="h-3.5 w-3.5 text-dayicon" />
-            ) : h >= 18 && h < 22 ? (
+            ) : h >= 19 && h < 22 ? (
               <Sunset className="h-3.5 w-3.5 text-sunseticon" />
             ) : (
               <Moon className="h-3.5 w-3.5 text-nighticon" />
@@ -133,14 +98,27 @@ export function ConversionPanel({
           const toOffset = getOffsetMinutes(city.timezone, now);
           const diffHours = Math.round((toOffset - fromOffset) / 60);
           const diffLabel = diffHours === 0 ? "" : `(${diffHours > 0 ? "+" : ""}${diffHours}h)`;
+          const isTop = i === 0;
 
           return (
             <div
               key={city.id}
-              className="flex items-center justify-between p-3 rounded-lg bg-secondary/50"
+              className={cn(
+                "flex items-center justify-between p-3 rounded-lg transition-all",
+                isTop 
+                  ? "border-2 shadow-sm"
+                  : "bg-secondary/50 border border-transparent"
+              )}
+              style={isTop ? { 
+                backgroundColor: `${highlightColor}15`, 
+                borderColor: `${highlightColor}40` 
+              } : undefined}
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
-                <span className="font-medium text-sm text-foreground">
+                <span className={cn(
+                  "font-medium text-sm",
+                  isTop ? "text-foreground" : "text-foreground/90"
+                )}>
                   {city.name}
                 </span>
                 <div className="flex items-center gap-1.5">
@@ -164,7 +142,12 @@ export function ConversionPanel({
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs flex items-center">{timeIcon}</span>
-                <span className="font-mono text-sm font-semibold tabular-nums text-foreground">
+                <span className={cn(
+                  "font-mono text-sm font-semibold tabular-nums",
+                  isTop ? "text-foreground" : "text-foreground/90"
+                )}
+                style={isTop ? { color: highlightColor } : undefined}
+                >
                   {formatTimeRange(conv.hour, conv.minute, duration)}
                 </span>
               </div>

@@ -8,6 +8,13 @@ interface WorldClockState {
   addCity: (city: City) => void;
   removeCity: (cityId: string) => void;
   reorderCities: (cities: City[]) => void;
+  updateCityName: (cityId: string, name: string) => void;
+  isEditingNames: boolean;
+  setIsEditingNames: (val: boolean) => void;
+  isCompactView: boolean;
+  setIsCompactView: (val: boolean) => void;
+  showSearchBox: boolean;
+  setShowSearchBox: (val: boolean) => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   highlightColor: string;
@@ -87,6 +94,9 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
   const [selectedHour, setSelectedHour] = useState(() => new Date().getHours());
   const [duration, setDuration] = useState(1);
   const [fromCityIdx, setFromCityIdx] = useState(0);
+  const [isEditingNames, setIsEditingNames] = useState(false);
+  const [isCompactView, setIsCompactView] = useState(false);
+  const [showSearchBox, setShowSearchBox] = useState(true);
 
   const setUse24h = useCallback((val: boolean) => {
     setUse24hState(val);
@@ -94,8 +104,17 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   const setTimelineMode = useCallback((mode: TimelineMode) => {
-    setTimelineModeState(mode);
-    localStorage.setItem('worldclock-timeline-mode', mode);
+    const update = () => {
+      setTimelineModeState(mode);
+      localStorage.setItem('worldclock-timeline-mode', mode);
+    };
+    // @ts-expect-error - startViewTransition is not in the standard Document type yet
+    if (!document.startViewTransition) {
+      update();
+    } else {
+      // @ts-expect-error - startViewTransition is not in the standard Document type yet
+      document.startViewTransition(update);
+    }
   }, []);
 
   const setHighlightColor = useCallback((color: string) => {
@@ -174,7 +193,16 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   const reorderCities = useCallback((cities: City[]) => {
+    const currentBaseCityId = selectedCities[fromCityIdx]?.id;
     setSelectedCities(cities);
+    if (currentBaseCityId) {
+      const newIdx = cities.findIndex(c => c.id === currentBaseCityId);
+      if (newIdx !== -1) setFromCityIdx(newIdx);
+    }
+  }, [selectedCities, fromCityIdx]);
+  
+  const updateCityName = useCallback((cityId: string, name: string) => {
+    setSelectedCities(prev => prev.map(c => c.id === cityId ? { ...c, customName: name } : c));
   }, []);
 
   const toggleTheme = useCallback(() => {
@@ -190,7 +218,10 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
 
   return (
     <WorldClockContext.Provider value={{ 
-      selectedCities, addCity, removeCity, reorderCities, 
+      selectedCities, addCity, removeCity, reorderCities, updateCityName,
+      isEditingNames, setIsEditingNames,
+      isCompactView, setIsCompactView,
+      showSearchBox, setShowSearchBox,
       theme, toggleTheme, 
       highlightColor, setHighlightColor,
       timelineHighlightColor, setTimelineHighlightColor,

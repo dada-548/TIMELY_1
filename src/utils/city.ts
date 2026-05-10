@@ -53,7 +53,6 @@ export const CITY_CODE_MAPPINGS: Record<string, string> = {
   "Zurich": "ZRH",
   "Geneva": "GVA",
   "Kyiv": "KYI",
-  "Dubai": "DXB",
   "Riyadh": "RUH",
   "Tehran": "THR",
   "Karachi": "KHI",
