@@ -1,12 +1,27 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Globe, Edit2, Minimize2, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Timer,
+  Edit2,
+  Minimize2,
+  Search,
+} from "lucide-react";
 import { CitySearch } from "@/components/CitySearch";
 import { CityList } from "@/components/CityList";
 import { useWorldClock } from "@/hooks/useWorldClock";
 
 export function WorldClocksSection() {
   const [visible, setVisible] = useState(true);
-  const { highlightColor, isEditingNames, setIsEditingNames, isCompactView, setIsCompactView, showSearchBox, setShowSearchBox } = useWorldClock();
+  const {
+    highlightColor,
+    isEditingNames,
+    setIsEditingNames,
+    isCompactView,
+    setIsCompactView,
+    showSearchBox,
+    setShowSearchBox,
+  } = useWorldClock();
 
   return (
     <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6">
@@ -15,10 +30,10 @@ export function WorldClocksSection() {
           onClick={() => setVisible((v) => !v)}
           className="flex items-center gap-2 text-sm font-bold text-foreground hover:opacity-80 transition-opacity"
         >
-          <Globe className="h-4 w-4" style={{ color: highlightColor }} />
+          <Timer className="h-4 w-4" style={{ color: highlightColor }} />
           WORLD CLOCK
         </button>
-        
+
         <div className="flex items-center gap-1">
           <div className="flex items-center rounded-lg border border-border overflow-hidden bg-card mr-1">
             <button
@@ -70,9 +85,9 @@ export function WorldClocksSection() {
               <Search className="h-3.5 w-3.5" />
             </button>
           </div>
-          
-          <button 
-            onClick={() => setVisible(!visible)} 
+
+          <button
+            onClick={() => setVisible(!visible)}
             className="p-1 px-1.5 text-muted-foreground hover:text-foreground transition-colors"
           >
             {visible ? (
@@ -83,7 +98,7 @@ export function WorldClocksSection() {
           </button>
         </div>
       </div>
- 
+
       {visible && (
         <div className="space-y-4">
           {showSearchBox && <CitySearch />}

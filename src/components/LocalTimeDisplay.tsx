@@ -6,7 +6,7 @@ import {
   getLocalTimezone,
   getLocalCityName,
 } from "@/utils/timezone";
-import { Timer, ChevronDown, ChevronUp } from "lucide-react";
+import { MapPin, ChevronDown, ChevronUp } from "lucide-react";
 import { useWorldClock } from "@/hooks/useWorldClock";
 
 export function LocalTimeDisplay() {
@@ -60,7 +60,7 @@ export function LocalTimeDisplay() {
   return (
     <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6 overflow-hidden">
       <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2">
-        <Timer className="h-4 w-4" style={{ color: highlightColor }} />
+        <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
         <span>MY TIME</span>
       </div>
       <p className="text-sm sm:text-base text-muted-foreground mb-1">
@@ -72,7 +72,9 @@ export function LocalTimeDisplay() {
       <div className="flex flex-row items-baseline gap-1.5 sm:gap-4 text-lg sm:text-4xl lg:text-5xl font-mono font-semibold tracking-tight text-foreground min-w-0 whitespace-nowrap">
         <span className="shrink-0">{formatTime(tz, now, use24h)}</span>
         <span className="text-muted-foreground/30 font-light">|</span>
-        <span className="shrink-0">{formatDate(tz, now, true).toUpperCase()}</span>
+        <span className="shrink-0">
+          {formatDate(tz, now, true).toUpperCase()}
+        </span>
       </div>
 
       {info.otherCities.length > 0 && (

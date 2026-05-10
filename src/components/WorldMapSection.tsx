@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Sun, Moon, Sunrise, Sunset } from "lucide-react";
-import { ChevronDown, ChevronUp, MapPin, Globe, CloudMoon } from "lucide-react";
+import { ChevronDown, ChevronUp, Earth, Globe, CloudMoon } from "lucide-react";
 import { useClock } from "@/hooks/useClock";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { CITIES, City } from "@/data/cities";
@@ -31,7 +31,7 @@ export function WorldMapSection() {
           className="flex flex-col items-start hover:text-foreground/80 transition-colors py-0.5 text-left"
         >
           <div className="flex items-center gap-2 text-foreground text-sm font-bold">
-            <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
+            <Earth className="h-4 w-4" style={{ color: highlightColor }} />
             <span>WORLD MAP</span>
           </div>
           <span
@@ -164,7 +164,7 @@ export function WorldMapSection() {
                         : tod === "dawn"
                           ? "text-sunriseicon"
                           : "text-sunseticon";
-                
+
                 const countryInfo = getCountryInfo(city.country);
                 const flagUrl = getFlagUrl(countryInfo.iso2);
 
@@ -176,9 +176,9 @@ export function WorldMapSection() {
                     onMouseLeave={() => setHoveredCity(null)}
                   >
                     {flagUrl && (
-                      <img 
-                        src={flagUrl} 
-                        alt={`${city.country} flag`} 
+                      <img
+                        src={flagUrl}
+                        alt={`${city.country} flag`}
                         className="w-4 h-auto rounded-[1px] shadow-sm flex-shrink-0"
                         referrerPolicy="no-referrer"
                       />
