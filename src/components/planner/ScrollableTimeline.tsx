@@ -576,7 +576,7 @@ export function ScrollableTimeline({
               <span>TIMELINE</span>
             </div>
             <span
-              className="text-xs sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg px-2.5 py-0.5 whitespace-nowrap"
+              className="text-xs sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg py-0.5 whitespace-nowrap"
               style={{
                 fontFamily: "'Inter', sans-serif",
                 color: dateFlash ? highlightColor : undefined,
