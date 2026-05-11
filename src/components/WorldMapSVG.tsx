@@ -569,10 +569,14 @@ export function WorldMapSVG({
                 {({ geographies }) => {
                   const offsetGroups: Record<
                     number,
-                    { tzid: string; geo: { rsmKey: string; properties?: { tzid?: string } } }[]
+                    {
+                      tzid: string;
+                      geo: { rsmKey: string; properties?: { tzid?: string } };
+                    }[]
                   > = {};
                   geographies.forEach((geo) => {
-                    const tzid = (geo as { properties?: { tzid?: string } }).properties?.tzid;
+                    const tzid = (geo as { properties?: { tzid?: string } })
+                      .properties?.tzid;
                     if (!tzid) return;
                     if (
                       tzid === "Antarctica/McMurdo" ||
@@ -582,7 +586,13 @@ export function WorldMapSVG({
                       return;
                     const offset = getTzidStandardOffset(tzid);
                     if (!offsetGroups[offset]) offsetGroups[offset] = [];
-                    offsetGroups[offset].push({ tzid, geo: geo as { rsmKey: string; properties?: { tzid?: string } } });
+                    offsetGroups[offset].push({
+                      tzid,
+                      geo: geo as {
+                        rsmKey: string;
+                        properties?: { tzid?: string };
+                      },
+                    });
                   });
 
                   return Object.entries(offsetGroups)
@@ -1001,7 +1011,8 @@ export function WorldMapSVG({
         >
           <div className="bg-card/95 border border-border shadow-[0_8px_30px_rgb(0,0,0,0.12)] backdrop-blur-md rounded-xl px-4 py-3 min-w-[160px]">
             <p className="text-xs font-semibold text-foreground">
-              {tooltipCity.city.customName || tooltipCity.city.name}, {getCountryInfo(tooltipCity.city.country).full}
+              {tooltipCity.city.customName || tooltipCity.city.name},{" "}
+              {getCountryInfo(tooltipCity.city.country).full}
             </p>
             <p
               className="text-sm font-mono font-semibold mt-0.5"

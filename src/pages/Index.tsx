@@ -50,7 +50,10 @@ function SectionItem({
         style={{ touchAction: "none" }}
         aria-label="Reorder section"
       >
-        <GripVertical className="h-3.5 w-3.5" style={{ color: highlightColor }} />
+        <GripVertical
+          className="h-3.5 w-3.5"
+          style={{ color: highlightColor }}
+        />
       </button>
       <Component />
     </Reorder.Item>
@@ -81,7 +84,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden">
       <Header />
-      <main className="w-full max-w-[1000px] mx-auto pt-2 sm:pt-8 pb-4 sm:pb-8 px-6 md:px-10 lg:px-12 box-border min-w-0">
+      <main className="w-full max-w-[1000px] mx-auto pt-4 sm:pt-8 pb-4 sm:pb-8 px-4 md:px-10 lg:px-12 box-border min-w-0">
         <Reorder.Group
           axis="y"
           values={order}

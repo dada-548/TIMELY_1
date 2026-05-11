@@ -58,7 +58,7 @@ export function LocalTimeDisplay() {
   const displayLocation = locationName || "My location";
 
   return (
-    <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6 overflow-hidden">
+    <div className="rounded-xl border border-border bg-card pt-4 px-4 pb-5 sm:p-6 overflow-hidden">
       <div className="flex items-center gap-2 text-foreground text-sm font-bold mb-2">
         <MapPin className="h-4 w-4" style={{ color: highlightColor }} />
         <span>MY TIME</span>

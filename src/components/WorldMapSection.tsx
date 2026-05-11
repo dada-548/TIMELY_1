@@ -24,7 +24,7 @@ export function WorldMapSection() {
   const [showNightShade, setShowNightShade] = useState(true);
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden pt-4 px-5 pb-5 sm:p-6">
+    <div className="rounded-xl border border-border bg-card overflow-hidden pt-4 px-4 pb-5 sm:p-6">
       <div className="w-full flex items-center justify-between mb-4">
         <button
           onClick={() => setVisible((v) => !v)}

@@ -54,7 +54,13 @@ import {
   LocateFixed,
   X,
 } from "lucide-react";
-import { motion, AnimatePresence, useMotionValue, useTransform, useAnimation } from "motion/react";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useTransform,
+  useAnimation,
+} from "motion/react";
 import {
   Tooltip,
   TooltipContent,
@@ -468,7 +474,10 @@ export function ScrollableTimeline({
           const dHours = Math.round(dx / cellWidth);
           const newHour = Math.max(
             -CENTER_START,
-            Math.min(TOTAL_CELLS - CENTER_START - duration, dragStartValue.current + dHours),
+            Math.min(
+              TOTAL_CELLS - CENTER_START - duration,
+              dragStartValue.current + dHours,
+            ),
           );
           onDragMove(newHour);
         } else if (type === "resize") {
@@ -484,7 +493,10 @@ export function ScrollableTimeline({
           const delta = dHalfHours * 0.5;
           const newStart = Math.max(
             -CENTER_START,
-            Math.min(dragStartValue.current + dragStartValue2.current - 0.5, dragStartValue.current + delta),
+            Math.min(
+              dragStartValue.current + dragStartValue2.current - 0.5,
+              dragStartValue.current + delta,
+            ),
           );
           const actualDelta = newStart - dragStartValue.current;
           const newDur = Math.max(0.5, dragStartValue2.current - actualDelta);
@@ -545,7 +557,7 @@ export function ScrollableTimeline({
   const selWidth = getCellLeft(selectionAbsStart + duration) - selLeft;
 
   return (
-    <div className="rounded-xl border border-border bg-card pt-4 px-5 pb-5 sm:p-6 overflow-hidden">
+    <div className="rounded-xl border border-border bg-card pt-4 px-4 pb-5 sm:p-6 overflow-hidden">
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -557,7 +569,10 @@ export function ScrollableTimeline({
             className="flex flex-col items-start hover:text-foreground/80 transition-colors text-left"
           >
             <div className="flex items-center gap-2 text-foreground text-sm font-bold">
-              <LayoutGrid className="h-4 w-4" style={{ color: highlightColor }} />
+              <LayoutGrid
+                className="h-4 w-4"
+                style={{ color: highlightColor }}
+              />
               <span>TIMELINE</span>
             </div>
             <span
@@ -783,13 +798,12 @@ export function ScrollableTimeline({
                             }}
                           >
                             {formatHourFull(selectedHour, use24h)} –{" "}
-                            {formatHourFull(
-                              selectedHour + duration,
-                              use24h,
-                            )}
+                            {formatHourFull(selectedHour + duration, use24h)}
                             {(() => {
                               const startDay = Math.floor(selectedHour / 24);
-                              const endDay = Math.floor((selectedHour + duration - 0.0001) / 24);
+                              const endDay = Math.floor(
+                                (selectedHour + duration - 0.0001) / 24,
+                              );
                               if (startDay === endDay) return "";
                               const diff = endDay - startDay;
                               return diff > 0 ? ` (+${diff}d)` : ` (${diff}d)`;
@@ -798,11 +812,16 @@ export function ScrollableTimeline({
                         </div>
                         {/* Resize handles */}
                         <div
-                          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-8 rounded-full pointer-events-auto cursor-col-resize hover:scale-110 shadow-md ${
+                          className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-7 rounded-full pointer-events-auto cursor-col-resize hover:scale-110 shadow-md ${
                             dragging === "resize-start" ? "scale-110" : ""
                           }`}
-                          style={{ backgroundColor: highlightColor, zIndex: 40 }}
-                          onMouseDown={(e) => handleMouseDown(e, "resize-start")}
+                          style={{
+                            backgroundColor: highlightColor,
+                            zIndex: 40,
+                          }}
+                          onMouseDown={(e) =>
+                            handleMouseDown(e, "resize-start")
+                          }
                           onTouchStart={(e) =>
                             handleTouchStart(e, "resize-start")
                           }
@@ -810,10 +829,13 @@ export function ScrollableTimeline({
                           <div className="absolute inset-[-8px] pointer-events-auto" />
                         </div>
                         <div
-                          className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-4 h-8 rounded-full pointer-events-auto cursor-col-resize hover:scale-110 shadow-md ${
+                          className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-7 rounded-full pointer-events-auto cursor-col-resize hover:scale-110 shadow-md ${
                             dragging === "resize" ? "scale-110" : ""
                           }`}
-                          style={{ backgroundColor: highlightColor, zIndex: 40 }}
+                          style={{
+                            backgroundColor: highlightColor,
+                            zIndex: 40,
+                          }}
                           onMouseDown={(e) => handleMouseDown(e, "resize")}
                           onTouchStart={(e) => handleTouchStart(e, "resize")}
                         >
@@ -828,104 +850,141 @@ export function ScrollableTimeline({
                         const offset = cityOffsets[idx] ?? 0;
                         return (
                           <div key={city.id} className="flex">
-                            {Array.from({ length: TOTAL_CELLS }, (_, cellIdx) => {
-                              const baseHour = cellIdx % 24;
-                              const dayIdx = Math.floor(cellIdx / 24);
-                              const cityHour = (((baseHour + offset) % 24) + 24) % 24;
-                              const isCurrent =
-                                dayIdx === 2 &&
-                                isToday &&
-                                currentHourInBase !== null &&
-                                baseHour === currentHourInBase;
-                              const inSelection =
-                                cellIdx >= selectionAbsStart &&
-                                cellIdx < selectionAbsEnd;
-                              const isDimmed = dayIdx !== 2;
+                            {Array.from(
+                              { length: TOTAL_CELLS },
+                              (_, cellIdx) => {
+                                const baseHour = cellIdx % 24;
+                                const dayIdx = Math.floor(cellIdx / 24);
+                                const cityHour =
+                                  (((baseHour + offset) % 24) + 24) % 24;
+                                const isCurrent =
+                                  dayIdx === 2 &&
+                                  isToday &&
+                                  currentHourInBase !== null &&
+                                  baseHour === currentHourInBase;
+                                const inSelection =
+                                  cellIdx >= selectionAbsStart &&
+                                  cellIdx < selectionAbsEnd;
+                                const isDimmed = dayIdx !== 2;
 
-                              const opacity = getTimeOfDayOpacity(cityHour, isDarkMode);
-                              const effectiveOpacity = isDimmed ? opacity * 0.35 : opacity;
-                              const showBg = timelineMode === "default";
-                              const cellStyle = {
-                                backgroundColor: showBg
-                                  ? `rgba(${hexToRgb(timelineHighlightColor)}, ${effectiveOpacity})`
-                                  : isDimmed
-                                    ? isDarkMode
-                                      ? "rgba(255,255,255,0.03)"
-                                      : "rgba(0,0,0,0.03)"
-                                    : "transparent",
-                                border: `1px solid ${isDarkMode ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
-                                backgroundClip: "padding-box",
-                                transition: "background-color 0.25s ease, opacity 0.25s ease",
-                              };
+                                const opacity = getTimeOfDayOpacity(
+                                  cityHour,
+                                  isDarkMode,
+                                );
+                                const effectiveOpacity = isDimmed
+                                  ? opacity * 0.35
+                                  : opacity;
+                                const showBg = timelineMode === "default";
+                                const cellStyle = {
+                                  backgroundColor: showBg
+                                    ? `rgba(${hexToRgb(timelineHighlightColor)}, ${effectiveOpacity})`
+                                    : isDimmed
+                                      ? isDarkMode
+                                        ? "rgba(255,255,255,0.03)"
+                                        : "rgba(0,0,0,0.03)"
+                                      : "transparent",
+                                  border: `1px solid ${isDarkMode ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
+                                  backgroundClip: "padding-box",
+                                  transition:
+                                    "background-color 0.25s ease, opacity 0.25s ease",
+                                };
 
-                              const isFriendly = cityHour >= 9 && cityHour < 21;
-                              const isWorking = cityHour >= 9 && cityHour < 18;
+                                const isFriendly =
+                                  cityHour >= 9 && cityHour < 21;
+                                const isWorking =
+                                  cityHour >= 9 && cityHour < 18;
 
-                              return (
-                                <button
-                                  key={cellIdx}
-                                  onClick={() => handleCellClick(cellIdx)}
-                                  className={`h-[44px] rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 overflow-hidden ${
-                                    cellIdx % 24 === 0 && cellIdx > 0 ? "ml-0.5" : ""
-                                  }`}
-                                  style={{
-                                    ...cellStyle,
-                                    minWidth: cellWidth,
-                                    flex: `0 0 ${cellWidth}px`,
-                                  }}
-                                  title={`${city.name}: ${formatHourFull(cityHour, use24h)}`}
-                                >
-                                  {cityHour === 0 && (
-                                    <div
-                                      className="absolute left-0 top-0 bottom-0 w-[2px] pointer-events-none z-20"
-                                      style={{ backgroundColor: dayIndicationColor }}
-                                    />
-                                  )}
-                                  <div
-                                    className={`absolute inset-0 flex flex-col items-center justify-center font-mono ${
-                                      inSelection
-                                        ? "font-semibold"
-                                        : isDimmed
-                                          ? "text-foreground/30"
-                                          : "text-foreground/70 group-hover/cell:text-foreground/90"
+                                return (
+                                  <button
+                                    key={cellIdx}
+                                    onClick={() => handleCellClick(cellIdx)}
+                                    className={`h-[44px] rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 overflow-hidden ${
+                                      cellIdx % 24 === 0 && cellIdx > 0
+                                        ? "ml-0.5"
+                                        : ""
                                     }`}
-                                    style={inSelection ? { color: highlightColor } : undefined}
+                                    style={{
+                                      ...cellStyle,
+                                      minWidth: cellWidth,
+                                      flex: `0 0 ${cellWidth}px`,
+                                    }}
+                                    title={`${city.name}: ${formatHourFull(cityHour, use24h)}`}
                                   >
-                                    <span className="text-[11px] sm:text-[13px] leading-tight text-center">
-                                      {formatHour(cityHour, use24h)}
-                                    </span>
-                                    {!use24h && (
-                                      <span className="text-[8px] sm:text-[9.5px] font-extrabold leading-tight -mt-0.5 uppercase opacity-80">
-                                        {formatHourAmPm(cityHour)}
-                                      </span>
+                                    {cityHour === 0 && (
+                                      <div
+                                        className="absolute left-0 top-0 bottom-0 w-[2px] pointer-events-none z-20"
+                                        style={{
+                                          backgroundColor: dayIndicationColor,
+                                        }}
+                                      />
                                     )}
-                                    <div className={cn("flex items-center justify-center", timelineMode !== "default" ? "h-3 mt-px" : "h-0 opacity-0 overflow-hidden")}>
-                                      {timelineMode === "tod" && (
-                                        <TimeOfDayIcon
-                                          tod={getTimeOfDay(city.timezone, now, cityHour)}
-                                          className={`h-2.5 w-2.5 ${isDimmed ? "opacity-30" : ""}`}
-                                        />
-                                      )}
-                                      {timelineMode === "friendly" && isFriendly && (
-                                        <MessageSquare className={`h-2.5 w-2.5 text-green-500 ${isDimmed ? "opacity-30" : ""}`} />
-                                      )}
-                                      {timelineMode === "working" && isWorking && (
-                                        <Briefcase className={`h-2.5 w-2.5 text-blue-500 ${isDimmed ? "opacity-30" : ""}`} />
-                                      )}
-                                    </div>
-                                  </div>
-                                  {isCurrent && (
                                     <div
-                                      className="absolute inset-x-0 top-0 bottom-0 rounded-sm pointer-events-none z-20"
-                                      style={{
-                                        borderLeft: `2px solid ${highlightColor}99`,
-                                        borderRight: `2px solid ${highlightColor}99`,
-                                      }}
-                                    />
-                                  )}
-                                </button>
-                              );
-                            })}
+                                      className={`absolute inset-0 flex flex-col items-center justify-center font-mono ${
+                                        inSelection
+                                          ? "font-semibold"
+                                          : isDimmed
+                                            ? "text-foreground/30"
+                                            : "text-foreground/70 group-hover/cell:text-foreground/90"
+                                      }`}
+                                      style={
+                                        inSelection
+                                          ? { color: highlightColor }
+                                          : undefined
+                                      }
+                                    >
+                                      <span className="text-[11px] sm:text-[13px] leading-tight text-center">
+                                        {formatHour(cityHour, use24h)}
+                                      </span>
+                                      {!use24h && (
+                                        <span className="text-[8px] sm:text-[9.5px] font-extrabold leading-tight -mt-0.5 uppercase opacity-80">
+                                          {formatHourAmPm(cityHour)}
+                                        </span>
+                                      )}
+                                      <div
+                                        className={cn(
+                                          "flex items-center justify-center",
+                                          timelineMode !== "default"
+                                            ? "h-3 mt-px"
+                                            : "h-0 opacity-0 overflow-hidden",
+                                        )}
+                                      >
+                                        {timelineMode === "tod" && (
+                                          <TimeOfDayIcon
+                                            tod={getTimeOfDay(
+                                              city.timezone,
+                                              now,
+                                              cityHour,
+                                            )}
+                                            className={`h-2.5 w-2.5 ${isDimmed ? "opacity-30" : ""}`}
+                                          />
+                                        )}
+                                        {timelineMode === "friendly" &&
+                                          isFriendly && (
+                                            <MessageSquare
+                                              className={`h-2.5 w-2.5 text-green-500 ${isDimmed ? "opacity-30" : ""}`}
+                                            />
+                                          )}
+                                        {timelineMode === "working" &&
+                                          isWorking && (
+                                            <Briefcase
+                                              className={`h-2.5 w-2.5 text-blue-500 ${isDimmed ? "opacity-30" : ""}`}
+                                            />
+                                          )}
+                                      </div>
+                                    </div>
+                                    {isCurrent && (
+                                      <div
+                                        className="absolute inset-x-0 top-0 bottom-0 rounded-sm pointer-events-none z-20"
+                                        style={{
+                                          borderLeft: `2px solid ${highlightColor}99`,
+                                          borderRight: `2px solid ${highlightColor}99`,
+                                        }}
+                                      />
+                                    )}
+                                  </button>
+                                );
+                              },
+                            )}
                           </div>
                         );
                       })}
@@ -995,7 +1054,9 @@ export function ScrollableTimeline({
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Sun className="h-3 w-3 text-dayicon" />
-                    <span className="text-[10px] text-muted-foreground">Day</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Day
+                    </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Sunset className="h-3 w-3 text-sunseticon" />
@@ -1140,7 +1201,8 @@ function SortableCityLabel({
       ref={(node) => {
         setNodeRef(node);
         if (node) {
-          (labelRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          (labelRef as React.MutableRefObject<HTMLDivElement | null>).current =
+            node;
         }
       }}
       style={style}
@@ -1151,7 +1213,7 @@ function SortableCityLabel({
     >
       {/* Swipe delete background */}
       {isMobileDevice && (
-        <motion.div 
+        <motion.div
           style={{ opacity: bgOpacity, clipPath }}
           className="absolute inset-0 bg-destructive flex items-center justify-end pr-6 text-destructive-foreground"
         >
@@ -1161,7 +1223,10 @@ function SortableCityLabel({
 
       <motion.div
         drag={isMobileDevice && !isDragging ? "x" : false}
-        dragConstraints={{ left: labelRef.current ? -labelRef.current.offsetWidth : -150, right: 0 }}
+        dragConstraints={{
+          left: labelRef.current ? -labelRef.current.offsetWidth : -150,
+          right: 0,
+        }}
         dragElastic={0.05}
         dragTransition={{ bounceStiffness: 600, bounceDampening: 30 }}
         style={{ x }}
@@ -1177,12 +1242,15 @@ function SortableCityLabel({
             removeCity(city.id);
           } else {
             // Snap back naturally
-            controls.start({ x: 0, transition: { type: "spring", stiffness: 500, damping: 40 } });
+            controls.start({
+              x: 0,
+              transition: { type: "spring", stiffness: 500, damping: 40 },
+            });
           }
         }}
         className={cn(
           "h-full w-full relative z-10 flex items-center px-1 sm:px-3",
-          getBgClass()
+          getBgClass(),
         )}
       >
         {/* Drag handle - minimized on mobile but with larger hit area */}
@@ -1192,23 +1260,23 @@ function SortableCityLabel({
           className="flex-shrink-0 cursor-grab active:cursor-grabbing p-2 -ml-1 sm:p-1 sm:mr-1 transition-opacity sm:opacity-0 sm:group-hover/label:opacity-100"
           style={{ touchAction: "none" }}
         >
-          <GripVertical 
-            className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5" 
+          <GripVertical
+            className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5"
             style={{ color: `${highlightColor}80` }}
           />
         </div>
 
-        <div className={cn(
-          "flex flex-col justify-center min-w-0 flex-1 px-1",
-          !isMobileDevice ? "pr-7 sm:pr-6" : "pr-1"
-        )}>
+        <div
+          className={cn(
+            "flex flex-col justify-center min-w-0 flex-1 px-1",
+            !isMobileDevice ? "pr-7 sm:pr-6" : "pr-1",
+          )}
+        >
           <div className="flex items-center gap-1 sm:gap-1.5 overflow-hidden">
             <span className="hidden sm:inline flex-shrink-0">
               <TimeOfDayIcon tod={tod} />
             </span>
-            <span
-              className="text-[9px] sm:text-xs font-medium truncate text-foreground"
-            >
+            <span className="text-[9px] sm:text-xs font-medium truncate text-foreground">
               <span className="inline sm:hidden">
                 {getCityCode(city.customName || city.name, city.airportCode)}
               </span>
@@ -1249,7 +1317,10 @@ function SortableCityLabel({
             className="flex-shrink-0 absolute right-0 opacity-0 group-hover/label:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-opacity"
             title="Remove city"
           >
-            <X className="h-3.5 w-3.5" style={{ color: `${highlightColor}80` }} />
+            <X
+              className="h-3.5 w-3.5"
+              style={{ color: `${highlightColor}80` }}
+            />
           </button>
         )}
       </motion.div>

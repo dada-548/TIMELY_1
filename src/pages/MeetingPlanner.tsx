@@ -15,12 +15,7 @@ import { DurationSelector } from "@/components/planner/DurationSelector";
 import { ScrollableTimeline } from "@/components/planner/ScrollableTimeline";
 import { ConversionPanel } from "@/components/planner/ConversionPanel";
 import { ShareMeetingPanel } from "@/components/planner/ShareMeetingPanel";
-import {
-  Clock,
-  Sun,
-  MessageSquare,
-  Briefcase,
-} from "lucide-react";
+import { Clock, Sun, MessageSquare, Briefcase } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -134,7 +129,7 @@ export default function MeetingPlanner() {
   return (
     <div className="min-h-screen bg-background w-full">
       <Header />
-      <main className="w-full max-w-[1000px] mx-auto pt-3 sm:pt-10 pb-6 space-y-4 px-6 md:px-10 lg:px-16 box-border">
+      <main className="w-full max-w-[1000px] mx-auto pt-4 sm:pt-10 pb-6 space-y-4 px-4 md:px-10 lg:px-16 box-border">
         {selectedCities.length === 0 ? (
           <div className="text-center py-16">
             <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
