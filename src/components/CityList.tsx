@@ -10,10 +10,12 @@ import {
   isDSTActive,
   observesDST,
   getTimezoneAbbreviation,
+  getTimezoneName,
 } from "@/utils/timezone";
 import { getCountryInfo } from "@/utils/country";
 import { useWorldClock } from "@/hooks/useWorldClock";
-import { useIsMobile, useIsMobileDevice } from "@/hooks/use-mobile";
+import { useIsMobile, useIsMobileDevice, useIsLandscape } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import {
   X,
   GripVertical,
@@ -61,6 +63,7 @@ function CityCard({
   const now = useClock();
   const isMobile = useIsMobile();
   const isMobileDevice = useIsMobileDevice();
+  const isLandscape = useIsLandscape();
   const {
     removeCity,
     updateCityName,
@@ -154,8 +157,19 @@ function CityCard({
       value={city}
       dragListener={false}
       dragControls={dragControls}
-      className="relative overflow-hidden group/card rounded-xl border border-border"
-      whileDrag={{ scale: 1.02, zIndex: 50 }}
+      className={cn(
+        "relative overflow-hidden group/card rounded-xl border border-border",
+        getBgClass()
+      )}
+      style={{ willChange: "transform", backfaceVisibility: "hidden" }}
+      whileDrag={{ 
+        scale: 1.02, 
+        zIndex: 100,
+        backgroundColor: theme === "dark" ? "rgba(30, 30, 30, 0.8)" : "rgba(255, 255, 255, 0.8)",
+        borderColor: `${highlightColor}80`,
+        boxShadow: "0 12px 30px rgba(0,0,0,0.15)",
+        opacity: 0.8,
+      }}
     >
       {/* Delete background for swipe */}
       {isMobileDevice && (
@@ -173,16 +187,15 @@ function CityCard({
           left: cardRef.current ? -cardRef.current.offsetWidth : -300,
           right: 0,
         }}
-        dragElastic={0.05}
+        dragElastic={0.2}
         dragTransition={{ bounceStiffness: 600, bounceDampening: 30 }}
-        style={{ x }}
+        style={{ x, touchAction: "pan-x" }}
         animate={controls}
         onDragStart={() => setIsSwiping(true)}
         onDragEnd={(_, info) => {
           setIsSwiping(false);
           const currentWidth = cardRef.current?.offsetWidth || 300;
           const threshold = -currentWidth / 2;
-
           // Trigger remove if swiped more than half width
           if (info.offset.x < threshold) {
             removeCity(city.id);
@@ -194,13 +207,20 @@ function CityCard({
             });
           }
         }}
-        className={`relative z-10 flex items-center gap-2 sm:gap-3 p-3 sm:p-4 ${getBgClass()} h-full w-full`}
+        className="relative z-10 flex items-center gap-2 sm:gap-3 p-3 sm:p-4 h-full w-full select-none"
       >
         <button
           type="button"
-          onPointerDown={(e) => dragControls.start(e)}
-          className="h-6 w-6 flex items-center justify-center opacity-0 group-hover/card:opacity-100 sm:flex hidden cursor-grab active:cursor-grabbing flex-shrink-0 transition-opacity"
-          style={{ touchAction: "none" }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            dragControls.start(e);
+          }}
+          onContextMenu={(e) => e.preventDefault()}
+          className={cn(
+            "h-6 w-6 flex items-center justify-center sm:flex hidden cursor-grab active:cursor-grabbing flex-shrink-0 transition-opacity",
+            isMobileDevice && isLandscape ? "opacity-100" : "opacity-0 group-hover/card:opacity-100"
+          )}
+          style={{ touchAction: "none", WebkitTapHighlightColor: "transparent" }}
           aria-label={`Reorder ${city.customName || city.name}`}
         >
           <GripVertical
@@ -210,9 +230,16 @@ function CityCard({
         </button>
         <button
           type="button"
-          onPointerDown={(e) => dragControls.start(e)}
-          className="h-5 w-5 flex items-center justify-center sm:hidden flex-shrink-0 cursor-grab active:cursor-grabbing"
-          style={{ touchAction: "none" }}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            dragControls.start(e);
+          }}
+          onContextMenu={(e) => e.preventDefault()}
+          className={cn(
+            "h-5 w-5 flex items-center justify-center sm:hidden flex-shrink-0 cursor-grab active:cursor-grabbing",
+            isMobileDevice && isLandscape ? "flex" : ""
+          )}
+          style={{ touchAction: "none", WebkitTapHighlightColor: "transparent" }}
           aria-label={`Reorder ${city.customName || city.name}`}
         >
           <GripVertical
@@ -225,7 +252,7 @@ function CityCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <div className="min-w-0 flex-1 relative group/name">
-                <div className="sm:flex sm:items-baseline sm:gap-2 sm:flex-nowrap">
+                <div className="sm:flex sm:items-baseline sm:gap-2 sm:flex-nowrap flex items-center gap-1.5">
                   {isEditingNames ? (
                     <input
                       ref={editInputRef}
@@ -241,13 +268,16 @@ function CityCard({
                   ) : (
                     <button
                       onClick={() => !isSwiping && setExpanded(!expanded)}
-                      className="text-left min-w-0 flex-1"
+                      className="text-left min-w-0 flex-1 flex items-center gap-1.5"
                     >
                       <span
                         className={`font-semibold truncate text-sm sm:text-base ${cardTextClass}`}
                       >
                         {city.customName || city.name}
                       </span>
+                      {city.isNotCurrent && (
+                        <div className="w-1.5 h-1.5 rounded-full bg-red-500 flex-shrink-0 shadow-[0_0_6px_rgba(239,68,68,0.4)]" title="Not currently used" />
+                      )}
                     </button>
                   )}
                 </div>
@@ -255,12 +285,15 @@ function CityCard({
             </div>
             {!isCompactView && (
               <div className="flex flex-col mt-0.5">
-                <span
-                  className={`text-[10px] sm:text-xs whitespace-nowrap ${cardMutedTextClass}`}
-                >
-                  <span className="hidden md:inline">{countryInfo.full}</span>
-                  <span className="md:hidden">{countryInfo.short}</span>
-                </span>
+                {!city.isTzOnly && (
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span
+                      className={`text-[10px] sm:text-xs whitespace-nowrap overflow-hidden text-ellipsis ${cardMutedTextClass}`}
+                    >
+                      {getTimezoneAbbreviation(city.timezone, now)}
+                    </span>
+                  </div>
+                )}
                 <button
                   onClick={() => !isSwiping && setExpanded(!expanded)}
                   className="flex items-center gap-2 mt-0.5 text-left w-full"
@@ -286,14 +319,16 @@ function CityCard({
           </div>
           <button
             onClick={() => !isSwiping && setExpanded(!expanded)}
-            className="flex items-center gap-2 sm:gap-3 flex-shrink-0"
+            className="flex items-center gap-2 sm:gap-3 flex-shrink-0 pr-2 sm:pr-0"
           >
-            <TimeOfDayIcon tod={tod} />
-            <span
-              className={`text-lg sm:text-2xl font-mono font-semibold tabular-nums ${cardTextClass}`}
-            >
-              {formatTime(city.timezone, now, use24h)}
-            </span>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <TimeOfDayIcon tod={tod} />
+              <span
+                className={`text-lg sm:text-2xl font-mono font-semibold tabular-nums ${cardTextClass}`}
+              >
+                {formatTime(city.timezone, now, use24h)}
+              </span>
+            </div>
           </button>
         </div>
 
@@ -316,35 +351,31 @@ function CityCard({
             transition={{ duration: 0.2 }}
             className="overflow-hidden bg-card/10 border-t border-border"
           >
-            <div className="p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm pl-8">
+            <div className="p-3 sm:p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-sm pl-8">
+              <div>
+                <span className={`text-xs ${cardMutedTextClass}`}>Country</span>
+                <p className={`font-medium truncate ${cardTextClass}`}>
+                  {city.isTzOnly ? "N/A" : countryInfo.full}
+                </p>
+              </div>
               {isCompactView && (
-                <>
-                  <div>
-                    <span className={`text-xs ${cardMutedTextClass}`}>
-                      Country
-                    </span>
-                    <p className={`font-medium truncate ${cardTextClass}`}>
-                      {countryInfo.full}
-                    </p>
-                  </div>
-                  <div>
-                    <span className={`text-xs ${cardMutedTextClass}`}>
-                      Relative Time
-                    </span>
-                    <p className={`font-medium ${cardTextClass}`}>
-                      {diff.timeDiff}
-                      {diff.dayOffset !== 0 && (
-                        <span className="ml-1 text-[#ef4444]">
-                          (
-                          {diff.dayOffset > 0
-                            ? `+${diff.dayOffset}D`
-                            : `${diff.dayOffset}D`}
-                          )
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                </>
+                <div>
+                  <span className={`text-xs ${cardMutedTextClass}`}>
+                    Relative Time
+                  </span>
+                  <p className={`font-medium ${cardTextClass}`}>
+                    {diff.timeDiff}
+                    {diff.dayOffset !== 0 && (
+                      <span className="ml-1 text-[#ef4444]">
+                        (
+                        {diff.dayOffset > 0
+                          ? `+${diff.dayOffset}D`
+                          : `${diff.dayOffset}D`}
+                        )
+                      </span>
+                    )}
+                  </p>
+                </div>
               )}
               <div>
                 <span className={`text-xs ${cardMutedTextClass}`}>Date</span>
@@ -358,14 +389,6 @@ function CityCard({
                 </span>
                 <p className={`font-medium ${cardTextClass}`}>
                   {getUTCOffset(city.timezone, now)}
-                </p>
-              </div>
-              <div>
-                <span className={`text-xs ${cardMutedTextClass}`}>
-                  Abbreviation
-                </span>
-                <p className={`font-medium ${cardTextClass}`}>
-                  {getTimezoneAbbreviation(city.timezone, now)}
                 </p>
               </div>
               <div>

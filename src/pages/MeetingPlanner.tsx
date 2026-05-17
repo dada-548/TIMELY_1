@@ -1,5 +1,5 @@
-import { useState, useMemo, useCallback } from "react";
-import { isSameDay, startOfDay } from "date-fns";
+import { useState, useMemo, useCallback, useEffect, useLayoutEffect } from "react";
+import { isSameDay, startOfDay, addDays } from "date-fns";
 import { useWorldClock } from "@/hooks/useWorldClock";
 import { useClock } from "@/hooks/useClock";
 import {
@@ -47,6 +47,10 @@ export default function MeetingPlanner() {
   } = useWorldClock();
   const now = useClock();
   const localTz = getLocalTimezone();
+  
+  useLayoutEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const [selectedMinute, setSelectedMinute] = useState(0);
 

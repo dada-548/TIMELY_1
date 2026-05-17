@@ -15,6 +15,8 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
   DragOverlay,
   defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
@@ -34,7 +36,7 @@ import {
 import { getCountryInfo } from "@/utils/country";
 import { getCityCode } from "@/utils/city";
 import { useWorldClock } from "@/hooks/useWorldClock";
-import { useIsMobile, useIsMobileDevice } from "@/hooks/use-mobile";
+import { useIsMobile, useIsMobileDevice, useIsLandscape } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import {
   GripVertical,
@@ -99,6 +101,7 @@ interface City {
   timezone: string;
   country: string;
   airportCode?: string;
+  isNotCurrent?: boolean;
 }
 
 interface ScrollableTimelineProps {
@@ -180,6 +183,158 @@ function formatHourFull(hour: number, use24h: boolean): string {
   return `${h12}:${mm} ${ampm}`;
 }
 
+function CityLabel({
+  city,
+  idx,
+  now,
+  fromCityIdx,
+  fromCity,
+  cityOffsets,
+  highlightColor,
+  dayIndicationColor,
+  removeCity,
+  getDiffLabel,
+  selectedHour,
+  selectedMinute,
+  isOverlay,
+  reorderCities,
+  activeId,
+  dragHandleProps,
+}: {
+  city: City;
+  idx: number;
+  now: Date;
+  fromCityIdx: number;
+  fromCity: City;
+  cityOffsets: number[];
+  highlightColor: string;
+  dayIndicationColor: string;
+  removeCity: (id: string) => void;
+  getDiffLabel: (offset: number) => string;
+  selectedHour: number;
+  selectedMinute: number;
+  isOverlay?: boolean;
+  reorderCities?: (cities: City[]) => void;
+  activeId?: string | null;
+  dragHandleProps?: React.HTMLAttributes<HTMLDivElement>;
+}) {
+  const tod = getTimeOfDay(city.timezone, now);
+  const abbrev = getTimezoneAbbreviation(city.timezone, now);
+  const offset = cityOffsets[idx] ?? 0;
+  const isBase = idx === fromCityIdx;
+  const { theme } = useWorldClock();
+  const isDark = theme === "dark";
+  const isMobileDevice = useIsMobileDevice();
+  const isLandscape = useIsLandscape();
+
+  const conv = convertTime(
+    fromCity.timezone,
+    [city.timezone],
+    selectedHour,
+    selectedMinute,
+    now,
+  );
+  const dayOff = isBase ? 0 : (conv[0]?.dayOffset ?? 0);
+  const countryInfo = getCountryInfo(city.country);
+
+  const bgStyle = isOverlay 
+    ? { 
+        backgroundColor: `${highlightColor}1a`,
+        borderColor: `${highlightColor}80`,
+        boxShadow: `0 8px 30px rgba(0,0,0,0.12)`,
+        zIndex: 100,
+      } 
+    : {};
+
+  const getBgClass = () => {
+    if (isOverlay) return "border shadow-2xl rounded-md backdrop-blur-sm";
+    const isNight = tod === "night";
+    const isDaylight = tod === "dawn" || tod === "day" || tod === "afternoon";
+    if (!isDark) {
+      if (isNight) return "bg-night/10";
+      return "bg-card";
+    } else {
+      if (isDaylight) return "bg-white/5";
+      return "bg-card";
+    }
+  };
+
+  return (
+    <div
+      className={cn(
+        "h-full w-full relative z-10 flex items-center px-1 sm:px-3 select-none",
+        getBgClass(),
+      )}
+      style={{ ...bgStyle, willChange: "transform", backfaceVisibility: "hidden" }}
+    >
+      <div
+        className={cn(
+          "flex-shrink-0 w-5 h-full flex items-center justify-center sm:-ml-3 transition-opacity cursor-grab active:cursor-grabbing touch-none",
+          isMobileDevice && isLandscape ? "opacity-100" : "opacity-100 sm:opacity-0 sm:group-hover/label:opacity-100"
+        )}
+        {...dragHandleProps}
+        onPointerDownCapture={(e) => e.stopPropagation()}
+        onContextMenu={(e) => e.preventDefault()}
+        style={{ WebkitTapHighlightColor: "transparent" }}
+      >
+        <GripVertical
+          className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5"
+          style={{ color: `${highlightColor}80` }}
+        />
+      </div>
+
+      <div className="flex flex-col justify-center min-w-0 flex-1 px-1 pr-1 sm:pr-2">
+        <div className="flex items-center gap-1 sm:gap-1.5 overflow-hidden">
+          <span className="text-[9px] sm:text-xs font-medium truncate text-foreground flex items-center gap-1 min-w-0">
+            <span className="inline sm:hidden truncate">
+              {getCityCode(city.customName || city.name, city.airportCode)}
+            </span>
+            <span className="hidden sm:inline truncate">
+              {city.customName || city.name}
+            </span>
+            {city.isNotCurrent && (
+              <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-red-500 flex-shrink-0 shadow-[0_0_4px_rgba(239,68,68,0.4)]" />
+            )}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 overflow-hidden font-mono text-[10px]">
+          {!city.isTzOnly && (
+            <span className="text-muted-foreground hidden sm:inline flex-shrink-0">
+              {abbrev}
+            </span>
+          )}
+          {!isBase && getDiffLabel(offset) && (
+            <span className="text-[8px] sm:text-[10px] text-muted-foreground flex-shrink-0">
+              {getDiffLabel(offset)}
+            </span>
+          )}
+          {dayOff !== 0 && (
+            <span
+              className="text-[8px] sm:text-[10px] font-semibold flex-shrink-0"
+              style={{ color: dayIndicationColor }}
+            >
+              {dayOff > 0 ? `+${dayOff}d` : `${dayOff}d`}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {!isOverlay && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            removeCity(city.id);
+          }}
+          className="flex-shrink-0 absolute right-0 opacity-0 sm:group-hover/label:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-opacity hidden sm:block"
+          title="Remove city"
+        >
+          <X className="h-3.5 w-3.5" style={{ color: `${highlightColor}80` }} />
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ScrollableTimeline({
   selectedCities,
   fromCityIdx,
@@ -217,26 +372,38 @@ export function ScrollableTimeline({
     reorderCities,
   } = useWorldClock();
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   // Reorder cities handler
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const oldIndex = selectedCities.findIndex((c) => c.id === active.id);
       const newIndex = selectedCities.findIndex((c) => c.id === over.id);
-      reorderCities(arrayMove(selectedCities, oldIndex, newIndex));
+      if (oldIndex !== -1 && newIndex !== -1) {
+        reorderCities(arrayMove(selectedCities, oldIndex, newIndex));
+      }
     }
+  };
+
+  const handleDragEnd = () => {
+    setActiveId(null);
   };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 5,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 150,
-        tolerance: 5,
+        delay: 70, // Rapid activation
+        tolerance: 10, // More forgiving movement before canceling
       },
     }),
   );
@@ -561,9 +728,11 @@ export function ScrollableTimeline({
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="w-full flex sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 mb-4 px-0.5 sm:px-0">
+        <div className="w-full flex sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-0 mb-4">
           <button
             onClick={() => setVisible((v) => !v)}
             className="flex flex-col items-start hover:text-foreground/80 transition-colors text-left"
@@ -576,7 +745,7 @@ export function ScrollableTimeline({
               <span>TIMELINE</span>
             </div>
             <span
-              className="text-xs sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg py-0.5 whitespace-nowrap"
+              className="text-xs sm:text-sm font-medium mt-1 sm:mt-1.5 rounded-lg py-0.5 whitespace-nowrap transition-all duration-300"
               style={{
                 fontFamily: "'Inter', sans-serif",
                 color: dateFlash ? highlightColor : undefined,
@@ -730,7 +899,7 @@ export function ScrollableTimeline({
           <>
             <div className="flex w-full min-w-0">
               {/* Fixed labels column - increased width on mobile */}
-              <div className="w-32 sm:w-44 flex-shrink-0 border-r border-border/50 bg-card/50">
+              <div className="w-[124px] sm:w-44 flex-shrink-0 border-r border-border/50 bg-card/50">
                 <div className="h-6" />
                 {/* City labels */}
                 <div className="space-y-0.5">
@@ -753,9 +922,37 @@ export function ScrollableTimeline({
                         getDiffLabel={getDiffLabel}
                         selectedHour={selectedHour}
                         selectedMinute={selectedMinute}
+                        activeId={activeId}
                       />
                     ))}
                   </SortableContext>
+                  <DragOverlay adjustScale={false} dropAnimation={null}>
+                    {activeId ? (
+                      <div 
+                        className="w-[124px] sm:w-44 h-[52px] opacity-80 scale-[1.02] transition-all duration-200"
+                        style={{ willChange: "transform", backfaceVisibility: "hidden" }}
+                      >
+                        <CityLabel
+                          city={
+                            selectedCities.find((c) => c.id === activeId) ||
+                            selectedCities[0]
+                          }
+                          idx={selectedCities.findIndex((c) => c.id === activeId)}
+                          now={now}
+                          fromCityIdx={fromCityIdx}
+                          fromCity={fromCity}
+                          cityOffsets={cityOffsets}
+                          highlightColor={highlightColor}
+                          dayIndicationColor={dayIndicationColor}
+                          removeCity={removeCity}
+                          getDiffLabel={getDiffLabel}
+                          selectedHour={selectedHour}
+                          selectedMinute={selectedMinute}
+                          isOverlay
+                        />
+                      </div>
+                    ) : null}
+                  </DragOverlay>
                 </div>
               </div>
 
@@ -898,7 +1095,7 @@ export function ScrollableTimeline({
                                   <button
                                     key={cellIdx}
                                     onClick={() => handleCellClick(cellIdx)}
-                                    className={`h-[44px] rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 overflow-hidden ${
+                                    className={`h-[52px] rounded-sm relative group/cell focus:outline-none focus-visible:outline-none hover:brightness-110 overflow-hidden ${
                                       cellIdx % 24 === 0 && cellIdx > 0
                                         ? "ml-0.5"
                                         : ""
@@ -1126,6 +1323,7 @@ interface SortableCityLabelProps {
   getDiffLabel: (offset: number) => string;
   selectedHour: number;
   selectedMinute: number;
+  activeId: string | null;
 }
 
 function SortableCityLabel({
@@ -1141,11 +1339,11 @@ function SortableCityLabel({
   getDiffLabel,
   selectedHour,
   selectedMinute,
+  activeId,
 }: SortableCityLabelProps) {
   const labelRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
   const isMobileDevice = useIsMobileDevice();
-  const { theme } = useWorldClock();
   const [isSwiping, setIsSwiping] = useState(false);
   const controls = useAnimation();
 
@@ -1163,56 +1361,25 @@ function SortableCityLabel({
   } = useSortable({ id: city.id });
 
   const style = {
-    transform: CSS.Transform.toString(transform),
+    transform: transform ? CSS.Translate.toString(transform) : undefined,
     transition,
-    zIndex: isDragging ? 50 : undefined,
-  };
-
-  const tod = getTimeOfDay(city.timezone, now);
-  const abbrev = getTimezoneAbbreviation(city.timezone, now);
-  const offset = cityOffsets[idx] ?? 0;
-  const isBase = idx === fromCityIdx;
-  const conv = convertTime(
-    fromCity.timezone,
-    [city.timezone],
-    selectedHour,
-    selectedMinute,
-    now,
-  );
-  const dayOff = isBase ? 0 : (conv[0]?.dayOffset ?? 0);
-  const countryInfo = getCountryInfo(city.country);
-
-  const isDark = theme === "dark";
-  const isNight = tod === "night";
-  const isDaylight = tod === "dawn" || tod === "day" || tod === "afternoon";
-
-  const getBgClass = () => {
-    if (!isDark) {
-      if (isNight) return "bg-night/10";
-      return "bg-card";
-    } else {
-      if (isDaylight) return "bg-white/5";
-      return "bg-card";
-    }
+    opacity: isDragging ? 0 : 1,
+    zIndex: isDragging ? 0 : 1,
+    willChange: "transform",
+    backfaceVisibility: "hidden" as const,
   };
 
   return (
     <div
-      ref={(node) => {
-        setNodeRef(node);
-        if (node) {
-          (labelRef as React.MutableRefObject<HTMLDivElement | null>).current =
-            node;
-        }
-      }}
+      ref={setNodeRef}
       style={style}
       className={cn(
-        "h-[44px] relative overflow-hidden group/label",
-        isDragging && "shadow-lg bg-accent/20 z-50 opacity-50",
+        "h-[52px] relative group/label",
+        isDragging && "z-0",
       )}
     >
       {/* Swipe delete background */}
-      {isMobileDevice && (
+      {(isMobile || isMobileDevice) && (
         <motion.div
           style={{ opacity: bgOpacity, clipPath }}
           className="absolute inset-0 bg-destructive flex items-center justify-end pr-6 text-destructive-foreground"
@@ -1222,14 +1389,14 @@ function SortableCityLabel({
       )}
 
       <motion.div
-        drag={isMobileDevice && !isDragging ? "x" : false}
+        drag={(isMobile || isMobileDevice) && !isDragging && !activeId ? "x" : false}
         dragConstraints={{
-          left: labelRef.current ? -labelRef.current.offsetWidth : -150,
+          left: -150,
           right: 0,
         }}
-        dragElastic={0.05}
+        dragElastic={0.2}
         dragTransition={{ bounceStiffness: 600, bounceDampening: 30 }}
-        style={{ x }}
+        style={{ x, touchAction: isDragging ? "none" : "pan-x" }}
         animate={controls}
         onDragStart={() => setIsSwiping(true)}
         onDragEnd={(_, info) => {
@@ -1237,92 +1404,35 @@ function SortableCityLabel({
           const currentWidth = labelRef.current?.offsetWidth || 150;
           const threshold = -currentWidth / 2;
 
-          // Trigger remove if swiped more than half width
           if (info.offset.x < threshold) {
             removeCity(city.id);
           } else {
-            // Snap back naturally
             controls.start({
               x: 0,
               transition: { type: "spring", stiffness: 500, damping: 40 },
             });
           }
         }}
-        className={cn(
-          "h-full w-full relative z-10 flex items-center px-1 sm:px-3",
-          getBgClass(),
-        )}
+        className="h-full w-full select-none"
       >
-        {/* Drag handle - minimized on mobile but with larger hit area */}
-        <div
-          {...attributes}
-          {...listeners}
-          className="flex-shrink-0 cursor-grab active:cursor-grabbing p-2 -ml-1 sm:p-1 sm:mr-1 transition-opacity sm:opacity-0 sm:group-hover/label:opacity-100"
-          style={{ touchAction: "none" }}
-        >
-          <GripVertical
-            className="h-3.5 w-3.5 sm:h-3.5 sm:w-3.5"
-            style={{ color: `${highlightColor}80` }}
+        <div ref={labelRef} className="h-full w-full">
+          <CityLabel
+            city={city}
+            idx={idx}
+            now={now}
+            fromCityIdx={fromCityIdx}
+            fromCity={fromCity}
+            cityOffsets={cityOffsets}
+            highlightColor={highlightColor}
+            dayIndicationColor={dayIndicationColor}
+            removeCity={removeCity}
+            getDiffLabel={getDiffLabel}
+            selectedHour={selectedHour}
+            selectedMinute={selectedMinute}
+            activeId={activeId}
+            dragHandleProps={{ ...attributes, ...listeners }}
           />
         </div>
-
-        <div
-          className={cn(
-            "flex flex-col justify-center min-w-0 flex-1 px-1",
-            !isMobileDevice ? "pr-7 sm:pr-6" : "pr-1",
-          )}
-        >
-          <div className="flex items-center gap-1 sm:gap-1.5 overflow-hidden">
-            <span className="hidden sm:inline flex-shrink-0">
-              <TimeOfDayIcon tod={tod} />
-            </span>
-            <span className="text-[9px] sm:text-xs font-medium truncate text-foreground">
-              <span className="inline sm:hidden">
-                {getCityCode(city.customName || city.name, city.airportCode)}
-              </span>
-              <span className="hidden sm:inline">
-                {city.customName || city.name}
-              </span>
-            </span>
-          </div>
-          <div className="flex items-center gap-1 sm:gap-1.5 sm:ml-[18px] overflow-hidden">
-            <span className="text-[7px] text-muted-foreground truncate sm:hidden">
-              {countryInfo.short}
-            </span>
-            <span className="text-[10px] text-muted-foreground font-mono hidden sm:inline flex-shrink-0">
-              {abbrev}
-            </span>
-            {!isBase && getDiffLabel(offset) && (
-              <span className="text-[8px] sm:text-[10px] text-muted-foreground flex-shrink-0">
-                {getDiffLabel(offset)}
-              </span>
-            )}
-            {dayOff !== 0 && (
-              <span
-                className="text-[8px] sm:text-[10px] font-semibold flex-shrink-0"
-                style={{ color: dayIndicationColor }}
-              >
-                {dayOff > 0 ? `+${dayOff}d` : `${dayOff}d`}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {!isMobileDevice && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              removeCity(city.id);
-            }}
-            className="flex-shrink-0 absolute right-0 opacity-0 group-hover/label:opacity-100 p-2 text-muted-foreground hover:text-destructive transition-opacity"
-            title="Remove city"
-          >
-            <X
-              className="h-3.5 w-3.5"
-              style={{ color: `${highlightColor}80` }}
-            />
-          </button>
-        )}
       </motion.div>
     </div>
   );

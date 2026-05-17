@@ -153,7 +153,7 @@ export function CitySearch() {
           >
             {results.length > 0 ? (
               results.map((city) => {
-                const isTz = city.id.startsWith('tz-');
+                const isTz = city.isTzOnly || city.id.startsWith('tz-');
                 return (
                   <button
                     key={city.id}
@@ -161,7 +161,7 @@ export function CitySearch() {
                     className="flex w-full items-center justify-between px-4 py-2.5 text-sm hover:bg-secondary text-left group"
                   >
                     {(() => {
-                      const countryInfo = getCountryInfo(city.country);
+                      const countryInfo = !isTz ? getCountryInfo(city.country) : null;
                       return (
                         <div className="flex items-center gap-3">
                           <div className="p-1.5 rounded-md bg-muted group-hover:bg-background transition-colors">
@@ -171,25 +171,28 @@ export function CitySearch() {
                               <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
                             )}
                           </div>
-                          <div>
-                            <div className="font-medium text-foreground">
-                              {city.name}
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-foreground flex items-center gap-2 truncate">
+                              {isTz ? `${city.name}${city.fullName ? `, ${city.fullName}` : ''}` : city.name}
+                              {city.isNotCurrent && (
+                                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-red-500/10 text-red-500 font-bold border border-red-500/20">
+                                  NOT CURRENTLY USED
+                                </span>
+                              )}
                             </div>
                             <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-                              <span>
-                                <span className="hidden sm:inline">{countryInfo.full}</span>
-                                <span className="sm:hidden inline">{countryInfo.short}</span>
-                              </span>
+                              {isTz ? (
+                                <span className="truncate">Time zone</span>
+                              ) : (
+                                <span>
+                                  <span className="hidden sm:inline">{countryInfo?.full}</span>
+                                  <span className="sm:hidden inline">{countryInfo?.short}</span>
+                                </span>
+                              )}
                               {city.airportCode && (
                                 <>
                                   <span className="w-1 h-1 rounded-full bg-border" />
                                   <span className="font-mono uppercase">{city.airportCode}</span>
-                                </>
-                              )}
-                              {isTz && (
-                                <>
-                                  <span className="w-1 h-1 rounded-full bg-border" />
-                                  <span className="text-[9px] font-mono opacity-70">{city.timezone}</span>
                                 </>
                               )}
                             </div>

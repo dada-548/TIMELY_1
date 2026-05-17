@@ -17,11 +17,12 @@ import {
 export function WorldMapSection() {
   const [visible, setVisible] = useState(true);
   const [showAllCities, setShowAllCities] = useState(false);
+  const [showNightShade, setShowNightShade] = useState(true);
   const now = useClock();
   const { selectedCities, highlightColor, use24h } = useWorldClock();
   const [hoveredCity, setHoveredCity] = useState<City | null>(null);
   const [hoveredTimezone, setHoveredTimezone] = useState<number | null>(null);
-  const [showNightShade, setShowNightShade] = useState(true);
+  const filteredSelectedCities = selectedCities.filter(c => !c.isTzOnly);
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden pt-4 px-4 pb-5 sm:p-6">
@@ -128,8 +129,8 @@ export function WorldMapSection() {
           <div className="relative rounded-lg overflow-hidden border border-border mt-2">
             <WorldMapSVG
               now={now}
-              selectedCities={selectedCities}
-              allCities={showAllCities ? CITIES : []}
+              selectedCities={filteredSelectedCities}
+              allCities={showAllCities ? CITIES.filter(c => !c.isTzOnly) : []}
               hoveredCity={hoveredCity}
               onHoverCity={setHoveredCity}
               highlightColor={highlightColor}
@@ -140,9 +141,9 @@ export function WorldMapSection() {
           </div>
 
           {/* City status bar */}
-          {selectedCities.length > 0 && (
+          {filteredSelectedCities.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2 max-h-[120px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-border">
-              {selectedCities.map((city) => {
+              {filteredSelectedCities.map((city) => {
                 const tod = getTimeOfDay(city.timezone, now);
                 const TodIcon =
                   tod === "day"
@@ -172,6 +173,7 @@ export function WorldMapSection() {
                   <button
                     key={city.id}
                     className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-border bg-background text-xs hover:bg-secondary transition-colors"
+                    style={{ willChange: "transform", backfaceVisibility: "hidden" }}
                     onMouseEnter={() => setHoveredCity(city)}
                     onMouseLeave={() => setHoveredCity(null)}
                   >

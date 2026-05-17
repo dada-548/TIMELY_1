@@ -31,3 +31,19 @@ export function useIsMobileDevice() {
 
   return isMobile;
 }
+
+export function useIsLandscape() {
+  const [isLandscape, setIsLandscape] = React.useState(
+    typeof window !== "undefined" ? window.innerWidth > window.innerHeight : false
+  );
+
+  React.useEffect(() => {
+    const onChange = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+    };
+    window.addEventListener("resize", onChange);
+    return () => window.removeEventListener("resize", onChange);
+  }, []);
+
+  return isLandscape;
+}

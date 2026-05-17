@@ -1,24 +1,58 @@
 import { CITIES } from "@/data/cities";
+import { getOffsetMinutes, isDSTActive, sanitizeTimezone } from "./timezone_base";
 
 export function getTimeInTimezone(
   timezone: string,
   date: Date = new Date(),
 ): Date {
-  const str = date.toLocaleString("en-US", { timeZone: timezone });
-  return new Date(str);
+  if (timezone && timezone.startsWith("FIXED:")) {
+    const offset = getOffsetMinutes(timezone, date);
+    // Convert current local date to its UTC timestamp, then add offset
+    const utcTimestamp = date.getTime();
+    // We create a Date that represents the absolute time in that zone
+    // But since the rest of the app expects a Date object that "looks" like the local time in that zone
+    // when formatted as UTC, we'll do that.
+    return new Date(utcTimestamp + offset * 60000);
+  }
+
+  const sanitizedTz = sanitizeTimezone(timezone);
+  try {
+    const str = date.toLocaleString("en-US", { timeZone: sanitizedTz });
+    return new Date(str);
+  } catch (e) {
+    console.error(`Error in getTimeInTimezone: ${timezone}`, e);
+    return date;
+  }
 }
 
 export function getUTCOffset(
   timezone: string,
   date: Date = new Date(),
 ): string {
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    timeZoneName: "shortOffset",
-  });
-  const parts = formatter.formatToParts(date);
-  const tzPart = parts.find((p) => p.type === "timeZoneName");
-  return tzPart?.value?.replace("GMT", "UTC") || "UTC";
+  if (timezone && timezone.startsWith("FIXED:")) {
+    const offset = getOffsetMinutes(timezone, date);
+    const absOffset = Math.abs(offset);
+    const hours = Math.floor(absOffset / 60);
+    const mins = absOffset % 60;
+    const sign = offset >= 0 ? "+" : "-";
+    const hoursStr = hours.toString();
+    const minsStr = mins > 0 ? `:${mins.toString().padStart(2, "0")}` : "";
+    return `UTC${sign}${hoursStr}${minsStr}`;
+  }
+
+  const sanitizedTz = sanitizeTimezone(timezone);
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: sanitizedTz,
+      timeZoneName: "shortOffset",
+    });
+    const parts = formatter.formatToParts(date);
+    const tzPart = parts.find((p) => p.type === "timeZoneName");
+    return tzPart?.value?.replace("GMT", "UTC") || "UTC";
+  } catch (e) {
+    console.error(`Error in getUTCOffset: ${timezone}`, e);
+    return "UTC";
+  }
 }
 
 // Mapping for timezones where Intl returns unhelpful "GMT+X" format
@@ -123,63 +157,102 @@ export function getTimezoneAbbreviation(
   timezone: string,
   date: Date = new Date(),
 ): string {
-  const seasonal = SEASONAL_TZ_MAP[timezone];
+  if (timezone && timezone.startsWith("FIXED:")) {
+    const parts = timezone.split(":");
+    if (parts.length >= 3 && parts[2]) return parts[2];
+  }
+
+  const sanitizedTz = sanitizeTimezone(timezone);
+  const seasonal = SEASONAL_TZ_MAP[sanitizedTz];
   if (seasonal) {
-    return isDSTActive(timezone, date) ? seasonal.daylight : seasonal.standard;
+    return isDSTActive(sanitizedTz, date) ? seasonal.daylight : seasonal.standard;
   }
 
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    timeZoneName: "short",
-  });
-  const parts = formatter.formatToParts(date);
-  const intlAbbrev = parts.find((p) => p.type === "timeZoneName")?.value || "";
-  // If Intl returns a proper abbreviation (not GMT+X format), use it
-  if (
-    intlAbbrev &&
-    !intlAbbrev.startsWith("GMT+") &&
-    !intlAbbrev.startsWith("GMT-")
-  ) {
-    return intlAbbrev;
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: sanitizedTz,
+      timeZoneName: "short",
+    });
+    const parts = formatter.formatToParts(date);
+    const intlAbbrev = parts.find((p) => p.type === "timeZoneName")?.value || "";
+    // If Intl returns a proper abbreviation (not GMT+X format), use it
+    if (
+      intlAbbrev &&
+      !intlAbbrev.startsWith("GMT+") &&
+      !intlAbbrev.startsWith("GMT-")
+    ) {
+      return intlAbbrev;
+    }
+    // Fall back to our curated map
+    return TZ_ABBREV_MAP[sanitizedTz] || intlAbbrev;
+  } catch (e) {
+    console.error(`Error in getTimezoneAbbreviation: ${timezone}`, e);
+    return "";
   }
-  // Fall back to our curated map
-  return TZ_ABBREV_MAP[timezone] || intlAbbrev;
 }
 
-export function getOffsetMinutes(
-  timezone: string,
-  date: Date = new Date(),
-): number {
-  const utcDate = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
-  const tzDate = new Date(date.toLocaleString("en-US", { timeZone: timezone }));
-  return (tzDate.getTime() - utcDate.getTime()) / 60000;
-}
+export { getOffsetMinutes };
 
 export function formatTime(
   timezone: string,
   date: Date = new Date(),
   use24h: boolean = false,
 ): string {
-  return date.toLocaleTimeString("en-US", {
-    timeZone: timezone,
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: !use24h,
-  });
+  if (timezone && timezone.startsWith("FIXED:")) {
+    const offset = getOffsetMinutes(timezone, date);
+    const utcDate = new Date(date.getTime() + offset * 60000);
+    return utcDate.toLocaleTimeString("en-US", {
+      timeZone: "UTC",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: !use24h,
+    });
+  }
+
+  const sanitizedTz = sanitizeTimezone(timezone);
+  try {
+    return date.toLocaleTimeString("en-US", {
+      timeZone: sanitizedTz,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: !use24h,
+    });
+  } catch (e) {
+    console.error(`Error in formatTime: ${timezone}`, e);
+    return date.toLocaleTimeString();
+  }
 }
 
 export function formatDate(
-  timezone: string, 
+  timezone: string,
   date: Date = new Date(),
   includeYear: boolean = false
 ): string {
-  return date.toLocaleDateString("en-US", {
-    timeZone: timezone,
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-    year: includeYear ? "numeric" : undefined,
-  });
+  if (timezone && timezone.startsWith("FIXED:")) {
+    const offset = getOffsetMinutes(timezone, date);
+    const utcDate = new Date(date.getTime() + offset * 60000);
+    return utcDate.toLocaleDateString("en-US", {
+      timeZone: "UTC",
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: includeYear ? "numeric" : undefined,
+    });
+  }
+
+  const sanitizedTz = sanitizeTimezone(timezone);
+  try {
+    return date.toLocaleDateString("en-US", {
+      timeZone: sanitizedTz,
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: includeYear ? "numeric" : undefined,
+    });
+  } catch (e) {
+    console.error(`Error in formatDate: ${timezone}`, e);
+    return date.toLocaleDateString();
+  }
 }
 
 export function isDaytime(timezone: string, date: Date = new Date()): boolean {
@@ -226,50 +299,58 @@ export function getDiffFromLocal(
   timezone: string,
   date: Date = new Date(),
 ): TimeDiff {
-  const localOffset = -date.getTimezoneOffset();
-  const tzOffset = getOffsetMinutes(timezone, date);
-  const diffHours = (tzOffset - localOffset) / 60;
+  const sanitizedTz = sanitizeTimezone(timezone);
+  const localTz = getLocalTimezone();
 
-  // Calculate day offset
-  const localDateStr = date.toLocaleDateString("en-US", {
-    timeZone: getLocalTimezone(),
-  });
-  const targetDateStr = date.toLocaleDateString("en-US", { timeZone: timezone });
+  try {
+    const localOffset = -date.getTimezoneOffset();
+    const tzOffset = getOffsetMinutes(timezone, date);
+    const diffHours = (tzOffset - localOffset) / 60;
 
-  const localDate = new Date(localDateStr);
-  const targetDate = new Date(targetDateStr);
+    // Calculate day offset
+    const localDateStr = date.toLocaleDateString("en-US", {
+      timeZone: localTz,
+    });
+    
+    let targetDateStr: string;
+    if (timezone && timezone.startsWith("FIXED:")) {
+      const utcDate = new Date(date.getTime() + tzOffset * 60000);
+      targetDateStr = utcDate.toLocaleDateString("en-US", {
+        timeZone: "UTC",
+      });
+    } else {
+      targetDateStr = date.toLocaleDateString("en-US", {
+        timeZone: sanitizedTz,
+      });
+    }
 
-  const diffTime = targetDate.getTime() - localDate.getTime();
-  const dayOffset = Math.round(diffTime / (1000 * 60 * 60 * 24));
+    const localDate = new Date(localDateStr);
+    const targetDate = new Date(targetDateStr);
 
-  if (diffHours === 0) return { timeDiff: "Current time", dayOffset };
-  const sign = diffHours > 0 ? "+" : "";
-  const abs = Math.abs(diffHours);
+    const diffTime = targetDate.getTime() - localDate.getTime();
+    const dayOffset = Math.round(diffTime / (1000 * 60 * 60 * 24));
 
-  let timeDiffStr = "";
-  if (abs % 1 === 0) {
-    timeDiffStr = `${sign}${diffHours}h`;
-  } else {
-    timeDiffStr = `${sign}${Math.floor(diffHours)}h ${Math.round(
-      (abs % 1) * 60,
-    )}m`;
+    if (Math.abs(diffHours) < 0.01) return { timeDiff: "My time", dayOffset };
+    const sign = diffHours > 0 ? "+" : "";
+    const abs = Math.abs(diffHours);
+
+    let timeDiffStr = "";
+    if (abs % 1 === 0) {
+      timeDiffStr = `${sign}${diffHours}h`;
+    } else {
+      timeDiffStr = `${sign}${Math.floor(diffHours)}h ${Math.round(
+        (abs % 1) * 60,
+      )}m`;
+    }
+
+    return { timeDiff: timeDiffStr, dayOffset };
+  } catch (e) {
+    console.error(`Error in getDiffFromLocal for ${timezone}:`, e);
+    return { timeDiff: "0h", dayOffset: 0 };
   }
-
-  return { timeDiff: timeDiffStr, dayOffset };
 }
 
-export function isDSTActive(
-  timezone: string,
-  date: Date = new Date(),
-): boolean {
-  const jan = new Date(date.getFullYear(), 0, 1);
-  const jul = new Date(date.getFullYear(), 6, 1);
-  const janOffset = getOffsetMinutes(timezone, jan);
-  const julOffset = getOffsetMinutes(timezone, jul);
-  if (janOffset === julOffset) return false;
-  const currentOffset = getOffsetMinutes(timezone, date);
-  return currentOffset === Math.max(janOffset, julOffset);
-}
+export { isDSTActive };
 
 export function observesDST(timezone: string): boolean {
   const jan = new Date(new Date().getFullYear(), 0, 1);
@@ -278,7 +359,31 @@ export function observesDST(timezone: string): boolean {
 }
 
 export function getLocalTimezone(): string {
-  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return sanitizeTimezone(tz);
+  } catch (e) {
+    console.error("Error getting local timezone", e);
+    return "UTC";
+  }
+}
+
+export function getTimezoneName(
+  timezone: string,
+  date: Date = new Date(),
+): string {
+  const sanitizedTz = sanitizeTimezone(timezone);
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: sanitizedTz,
+      timeZoneName: "long",
+    });
+    const parts = formatter.formatToParts(date);
+    return parts.find((p) => p.type === "timeZoneName")?.value || sanitizedTz;
+  } catch (e) {
+    console.error(`Error in getTimezoneName: ${timezone}`, e);
+    return sanitizedTz;
+  }
 }
 
 export function getLocalCityName(): {
@@ -286,20 +391,29 @@ export function getLocalCityName(): {
   otherCities: string[];
 } {
   const tz = getLocalTimezone();
-  const formatter = new Intl.DateTimeFormat("en-US", {
-    timeZone: tz,
-    timeZoneName: "long",
-  });
-  const parts = formatter.formatToParts(new Date());
-  const tzName = parts.find((p) => p.type === "timeZoneName")?.value || "";
+  try {
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      timeZoneName: "long",
+    });
+    const parts = formatter.formatToParts(new Date());
+    const tzName = parts.find((p) => p.type === "timeZoneName")?.value || "";
 
-  const matchingCities = CITIES.filter((c) => c.timezone === tz);
-  const cityNames = matchingCities.map((c) => c.name);
+    const matchingCities = CITIES.filter((c) => c.timezone === tz);
+    const cityNames = matchingCities.map((c) => c.name);
 
-  return {
-    timezoneName: tzName || tz.split("/").pop()?.replace(/_/g, " ") || "",
-    otherCities: cityNames,
-  };
+    return {
+      timezoneName: tzName || tz.split("/").pop()?.replace(/_/g, " ") || "",
+      otherCities: cityNames,
+    };
+  } catch (e) {
+    console.error(`Error in getLocalCityName: ${tz}`, e);
+    const matchingCities = CITIES.filter((c) => c.timezone === tz);
+    return {
+      timezoneName: tz.split("/").pop()?.replace(/_/g, " ") || "Local Time",
+      otherCities: matchingCities.map((c) => c.name),
+    };
+  }
 }
 
 export function findOverlappingWorkingHours(

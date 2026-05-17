@@ -35,6 +35,8 @@ interface WorldClockState {
   setDuration: (duration: number) => void;
   fromCityIdx: number;
   setFromCityIdx: (idx: number) => void;
+  timeBarMode: 'strip' | 'grid';
+  setTimeBarMode: (mode: 'strip' | 'grid') => void;
 }
 
 const WorldClockContext = createContext<WorldClockState | null>(null);
@@ -67,15 +69,15 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
   });
 
   const [highlightColor, setHighlightColorState] = useState<string>(() => {
-    return localStorage.getItem('worldclock-highlight') || '#3b82f6';
+    return localStorage.getItem('worldclock-highlight') || '#f97316';
   });
 
   const [timelineHighlightColor, setTimelineHighlightColorState] = useState<string>(() => {
-    return localStorage.getItem('worldclock-timeline-highlight') || '#10b981';
+    return localStorage.getItem('worldclock-timeline-highlight') || '#8b5cf6';
   });
 
   const [dayIndicationColor, setDayIndicationColorState] = useState<string>(() => {
-    return localStorage.getItem('worldclock-day-indication') || '#cf8b17';
+    return localStorage.getItem('worldclock-day-indication') || '#22c55e';
   });
 
   const [use24h, setUse24hState] = useState<boolean>(() => {
@@ -93,10 +95,38 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
   });
   const [selectedHour, setSelectedHour] = useState(() => new Date().getHours());
   const [duration, setDuration] = useState(1);
-  const [fromCityIdx, setFromCityIdx] = useState(0);
+  const [fromCityIdx, setFromCityIdxState] = useState(0);
+  const [timeBarMode, setTimeBarModeState] = useState<'strip' | 'grid'>(() => {
+    return (localStorage.getItem('worldclock-timebar-mode') as 'strip' | 'grid') || 'strip';
+  });
   const [isEditingNames, setIsEditingNames] = useState(false);
-  const [isCompactView, setIsCompactView] = useState(false);
+  const [isCompactView, setIsCompactViewState] = useState<boolean>(() => {
+    return localStorage.getItem('worldclock-compact') === 'true';
+  });
   const [showSearchBox, setShowSearchBox] = useState(true);
+
+  const setIsCompactView = useCallback((val: boolean) => {
+    setIsCompactViewState(val);
+    localStorage.setItem('worldclock-compact', String(val));
+  }, []);
+
+  const setFromCityIdx = useCallback((idx: number) => {
+    setFromCityIdxState(idx);
+  }, []);
+
+  const setTimeBarMode = useCallback((mode: 'strip' | 'grid') => {
+    const update = () => {
+      setTimeBarModeState(mode);
+      localStorage.setItem('worldclock-timebar-mode', mode);
+    };
+    // @ts-expect-error - startViewTransition is not in the standard Document type yet
+    if (!document.startViewTransition) {
+      update();
+    } else {
+      // @ts-expect-error - startViewTransition is not in the standard Document type yet
+      document.startViewTransition(update);
+    }
+  }, []);
 
   const setUse24h = useCallback((val: boolean) => {
     setUse24hState(val);
@@ -231,7 +261,8 @@ export function WorldClockProvider({ children }: { children: React.ReactNode }) 
       selectedDate, setSelectedDate,
       selectedHour, setSelectedHour,
       duration, setDuration,
-      fromCityIdx, setFromCityIdx
+      fromCityIdx, setFromCityIdx,
+      timeBarMode, setTimeBarMode
     }}>
       {children}
     </WorldClockContext.Provider>

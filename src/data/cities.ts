@@ -1,3 +1,6 @@
+import { getOffsetMinutes, isDSTActive } from "@/utils/timezone_base";
+import { COMMON_TIMEZONES } from "./timezones";
+
 export interface City {
   id: string;
   name: string;
@@ -8,6 +11,9 @@ export interface City {
   lat?: number;
   lng?: number;
   airportCode?: string;
+  isTzOnly?: boolean;
+  isNotCurrent?: boolean;
+  fullName?: string;
 }
 
 export const CITIES: City[] = [
@@ -531,7 +537,60 @@ export const CITIES: City[] = [
 
 export function searchCities(query: string): City[] {
   const q = query.toLowerCase();
-  const results = CITIES.filter(
+  
+  // 1. Search Timezones specifically
+  const tzResults: City[] = [];
+  const now = new Date();
+
+  COMMON_TIMEZONES.forEach(tz => {
+    const nameMatch = tz.name.toLowerCase().includes(q);
+    const stdNameMatch = tz.standardName?.toLowerCase().includes(q);
+    const dlNameMatch = tz.daylightName?.toLowerCase().includes(q);
+    const standardMatch = tz.standard.toLowerCase() === q;
+    const daylightMatch = tz.daylight.toLowerCase() === q;
+    const standardPartialMatch = tz.standard.toLowerCase().includes(q);
+    const daylightPartialMatch = tz.daylight.toLowerCase().includes(q);
+
+    if (nameMatch || stdNameMatch || dlNameMatch || standardMatch || daylightMatch || (q.length >= 2 && (standardPartialMatch || daylightPartialMatch))) {
+      const activeIsDaylight = isDSTActive(tz.iana, now);
+      
+      const jan = new Date(now.getFullYear(), 0, 1);
+      const jul = new Date(now.getFullYear(), 6, 1);
+      const off1 = getOffsetMinutes(tz.iana, jan);
+      const off2 = getOffsetMinutes(tz.iana, jul);
+      
+      const stdOffset = Math.min(off1, off2);
+      const dlOffset = Math.max(off1, off2);
+
+      // Push Standard
+      tzResults.push({
+        id: `tz-std-${tz.standard}-${tz.iana}`,
+        name: tz.standard,
+        fullName: tz.standardName || tz.name,
+        timezone: `FIXED:${stdOffset}:${tz.standard}:${tz.iana}`,
+        country: '',
+        coordinates: [0, 0],
+        isTzOnly: true,
+        isNotCurrent: activeIsDaylight
+      });
+
+      // Push Daylight (if different)
+      if (tz.standard !== tz.daylight) {
+        tzResults.push({
+          id: `tz-dl-${tz.daylight}-${tz.iana}`,
+          name: tz.daylight,
+          fullName: tz.daylightName || tz.name,
+          timezone: `FIXED:${dlOffset}:${tz.daylight}:${tz.iana}`,
+          country: '',
+          coordinates: [0, 0],
+          isTzOnly: true,
+          isNotCurrent: !activeIsDaylight
+        });
+      }
+    }
+  });
+
+  const cityResults = CITIES.filter(
     (c) =>
       c.name.toLowerCase().includes(q) ||
       c.country.toLowerCase().includes(q) ||
@@ -539,11 +598,21 @@ export function searchCities(query: string): City[] {
       (c.airportCode && c.airportCode.toLowerCase().includes(q))
   );
 
+  const results = [...tzResults, ...cityResults];
+
   // Sort results by relevance
   results.sort((a, b) => {
     const aName = a.name.toLowerCase();
     const bName = b.name.toLowerCase();
     
+    // Timezone matches often have high priority if they are exact
+    if (a.isTzOnly) {
+      if (aName === q || (a.fullName && a.fullName.toLowerCase() === q)) return -1;
+    }
+    if (b.isTzOnly) {
+      if (bName === q || (b.fullName && b.fullName.toLowerCase() === q)) return 1;
+    }
+
     // Exact name matches first
     if (aName === q && bName !== q) return -1;
     if (bName === q && aName !== q) return 1;
@@ -561,25 +630,34 @@ export function searchCities(query: string): City[] {
     return 0;
   });
 
+  // Unique by name for timezones
+  const seen = new Set();
+  const uniqueResults = results.filter(city => {
+    const key = city.isTzOnly ? `tz-${city.name}-${city.timezone}` : city.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
   // If no direct city match, or if query is long enough, also search IANA timezones
-  if (query.length >= 3) {
+  if (uniqueResults.length < 5 && query.length >= 3) {
     const allTimezones = Intl.supportedValuesOf('timeZone');
     const matchingTzs = allTimezones.filter(tz => tz.toLowerCase().includes(q));
     
     matchingTzs.forEach(tz => {
-      // Avoid duplicates if a city already has this timezone and is in results
-      if (!results.some(r => r.timezone === tz)) {
+      if (!uniqueResults.some(r => r.timezone === tz)) {
         const name = tz.split('/').pop()?.replace(/_/g, ' ') || tz;
-        results.push({
-          id: `tz-${tz}`,
+        uniqueResults.push({
+          id: `tz-iana-${tz}`,
           name: name,
           timezone: tz,
-          country: tz.split('/')[0],
-          coordinates: [0, 0], // Placeholder
+          country: '',
+          coordinates: [0, 0],
+          isTzOnly: true
         });
       }
     });
   }
 
-  return results;
+  return uniqueResults;
 }
